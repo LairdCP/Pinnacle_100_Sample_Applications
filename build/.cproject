@@ -1,0 +1,1462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?fileVersion 4.0.0?>
+<cproject>
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="org.eclipse.cdt.core.default.config.1">
+			<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="org.eclipse.cdt.core.default.config.1" moduleId="org.eclipse.cdt.core.settings" name="Configuration">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser">
+						<attribute key="addr2line" value="addr2line"/>
+						<attribute key="c++filt" value="c++filt"/>
+					</extension>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping">
+				<project-mappings/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+				<pathentry kind="src" path="[Source directory]"/>
+				<pathentry excluding="[Source directory]/|**/CMakeFiles/" kind="out" path=""/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/samples/bluetooth" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/kernel/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/arch/arm/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/arch/arm/soc/nordic_nrf/nrf52" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/arch/arm/soc/nordic_nrf/nrf52/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/arch/arm/soc/nordic_nrf/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/boards/arm/nrf52840_pca10056" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/include/drivers" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/build/zephyr/include/generated" kind="inc" path="" system="true"/>
+				<pathentry include="C:/gccarmemb/lib/gcc/arm-none-eabi/7.2.1/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/gccarmemb/lib/gcc/arm-none-eabi/7.2.1/include-fixed" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/lib/libc/minimal/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/lib/crypto/tinycrypt/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/cmsis/Include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/nordic/nrfx" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/nordic/nrfx/drivers/include" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/nordic/nrfx/hal" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/nordic/nrfx/mdk" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/hal/nordic" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/ext/debug/segger" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth/controller" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth/controller/util" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth/controller/hal" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth/controller/ticker" kind="inc" path="" system="true"/>
+				<pathentry include="C:/git/Cell_IOT_Zephyr/zephyr/subsys/bluetooth/controller/include" kind="inc" path="" system="true"/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+				<buildTargets>
+					<target name=": pristine" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>pristine</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": pymenuconfig" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>pymenuconfig</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": config" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>config</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": config-sanitycheck" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>config-sanitycheck</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": oldconfig" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>oldconfig</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": gconfig" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>gconfig</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] app" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>app</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] app/fast" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>app/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] app" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>app</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] app" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/app.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": menuconfig" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>menuconfig</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": xconfig" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>xconfig</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": edit_cache" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>edit_cache</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": rebuild_cache" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>rebuild_cache</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": syscall_macros_h_target" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>syscall_macros_h_target</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] zephyr" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>zephyr</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] zephyr/fast" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>zephyr/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>zephyr</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/zephyr.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] offsets" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>offsets</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] offsets/fast" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>offsets/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] offsets" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>offsets</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] offsets" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/offsets.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": linker_script" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>linker_script</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": syscall_list_h_target" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>syscall_list_h_target</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": offsets_h" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>offsets_h</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": driver_validation_h_target" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>driver_validation_h_target</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": kobj_types_h_target" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kobj_types_h_target</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[exe] zephyr_prebuilt" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>zephyr_prebuilt</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[exe] zephyr_prebuilt/fast" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>zephyr_prebuilt/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[exe] zephyr_prebuilt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>zephyr_prebuilt</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[exe] zephyr_prebuilt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/zephyr_prebuilt.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": linker_pass_final_script" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>linker_pass_final_script</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[exe] kernel_elf" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kernel_elf</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[exe] kernel_elf/fast" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kernel_elf/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[exe] kernel_elf" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>kernel_elf</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[exe] kernel_elf" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/kernel_elf.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": run" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>run</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/soc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/soc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/soc/nordic_nrf" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/soc/nordic_nrf" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/soc/nordic_nrf/nrf52" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/soc/nordic_nrf/nrf52" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/core" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/core" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/core/cortex_m" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/core/cortex_m" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/arch/arm/core/cortex_m/mpu" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/arch/arm/core/cortex_m/mpu" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib/crc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib/crc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib/libc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib/libc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib/libc/minimal" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib/libc/minimal" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib/mempool" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib/mempool" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/lib/rbtree" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/lib/rbtree" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/misc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/misc" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/boards" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/boards" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/lib/crypto" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/lib/crypto" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/lib/crypto/tinycrypt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/lib/crypto/tinycrypt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/lib/encoding" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/lib/encoding" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/lib/mgmt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/lib/mgmt" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/atmel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/atmel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/cmsis" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/cmsis" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/nordic" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/nordic" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/nxp" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/nxp" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/st" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/st" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/ti" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/ti" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/ti/simplelink" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/ti/simplelink" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/ti/simplelink/source/ti/devices" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/ti/simplelink/source/ti/devices" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/silabs" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/silabs" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/hal/esp" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/hal/esp" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/ext/debug/segger" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/ext/debug/segger" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/logging" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/logging" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/bluetooth" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/bluetooth" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__common" path="zephyr/subsys/bluetooth/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__common</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__common/fast" path="zephyr/subsys/bluetooth/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__common/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] subsys__bluetooth__common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>subsys__bluetooth__common</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] subsys__bluetooth__common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr/subsys/bluetooth/common" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/subsys__bluetooth__common.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/bluetooth/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/bluetooth/common" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__host" path="zephyr/subsys/bluetooth/host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__host</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__host/fast" path="zephyr/subsys/bluetooth/host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__host/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] subsys__bluetooth__host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>subsys__bluetooth__host</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] subsys__bluetooth__host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr/subsys/bluetooth/host" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/subsys__bluetooth__host.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/bluetooth/host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/bluetooth/host" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__controller" path="zephyr/subsys/bluetooth/controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__controller</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__bluetooth__controller/fast" path="zephyr/subsys/bluetooth/controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__bluetooth__controller/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] subsys__bluetooth__controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>subsys__bluetooth__controller</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] subsys__bluetooth__controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr/subsys/bluetooth/controller" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/subsys__bluetooth__controller.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/bluetooth/controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/bluetooth/controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/fs" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/fs" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__net" path="zephyr/subsys/net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__net</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] subsys__net/fast" path="zephyr/subsys/net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>subsys__net/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] subsys__net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>subsys__net</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] subsys__net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr/subsys/net" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/subsys__net.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/net" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/net/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/net/lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/random" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/random" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/subsys/storage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/subsys/storage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/console" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/console" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/display" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/display" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/interrupt_controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/interrupt_controller" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/clock_control" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/clock_control" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/gpio" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/gpio" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/serial" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/serial" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/bluetooth" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/bluetooth" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/bluetooth/hci" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/bluetooth/hci" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/entropy" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/entropy" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/drivers/timer" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/drivers/timer" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/tests" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/tests" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] kernel" path="zephyr/kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kernel</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="[lib] kernel/fast" path="zephyr/kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kernel/fast</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Build" path="[Targets]/[lib] kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments>-C "C:/git/Cell_IOT_Zephyr/build" </buildArguments>
+						<buildTarget>kernel</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name="Clean" path="[Targets]/[lib] kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/Program Files/CMake/bin/cmake.exe</buildCommand>
+						<buildArguments>-E chdir "C:/git/Cell_IOT_Zephyr/build/zephyr/kernel" "C:/Program Files/CMake/bin/cmake.exe" -P "CMakeFiles/kernel.dir/cmake_clean.cmake"</buildArguments>
+						<buildTarget></buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/kernel" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": flash" path="zephyr/cmake/flash" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>flash</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": debug" path="zephyr/cmake/flash" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>debug</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": debugserver" path="zephyr/cmake/flash" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>debugserver</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/cmake/flash" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/cmake/flash" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": usage" path="zephyr/cmake/usage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>usage</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": kconfig-usage" path="zephyr/cmake/usage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>kconfig-usage</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/cmake/usage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/cmake/usage" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": ram_report" path="zephyr/cmake/reports" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>ram_report</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": rom_report" path="zephyr/cmake/reports" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>rom_report</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": all" path="zephyr/cmake/reports" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>all</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+					<target name=": clean" path="zephyr/cmake/reports" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>C:/ProgramData/chocolatey/bin/ninja.exe</buildCommand>
+						<buildArguments></buildArguments>
+						<buildTarget>clean</buildTarget>
+						<stopOnError>true</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+					</target>
+				</buildTargets>
+			</storageModule>
+			<storageModule moduleId="scannerConfiguration">
+				<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
+				<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="C:/gccarmemb/bin/arm-none-eabi-gcc.exe" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="makefileGenerator">
+						<runAction arguments="-f ${project_name}_scd.mk" command="C:/ProgramData/chocolatey/bin/ninja.exe" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+			</storageModule>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="Cellular_IOT.null.1" name="Cellular_IOT"/>
+	</storageModule>
+</cproject>
