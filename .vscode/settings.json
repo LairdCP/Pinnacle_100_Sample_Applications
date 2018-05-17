@@ -1,5 +1,9 @@
 {
     "C_Cpp.intelliSenseEngineFallback": "Enabled",
     "cortex-debug.JLinkGDBServerPath": "C:\\Program Files (x86)\\SEGGER\\JLink_V632c\\JLinkGDBServerCL.exe",
-    "cortex-debug.armToolchainPath": "C:\\gccarmemb\\bin"
+    "cortex-debug.armToolchainPath": "C:\\gccarmemb\\bin",
+    "files.associations": {
+        "soc.h": "c",
+        "device.h": "c"
+    }
 }

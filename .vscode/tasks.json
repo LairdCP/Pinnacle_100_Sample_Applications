@@ -6,13 +6,25 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cd build && ninja all",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja all",
             "problemMatcher": []
         },
         {
             "label": "clean",
             "type": "shell",
             "command": "cd build && ninja clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "env",
+            "type": "shell",
+            "command": "cd zephyr && source zephyr-env.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake",
+            "type": "shell",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build && rm -rf * && cmake -GNinja ../app",
             "problemMatcher": []
         }
     ]

@@ -1,0 +1,11 @@
+identifier: cell_iot
+name: cell-iot
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gccarmemb
+supported:
+  - usb_device
+  - ble
+  - ieee802154

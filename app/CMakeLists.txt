@@ -1,4 +1,5 @@
-set(BOARD nrf52840_PCA10056)
+set(BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR})
+set(BOARD cell_iot)
 set(CMAKE_ECLIPSE_VERSION 4.7)
 include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
 project(Cellular_IOT)
