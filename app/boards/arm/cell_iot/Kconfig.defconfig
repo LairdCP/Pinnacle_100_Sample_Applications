@@ -19,16 +19,19 @@ endif # GPIO_NRF5
 if UART_NRF5
 
 config UART_NRF5_GPIO_TX_PIN
-	default 6
+	default 3
 
 config UART_NRF5_GPIO_RX_PIN
-	default 8
+	default 4
 
 config UART_NRF5_GPIO_RTS_PIN
-	default 5
+	default 28
 
 config UART_NRF5_GPIO_CTS_PIN
-	default 7
+	default 29
+
+config UART_NRF5_FLOW_CONTROL
+    default y
 
 endif # UART_NRF5
 
