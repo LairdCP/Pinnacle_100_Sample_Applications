@@ -305,7 +305,7 @@ static void msg_dump(const char *s, u8_t *data, unsigned len)
     printk("%s: ", s);
     for (i = 0; i < len; i++)
     {
-        printk("%02x ", data[i]);
+        printk("%c ", data[i]);
     }
     printk("(%u bytes)\n", len);
 }
@@ -382,7 +382,7 @@ static void send_AT_cmd(void)
         if (sent_char != tx_buf[i])
         {
             printk("expect send %c, actaul send %c\n",
-                     tx_buf[i], sent_char);
+                   tx_buf[i], sent_char);
             return;
         }
     }
@@ -404,6 +404,7 @@ void main(void)
 
     uart0_init();
     led_init();
+    send_AT_cmd();
 
     /* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
@@ -412,7 +413,6 @@ void main(void)
     {
         k_sleep(MSEC_PER_SEC);
         toggle_led1();
-        send_AT_cmd();
 
         /* Current Time Service updates only when time is changed */
         cts_notify();

@@ -12,13 +12,7 @@
         {
             "label": "clean",
             "type": "shell",
-            "command": "cd build && ninja clean",
-            "problemMatcher": []
-        },
-        {
-            "label": "env",
-            "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja clean",
             "problemMatcher": []
         },
         {
