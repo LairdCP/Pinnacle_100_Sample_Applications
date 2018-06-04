@@ -10,6 +10,12 @@
             "problemMatcher": []
         },
         {
+            "label": "flash",
+            "type": "shell",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja flash",
+            "problemMatcher": []
+        },
+        {
             "label": "clean",
             "type": "shell",
             "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja clean",
