@@ -1,7 +1,14 @@
 {
-    "C_Cpp.intelliSenseEngineFallback": "Enabled",
     "files.associations": {
-        "soc.h": "c",
-        "device.h": "c"
-    }
+        "printk.h": "c",
+        "toolchain.h": "c",
+        "zephyr.h": "c",
+        "kernel.h": "c",
+        "sched_priq.h": "c",
+        "rb.h": "c",
+        "types.h": "c",
+        "bluetooth.h": "c",
+        "stddef.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
