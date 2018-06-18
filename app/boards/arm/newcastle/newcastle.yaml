@@ -1,5 +1,5 @@
-identifier: cell_iot
-name: cell-iot
+identifier: newcastle
+name: newcastle
 type: mcu
 arch: arm
 toolchain:

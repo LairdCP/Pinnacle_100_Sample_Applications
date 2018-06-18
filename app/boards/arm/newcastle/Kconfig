@@ -4,6 +4,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-config  BOARD_CELL_IOT
-	bool "Cell IOT"
-	depends on SOC_NRF52840_QIAA
+if BOARD_NEWCASTLE
+
+config GPIO_AS_PINRESET
+	bool "GPIO as pin reset (reset button)"
+	default y
+
+endif # BOARD_NEWCASTLE

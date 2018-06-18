@@ -4,10 +4,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if BOARD_CELL_IOT
+if BOARD_NEWCASTLE
 
 config BOARD
-	default cell_iot
+	default newcastle
 
 if GPIO_NRF5
 
@@ -45,4 +45,4 @@ config USB_DEVICE_STACK
 
 endif # USB
 
-endif # BOARD_CELL_IOT
+endif # BOARD_NEWCASTLE
