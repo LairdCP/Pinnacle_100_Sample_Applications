@@ -11,12 +11,24 @@
 
 #include <settings/settings.h>
 
+#include <gpio.h>
+
 #include "app_bt.h"
 
 /* ********** DEFINES ********** */
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 #define MAX_DATA 74
+
+#ifdef SW0_GPIO_INT_CONF
+#define EDGE SW0_GPIO_INT_CONF
+#else
+/*
+ * If SW0_GPIO_INT_CONF not defined used default EDGE value.
+ * Change this to use a different interrupt trigger
+ */
+#define EDGE (GPIO_INT_EDGE | GPIO_INT_ACTIVE_LOW)
+#endif
 
 /* ********** FUNCTION DEFINITIONS ********** */
 static ssize_t read_vnd(struct bt_conn *conn, const struct bt_gatt_attr *attr,
@@ -43,6 +55,11 @@ static void disconnected(struct bt_conn *conn, u8_t reason);
 static void bt_ready(int err);
 static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey);
 static void auth_cancel(struct bt_conn *conn);
+static void advertButtonInit();
+void advertButtonPressed(struct device *gpiob, struct gpio_callback *cb,
+                         u32_t pins);
+static void advertLedInit();
+static void flashAdvertLed();
 
 /* Custom Service Variables */
 static struct bt_uuid_128 vnd_uuid = BT_UUID_INIT_128(
@@ -136,6 +153,13 @@ static struct bt_conn_auth_cb auth_cb_display = {
     .passkey_entry = NULL,
     .cancel = auth_cancel,
 };
+
+static struct device *advertButton_dev;
+static struct device *advertLed_dev;
+static struct gpio_callback gpio_cb;
+static bool bAdvertising = 0;
+static bool bConnected = 0;
+static bool bSignalAdvertising = 0;
 
 /* ********** FUNCTIONS ********** */
 static ssize_t read_vnd(struct bt_conn *conn, const struct bt_gatt_attr *attr,
@@ -235,16 +259,21 @@ static void connected(struct bt_conn *conn, u8_t err)
 {
     if (err)
     {
+        bConnected = 0;
         printk("Connection failed (err %u)\n", err);
     }
     else
     {
+        bConnected = 1;
+        bAdvertising = 0;
         printk("Connected\n");
     }
 }
 
 static void disconnected(struct bt_conn *conn, u8_t reason)
 {
+    bConnected = 0;
+    bAdvertising = 1;
     printk("Disconnected (reason %u)\n", reason);
 }
 
@@ -261,23 +290,41 @@ static void bt_ready(int err)
     hrs_init(0x01);
     bas_init();
     cts_init();
-    dis_init(CONFIG_SOC, "Manufacturer");
+    dis_init(CONFIG_SOC, "Laird");
     bt_gatt_service_register(&vnd_svc);
 
     if (IS_ENABLED(CONFIG_SETTINGS))
     {
         settings_load();
     }
+}
 
-    err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad),
-                          sd, ARRAY_SIZE(sd));
+static void startAdvertising()
+{
+    int err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad),
+                              sd, ARRAY_SIZE(sd));
     if (err)
     {
+        bAdvertising = 0;
         printk("Advertising failed to start (err %d)\n", err);
         return;
     }
 
+    bAdvertising = 1;
     printk("Advertising successfully started\n");
+}
+
+static void stopAdvertising()
+{
+    int err = bt_le_adv_stop();
+    if (err)
+    {
+        printk("Advertising failed to stop (err %d)\n", err);
+        return;
+    }
+
+    bAdvertising = 0;
+    printk("Advertising stopped\n");
 }
 
 static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
@@ -298,6 +345,85 @@ static void auth_cancel(struct bt_conn *conn)
     printk("Pairing cancelled: %s\n", addr);
 }
 
+static void advertButtonInit()
+{
+    int ret;
+
+    advertButton_dev = device_get_binding(SW0_GPIO_NAME);
+    if (!advertButton_dev)
+    {
+        printk("Cannot find %s!\n", SW0_GPIO_NAME);
+        return;
+    }
+
+    ret = gpio_pin_configure(advertButton_dev, ADVERT_BUTTON,
+                             GPIO_DIR_IN | GPIO_INT | SW0_GPIO_PIN_PUD | EDGE);
+    if (ret)
+    {
+        printk("Error configuring GPIO %d!\n", ADVERT_BUTTON);
+    }
+
+    gpio_init_callback(&gpio_cb, advertButtonPressed, BIT(ADVERT_BUTTON));
+    ret = gpio_add_callback(advertButton_dev, &gpio_cb);
+    if (ret)
+    {
+        printk("Error adding GPIO %d callback!\n", ADVERT_BUTTON);
+    }
+
+    ret = gpio_pin_enable_callback(advertButton_dev, ADVERT_BUTTON);
+    if (ret)
+    {
+        printk("Error enabling GPIO %d callback!\n", ADVERT_BUTTON);
+    }
+}
+
+void advertButtonPressed(struct device *gpiob, struct gpio_callback *cb,
+                         u32_t pins)
+{
+    // Set flag to BT app thread can start advertising
+    bSignalAdvertising = 1;
+}
+
+static void advertLedInit()
+{
+    int ret;
+
+    advertLed_dev = device_get_binding(LED1_GPIO_PORT);
+    if (!advertLed_dev)
+    {
+        printk("Cannot find %s!\n", LED1_GPIO_PORT);
+        return;
+    }
+
+    ret = gpio_pin_configure(advertLed_dev, ADVERT_LED, (GPIO_DIR_OUT));
+    if (ret)
+    {
+        printk("Error configuring GPIO %d!\n", ADVERT_LED);
+    }
+
+    ret = gpio_pin_write(advertLed_dev, ADVERT_LED, LED_OFF);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", ADVERT_LED);
+    }
+}
+
+static void flashAdvertLed()
+{
+    int ret;
+    ret = gpio_pin_write(advertLed_dev, ADVERT_LED, LED_ON);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", ADVERT_LED);
+    }
+    k_sleep(25);
+    ret = gpio_pin_write(advertLed_dev, ADVERT_LED, LED_OFF);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", ADVERT_LED);
+    }
+}
+
 void app_bt_thread()
 {
     int err;
@@ -312,9 +438,30 @@ void app_bt_thread()
     bt_conn_cb_register(&conn_callbacks);
     bt_conn_auth_cb_register(&auth_cb_display);
 
+    advertLedInit();
+    advertButtonInit();
+
     while (1)
     {
         k_sleep(MSEC_PER_SEC);
+
+        if (bSignalAdvertising)
+        {
+            bSignalAdvertising = 0;
+            if (!bAdvertising && !bConnected)
+            {
+                startAdvertising();
+            }
+            else if (bAdvertising)
+            {
+                stopAdvertising();
+            }
+        }
+
+        if (bAdvertising)
+        {
+            flashAdvertLed();
+        }
 
         /* Current Time Service updates only when time is changed */
         cts_notify();
@@ -347,4 +494,4 @@ void app_bt_thread()
 }
 
 K_THREAD_DEFINE(app_bt_id, 512, app_bt_thread, NULL, NULL, NULL,
-    7, 0, K_NO_WAIT);
+                7, 0, K_NO_WAIT);

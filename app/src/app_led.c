@@ -2,7 +2,6 @@
 
 #include <gpio.h>
 
-static int heartbeat_led_state = LED_OFF;
 static struct device *gpio_dev;
 
 void led_init(void)
@@ -22,10 +21,10 @@ void led_init(void)
         printk("Error configuring GPIO %d!\n", HEARTBEAT_LED);
     }
 
-    ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, heartbeat_led_state);
+    ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, LED_OFF);
     if (ret)
     {
-        printk("Error setting GPIO %d!\n", heartbeat_led_state);
+        printk("Error setting GPIO %d!\n", HEARTBEAT_LED);
     }
 }
 
@@ -35,19 +34,17 @@ void ledHeartBeat(void)
     /* flash LED twice quickly */
     for (u8_t i = 0; i < 2; i++)
     {
-        ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, heartbeat_led_state);
+        ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, LED_ON);
         if (ret)
         {
             printk("Error setting GPIO %d!\n", HEARTBEAT_LED);
         }
-        heartbeat_led_state = ~heartbeat_led_state;
         k_sleep(25);
-        ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, heartbeat_led_state);
+        ret = gpio_pin_write(gpio_dev, HEARTBEAT_LED, LED_OFF);
         if (ret)
         {
             printk("Error setting GPIO %d!\n", HEARTBEAT_LED);
         }
-        heartbeat_led_state = ~heartbeat_led_state;
         k_sleep(50);
     }
 }
