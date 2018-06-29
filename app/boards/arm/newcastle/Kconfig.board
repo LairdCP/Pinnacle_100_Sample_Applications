@@ -6,4 +6,6 @@
 
 config  BOARD_NEWCASTLE
 	bool "Newcastle"
+	select HAS_DTS_GPIO
+	select HAS_DTS_I2C
 	depends on SOC_NRF52840_QIAA

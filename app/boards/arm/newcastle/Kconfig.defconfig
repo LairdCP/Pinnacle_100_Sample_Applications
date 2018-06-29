@@ -7,7 +7,7 @@
 if BOARD_NEWCASTLE
 
 config BOARD
-	default newcastle
+	default "newcastle"
 
 if GPIO_NRF5
 
@@ -16,24 +16,24 @@ config GPIO_NRF5_P0
 
 endif # GPIO_NRF5
 
-if UART_NRF5
+if UART_NRFX
 
-config UART_NRF5_GPIO_TX_PIN
+config UART_0_NRF_TX_PIN
 	default 3
 
-config UART_NRF5_GPIO_RX_PIN
+config UART_0_NRF_RX_PIN
 	default 4
 
-config UART_NRF5_GPIO_RTS_PIN
+config UART_0_NRF_RTS_PIN
 	default 28
 
-config UART_NRF5_GPIO_CTS_PIN
+config UART_0_NRF_CTS_PIN
 	default 29
 
-config UART_NRF5_FLOW_CONTROL
-    default y
+#config UART_0_NRF5_FLOW_CONTROL
+#    default y
 
-endif # UART_NRF5
+endif # UART_NRFX
 
 if USB
 
@@ -44,5 +44,84 @@ config USB_DEVICE_STACK
 	def_bool y
 
 endif # USB
+
+if SPI
+
+if SPI_0
+
+config SPI_0_NAME
+	default "SPI_0"
+
+config SPI_0_OP_MODES
+	default 1
+
+config SPI_0_IRQ_PRI
+	default 50
+
+config SPI_0_NRF_SCK_PIN
+	default 19
+
+config SPI_0_NRF_MOSI_PIN
+	default 20
+
+config SPI_0_NRF_MISO_PIN
+	default 21
+
+endif # SPI_0
+
+endif # SPI
+
+if FLASH
+
+config FLASH_HAS_DRIVER_ENABLED
+	def_bool y
+
+config FLASH_HAS_PAGE_LAYOUT
+	def_bool y
+
+config SOC_FLASH_NRF
+	def_bool y
+
+config SOC_FLASH_NRF_RADIO_SYNC
+	def_bool y
+
+config SPI_FLASH_W25QXXDV
+	def_bool y
+
+config SPI_FLASH_W25QXXDV_SPI_NAME
+	default "SPI_0"
+
+config SPI_FLASH_W25QXXDV_DRV_NAME
+	default "W25QXXDV"
+
+config SPI_FLASH_W25QXXDV_INIT_PRIORITY
+	default 80
+
+config SPI_FLASH_W25QXXDV_SPI_FREQ_0
+	default 8000000
+
+config SPI_FLASH_W25QXXDV_SPI_SLAVE
+	default 1
+
+config SPI_FLASH_W25QXXDV_GPIO_SPI_CS
+	def_bool y
+
+config SPI_FLASH_W25QXXDV_GPIO_SPI_CS_DRV_NAME
+	default "GPIO_0"
+
+config SPI_FLASH_W25QXXDV_GPIO_SPI_CS_PIN
+	default 17
+
+config SPI_FLASH_W25QXXDV_GPIO_CS_WAIT_DELAY
+	default 50
+
+config SPI_FLASH_W25QXXDV_FLASH_SIZE
+	default 67108864
+
+config SPI_FLASH_W25QXXDV_DEVICE_ID
+	default 0x00c22817
+
+endif # FLASH
+
 
 endif # BOARD_NEWCASTLE
