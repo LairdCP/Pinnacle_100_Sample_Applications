@@ -5,10 +5,10 @@
  */
 
 /dts-v1/;
-#include <nordic/nrf52840.dtsi>
+#include <nordic/nrf52840_qiaa.dtsi>
 
 / {
-	model = "Nordic PCA10056 Dev Kit";
+	model = "Newcastle Dev Kit";
 	compatible = "nordic,pca10056-dk", "nordic,nrf52840-qiaa",
 		     "nordic,nrf52840";
 
@@ -20,6 +20,62 @@
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		led1: led@1 {
+			gpios = <&gpio0 36 GPIO_INT_ACTIVE_HIGH>;
+			label = "Blue LED 1";
+		};
+		led2: led@2 {
+			gpios = <&gpio0 37 GPIO_INT_ACTIVE_HIGH>;
+			label = "Green LED 2";
+		};
+		led3: led@3 {
+			gpios = <&gpio0 38 GPIO_INT_ACTIVE_HIGH>;
+			label = "Red LED 3";
+		};
+		led4: led@4 {
+			gpios = <&gpio0 39 GPIO_INT_ACTIVE_HIGH>;
+			label = "Green LED 4";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		button1: button@1 {
+			gpios = <&gpio0 24 GPIO_PUD_PULL_UP>;
+			label = "Push button switch 1";
+		};
+		button2: button@2 {
+			gpios = <&gpio0 25 GPIO_PUD_PULL_UP>;
+			label = "Push button switch 2";
+		};
+		button3: button@3 {
+			gpios = <&gpio0 40 GPIO_PUD_PULL_UP>;
+			label = "Push button switch 3";
+		};
+		button4: button@4 {
+			gpios = <&gpio0 43 GPIO_PUD_PULL_UP>;
+			label = "Push button switch 4";
+		};
+	};
+
+	/* These aliases are provided for compatibility with samples */
+	aliases {
+		led1 = &led1;
+		led2 = &led2;
+		led3 = &led3;
+		led4 = &led4;
+		sw1 = &button1;
+		sw2 = &button2;
+		sw3 = &button3;
+		sw4 = &button4;
+	};
+};
+
+&adc {
+	status ="ok";
 };
 
 &gpiote {
@@ -38,21 +94,80 @@
 	compatible = "nordic,nrf-uart";
 	current-speed = <115200>;
 	status = "ok";
+	tx-pin = <6>;
+	rx-pin = <8>;
+	rts-pin = <5>;
+	cts-pin = <7>;
 };
 
+#ifdef CONFIG_UART_1_NRF_UARTE
 &uart1 {
-	compatible = "nordic,nrf-uart";
 	current-speed = <115200>;
 	status = "ok";
+	tx-pin = <14>;
+	rx-pin = <16>;
+	rts-pin = <13>;
+	cts-pin = <15>;
+/*
+#ifdef CONFIG_MODEM_WNCM14A2A
+	wncm14a2a {
+		compatible = "wnc,m14a2a";
+		label = "wncm14a2a";
+		mdm-boot-mode-sel-gpios = <&gpio1 2 0>;
+		mdm-power-gpios = <&gpio1 3 0>;
+		mdm-keep-awake-gpios = <&gpio1 7 0>;
+		mdm-reset-gpios = <&gpio1 10 0>;
+		mdm-shld-trans-ena-gpios = <&gpio1 11 0>;
+		status = "ok";
+	};
+#endif
+*/
 };
+#endif
 
 &i2c0 {
 	status = "ok";
+	sda-pin = <26>;
+	scl-pin = <27>;
 };
 
+/*
 &i2c1 {
 	status = "ok";
+	sda-pin = <30>;
+	scl-pin = <31>;
 };
+*/
+
+&spi0 {
+	status = "ok";
+	sck-pin = <19>;
+	mosi-pin = <20>;
+	miso-pin = <21>;
+};
+
+/*
+&spi1 {
+	status = "ok";
+	sck-pin = <31>;
+	mosi-pin = <30>;
+	miso-pin = <40>;
+};
+
+&spi2 {
+	status = "ok";
+	sck-pin = <43>;
+	mosi-pin = <44>;
+	miso-pin = <45>;
+};
+
+&spi3 {
+	status = "ok";
+	sck-pin = <42>;
+	mosi-pin = <41>;
+	miso-pin = <20>;
+};
+*/
 
 &flash0 {
 	/*

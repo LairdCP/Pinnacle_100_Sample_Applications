@@ -9,32 +9,6 @@ if BOARD_NEWCASTLE
 config BOARD
 	default "newcastle"
 
-if GPIO_NRF5
-
-config GPIO_NRF5_P0
-	default y
-
-endif # GPIO_NRF5
-
-if UART_NRFX
-
-config UART_0_NRF_TX_PIN
-	default 3
-
-config UART_0_NRF_RX_PIN
-	default 4
-
-config UART_0_NRF_RTS_PIN
-	default 28
-
-config UART_0_NRF_CTS_PIN
-	default 29
-
-#config UART_0_NRF5_FLOW_CONTROL
-#    default y
-
-endif # UART_NRFX
-
 if USB
 
 config USB_NRF52840
@@ -44,32 +18,6 @@ config USB_DEVICE_STACK
 	def_bool y
 
 endif # USB
-
-if SPI
-
-if SPI_0
-
-config SPI_0_NAME
-	default "SPI_0"
-
-config SPI_0_OP_MODES
-	default 1
-
-config SPI_0_IRQ_PRI
-	default 50
-
-config SPI_0_NRF_SCK_PIN
-	default 19
-
-config SPI_0_NRF_MOSI_PIN
-	default 20
-
-config SPI_0_NRF_MISO_PIN
-	default 21
-
-endif # SPI_0
-
-endif # SPI
 
 if FLASH
 

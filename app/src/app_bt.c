@@ -20,8 +20,8 @@
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 #define MAX_DATA 74
 
-#ifdef SW0_GPIO_INT_CONF
-#define EDGE SW0_GPIO_INT_CONF
+#ifdef SW1_GPIO_INT_CONF
+#define EDGE SW1_GPIO_INT_CONF
 #else
 /*
  * If SW0_GPIO_INT_CONF not defined used default EDGE value.
@@ -349,15 +349,15 @@ static void advertButtonInit()
 {
     int ret;
 
-    advertButton_dev = device_get_binding(SW0_GPIO_NAME);
+    advertButton_dev = device_get_binding(ADVERT_BUTTON_PORT);
     if (!advertButton_dev)
     {
-        printk("Cannot find %s!\n", SW0_GPIO_NAME);
+        printk("Cannot find %s!\n", ADVERT_BUTTON_PORT);
         return;
     }
 
     ret = gpio_pin_configure(advertButton_dev, ADVERT_BUTTON,
-                             GPIO_DIR_IN | GPIO_INT | SW0_GPIO_PIN_PUD | EDGE);
+                             GPIO_DIR_IN | GPIO_INT | GPIO_PUD_PULL_UP | EDGE);
     if (ret)
     {
         printk("Error configuring GPIO %d!\n", ADVERT_BUTTON);
@@ -388,10 +388,10 @@ static void advertLedInit()
 {
     int ret;
 
-    advertLed_dev = device_get_binding(LED1_GPIO_PORT);
+    advertLed_dev = device_get_binding(ADVERT_LED_PORT);
     if (!advertLed_dev)
     {
-        printk("Cannot find %s!\n", LED1_GPIO_PORT);
+        printk("Cannot find %s!\n", ADVERT_LED_PORT);
         return;
     }
 
@@ -493,5 +493,5 @@ void app_bt_thread()
     }
 }
 
-K_THREAD_DEFINE(app_bt_id, 512, app_bt_thread, NULL, NULL, NULL,
-                7, 0, K_NO_WAIT);
+// K_THREAD_DEFINE(app_bt_id, 512, app_bt_thread, NULL, NULL, NULL,
+//                 7, 0, K_NO_WAIT);

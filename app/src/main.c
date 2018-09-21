@@ -80,9 +80,10 @@ static void send_AT_cmd(void)
 
 void main(void)
 {
-    uart0_init();
-    led_init();
-    send_AT_cmd();
+    printk("Newcastle Test App\n");
+    //uart0_init();
+    //led_init();
+    //send_AT_cmd();
 
     /* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
@@ -90,6 +91,7 @@ void main(void)
     while (1)
     {
         k_sleep(MSEC_PER_SEC);
-        ledHeartBeat();
+        //printk("Heartbeat!\n");
+        //ledHeartBeat();
     }
 }

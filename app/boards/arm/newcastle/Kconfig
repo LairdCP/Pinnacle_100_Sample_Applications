@@ -6,13 +6,9 @@
 
 if BOARD_NEWCASTLE
 
-config BOARD_HAS_DCDC
-	bool "Board has DCDC circuitry"
-	select SOC_DCDC_NRF52X
-	default y
-
-config GPIO_AS_PINRESET
-	bool "GPIO as pin reset (reset button)"
-	default y
+config BOARD_ENABLE_DCDC
+        bool "Enable DCDC mode"
+        select SOC_DCDC_NRF52X
+        default y
 
 endif # BOARD_NEWCASTLE

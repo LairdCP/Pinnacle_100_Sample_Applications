@@ -3,9 +3,10 @@
 
 #include <board.h>
 
-#define LED_OFF 1
-#define LED_ON 0
-#define HEARTBEAT_LED LED0_GPIO_PIN
+#define LED_OFF 0
+#define LED_ON  1
+#define HEARTBEAT_LED_PORT  LED1_GPIO_CONTROLLER
+#define HEARTBEAT_LED       LED1_GPIO_PIN
 
 
 /**

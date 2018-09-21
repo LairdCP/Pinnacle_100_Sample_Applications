@@ -8,10 +8,10 @@ void led_init(void)
 {
     int ret;
 
-    gpio_dev = device_get_binding(LED0_GPIO_PORT);
+    gpio_dev = device_get_binding(HEARTBEAT_LED_PORT);
     if (!gpio_dev)
     {
-        printk("Cannot find %s!\n", LED0_GPIO_PORT);
+        printk("Cannot find %s!\n", HEARTBEAT_LED_PORT);
         return;
     }
 
