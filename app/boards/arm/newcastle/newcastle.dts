@@ -24,19 +24,19 @@
 	leds {
 		compatible = "gpio-leds";
 		led1: led@1 {
-			gpios = <&gpio0 36 GPIO_INT_ACTIVE_HIGH>;
+			gpios = <&gpio1 4 GPIO_INT_ACTIVE_HIGH>;
 			label = "Blue LED 1";
 		};
 		led2: led@2 {
-			gpios = <&gpio0 37 GPIO_INT_ACTIVE_HIGH>;
+			gpios = <&gpio1 5 GPIO_INT_ACTIVE_HIGH>;
 			label = "Green LED 2";
 		};
 		led3: led@3 {
-			gpios = <&gpio0 38 GPIO_INT_ACTIVE_HIGH>;
+			gpios = <&gpio1 6 GPIO_INT_ACTIVE_HIGH>;
 			label = "Red LED 3";
 		};
 		led4: led@4 {
-			gpios = <&gpio0 39 GPIO_INT_ACTIVE_HIGH>;
+			gpios = <&gpio1 7 GPIO_INT_ACTIVE_HIGH>;
 			label = "Green LED 4";
 		};
 	};
@@ -52,11 +52,11 @@
 			label = "Push button switch 2";
 		};
 		button3: button@3 {
-			gpios = <&gpio0 40 GPIO_PUD_PULL_UP>;
+			gpios = <&gpio1 8 GPIO_PUD_PULL_UP>;
 			label = "Push button switch 3";
 		};
 		button4: button@4 {
-			gpios = <&gpio0 43 GPIO_PUD_PULL_UP>;
+			gpios = <&gpio1 11 GPIO_PUD_PULL_UP>;
 			label = "Push button switch 4";
 		};
 	};

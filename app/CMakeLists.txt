@@ -12,6 +12,8 @@ target_sources(app PRIVATE
   src/cts.c
   src/app_bt.c
   src/app_led.c
+  src/console_rx.c
+  src/hl7800.c
 )
 
 zephyr_library_include_directories($ENV{ZEPHYR_BASE}/samples/bluetooth)
