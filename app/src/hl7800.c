@@ -17,6 +17,8 @@ static char lte_temp_msg[LTE_UART_RX_PIPE_SIZE];
 static int lte_tmp_msg_index = 0;
 static int parseCmdState = CMD_STATE_FIND_MSG_START_1;
 static bool lteBooted = false;
+static int lteBytesRxd = 0;
+static int lteBytesProc = 0;
 
 K_PIPE_DEFINE(lte_rx_pipe, LTE_UART_RX_PIPE_SIZE, 1);
 K_SEM_DEFINE(lte_rx_sem, 0, 1);
@@ -47,7 +49,7 @@ K_TIMER_DEFINE(lte_rx_timer, lte_rx_timer_handler, NULL);
 K_TIMER_DEFINE(lte_boot_timer, lte_boot_timer_handler, NULL);
 
 K_THREAD_DEFINE(hl7800rx, 512, hl7800_rx_thread, NULL, NULL, NULL,
-                7, 0, K_NO_WAIT);
+                6, 0, K_NO_WAIT);
 
 K_THREAD_DEFINE(hl7800, 512, hl7800_thread, NULL, NULL, NULL,
                 7, 0, K_NO_WAIT);
@@ -81,7 +83,7 @@ static void initIO()
     toggleLteReset();
 
     // LTE wake
-    ret = gpio_pin_configure(gpio1_dev, SIO_LTE_WAKE, GPIO_DIR_OUT);
+    ret = gpio_pin_configure(gpio1_dev, SIO_LTE_WAKE, (GPIO_DIR_OUT | GPIO_DS_DISCONNECT_LOW));
     if (ret)
     {
         printk("Error configuring GPIO %d!\n", ret);
@@ -118,15 +120,10 @@ static void initIO()
     }
 
     // LTE gps enable
-    ret = gpio_pin_configure(gpio1_dev, SIO_LTE_GPS_EN, (GPIO_DIR_OUT | GPIO_DS_DISCONNECT_HIGH));
+    ret = gpio_pin_configure(gpio1_dev, SIO_LTE_GPS_EN, GPIO_DIR_IN);
     if (ret)
     {
         printk("Error configuring GPIO %d!\n", ret);
-    }
-    ret = gpio_pin_write(gpio1_dev, SIO_LTE_GPS_EN, 0);
-    if (ret)
-    {
-        printk("Error setting GPIO %d!\n", ret);
     }
 
     // LTE TX on
@@ -169,7 +166,25 @@ static void lte_uart_isr(struct device *dev)
 
         if (len > 0)
         {
+            lteBytesRxd += len;
             //printk("Bytes read: %d, msg: %s\n", len, lte_uart_rx_buf);
+
+            // Raw print of what we receive
+            // for (int i = 0; i < len; i++)
+            // {
+            //     char c = lte_uart_rx_buf[i];
+            //     if (c < 0x21)
+            //     {
+            //         printk("rx:0x%x ", lte_uart_rx_buf[i]);
+            //     }
+            //     else
+            //     {
+            //         printk("rx:%c ", lte_uart_rx_buf[i]);
+            //     }
+            // }
+            // // new line after printing RX bytes
+            // printk("\n");
+
             ret = k_pipe_put(&lte_rx_pipe,
                              lte_uart_rx_buf,
                              len, &bytes_written,
@@ -235,18 +250,22 @@ static void process_lte_rx()
 {
     int rc;
     size_t bytesRead;
-
     rc = k_sem_take(&lte_rx_sem, K_FOREVER);
-    rc = k_pipe_get(&lte_rx_pipe,
-                    lte_rx_msg_buf,
-                    sizeof(lte_rx_msg_buf),
-                    &bytesRead, 1, K_NO_WAIT);
-    if (rc >= 0)
+    do
     {
-        parse_lte_cmd(lte_rx_msg_buf, bytesRead);
-    }
+        rc = k_pipe_get(&lte_rx_pipe,
+                        lte_rx_msg_buf,
+                        sizeof(lte_rx_msg_buf),
+                        &bytesRead, 1, 1);
+        if (rc >= 0)
+        {
+            parse_lte_cmd(lte_rx_msg_buf, bytesRead);
+        }
+    } while (rc >= 0);
 }
 
+// TODO: add safety checks to make sure we dont overrun lte_temp_msg when adding to it.
+// TODO: evaluate how to frame RX messages properly. Commented out code for framing RX messages.
 static void parse_lte_cmd(u8_t *msg, int size)
 {
     int index = 0;
@@ -254,7 +273,7 @@ static void parse_lte_cmd(u8_t *msg, int size)
     // char errStr[8];
     int cpySize = 0;
     //printk("LTE msg: %s\n", msg);
-
+    lteBytesProc += size;
     do
     {
         switch (parseCmdState)
@@ -262,30 +281,37 @@ static void parse_lte_cmd(u8_t *msg, int size)
         case CMD_STATE_FIND_MSG_START_1:
             lte_tmp_msg_index = 0;
             memset(lte_temp_msg, 0, sizeof(lte_temp_msg));
-            if (msg[index] == '\r')
-            {
-                lte_temp_msg[lte_tmp_msg_index++] = msg[index++];
-                parseCmdState = CMD_STATE_FIND_MSG_START_2;
-                start_lte_rx_timer();
-            }
-            else
-            {
-                // Throw the byte away
-                index++;
-            }
+            parseCmdState = CMD_STATE_GET_REST;
+            // if (msg[index] == '\r')
+            // {
+            //     lte_temp_msg[lte_tmp_msg_index++] = msg[index++];
+            //     parseCmdState = CMD_STATE_FIND_MSG_START_2;
+            //     start_lte_rx_timer();
+            // }
+            // else if (msg[index] == '\n')
+            // {
+            //     lte_temp_msg[lte_tmp_msg_index++] = msg[index++];
+            //     parseCmdState = CMD_STATE_GET_REST;
+            //     start_lte_rx_timer();
+            // }
+            // else
+            // {
+            //     // Throw the byte away
+            //     index++;
+            // }
             break;
-        case CMD_STATE_FIND_MSG_START_2:
-            if (msg[index] == '\n')
-            {
-                lte_temp_msg[lte_tmp_msg_index++] = msg[index++];
-                parseCmdState = CMD_STATE_GET_REST;
-            }
-            else
-            {
-                stop_lte_rx_timer();
-                parseCmdState = CMD_STATE_FIND_MSG_START_1;
-            }
-            break;
+        // case CMD_STATE_FIND_MSG_START_2:
+        //     if (msg[index] == '\n')
+        //     {
+        //         lte_temp_msg[lte_tmp_msg_index++] = msg[index++];
+        //         parseCmdState = CMD_STATE_GET_REST;
+        //     }
+        //     else
+        //     {
+        //         stop_lte_rx_timer();
+        //         parseCmdState = CMD_STATE_FIND_MSG_START_1;
+        //     }
+        //     break;
         case CMD_STATE_GET_REST:
             // if (size >= 4 && msg[index] == 'O')
             // {
@@ -378,8 +404,15 @@ static void lte_rx_timer_handler(struct k_timer *timer_id)
 {
     if (strlen(lte_temp_msg) > 0)
     {
+        if (lteBytesRxd != lteBytesProc)
+        {
+            printk("\n\n!!!Did not process all RX bytes!!!\n\n");
+        }
+        printk("Bytes RXd: %d\nBytes proc: %d\nt:%d LTE msg:\n%s\n",
+               lteBytesRxd, lteBytesProc, k_uptime_get_32(), lte_temp_msg);
+        lteBytesRxd = 0;
+        lteBytesProc = 0;
         k_sem_give(&lte_rx_cmd_sem);
-        printk("LTE msg: %s", lte_temp_msg);
     }
     parseCmdState = CMD_STATE_FIND_MSG_START_1;
 }
@@ -390,6 +423,7 @@ static void lte_boot_timer_handler(struct k_timer *timer_id)
     lteBooted = true;
 }
 
+// TODO: use message queue to send commands to the HL7800 so the sending thread is not blocked
 void sendLteCmd(char *cmd)
 {
     if (!lteBooted)
@@ -404,12 +438,12 @@ void sendLteCmd(char *cmd)
         return;
     }
 
-    int len = strlen(cmd);
-    if (len > 0)
+    int sendLen = strlen(cmd);
+    if (sendLen > 0)
     {
-        printk("Send LTE msg: %s", cmd);
+        printk("t:%d Send LTE msg: %s\n\n", k_uptime_get_32(), cmd);
         k_sem_reset(&lte_rx_cmd_sem);
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < sendLen; i++)
         {
             uart_poll_out(lte_uart_dev, cmd[i]);
         }
@@ -418,7 +452,7 @@ void sendLteCmd(char *cmd)
 
 void waitForLteCmdResponse()
 {
-    k_sem_take(&lte_rx_cmd_sem, K_MSEC(5000));
+    k_sem_take(&lte_rx_cmd_sem, K_MSEC(LTE_DEFAULT_RESPONSE_WAIT_TIME));
 }
 
 static void queryLteInfo()
@@ -444,7 +478,7 @@ static void hl7800_thread()
     initIO();
     lteUartInit();
     k_sem_take(&lte_boot_sem, K_FOREVER);
-    printk("LTE booted\n");
+    printk("LTE booted, time:%d\n", k_uptime_get_32());
     queryLteInfo();
 
     while (1)

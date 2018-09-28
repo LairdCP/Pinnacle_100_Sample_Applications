@@ -7,6 +7,6 @@
 #define CMD_W           'w'
 #define CMD_S           's'
 
-#define CMD_RESP_OK          "OK\n"
+#define CMD_RESP_OK          "\n#"
 
 #endif

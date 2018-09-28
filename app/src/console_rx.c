@@ -37,7 +37,7 @@ static void parse_cmd(char *cmdStr)
             toggleLteWake();
             break;
         default:
-            printk("Unknown cmd \"%s\"\n", cmdStr);
+            printk("Unknown cmd \"%s\"\n#", cmdStr);
             break;
         }
     }
@@ -55,7 +55,7 @@ static void parse_cmd(char *cmdStr)
             sendLteCmd(sendCmd);
             break;
         default:
-            printk("Unknown cmd \"%s\"\n", cmdStr);
+            printk("Unknown cmd \"%s\"\n#", cmdStr);
             break;
         }
     }
