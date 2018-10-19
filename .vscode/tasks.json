@@ -6,25 +6,25 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja all",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja all",
             "problemMatcher": []
         },
         {
             "label": "flash",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja flash",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash",
             "problemMatcher": []
         },
         {
             "label": "clean",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build && ninja clean",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja clean",
             "problemMatcher": []
         },
         {
             "label": "cmake",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build && rm -rf * && cmake -GNinja ../app",
+            "command": "mkdir build/lte_console -p && cd zephyr && source zephyr-env.sh && cd ../build/lte_console && rm -rf * && cmake -GNinja ../../apps/lte_console",
             "problemMatcher": []
         }
     ]
