@@ -9,12 +9,16 @@
 #define SIO_LTE_GPS_EN 12     //M2.46
 #define SIO_LTE_FAST_SHUTD 14 //M2.50
 
+#define SIO_LTE_UART_IO_CONTROLLER "GPIO_0"
+#define SIO_LTE_CTS 15
+#define SIO_LTE_RTS 13
+
 #define LTE_UART_DEV "UART_1"
-#define LTE_UART_RX_READ_SIZE 64            // size in bytes
-#define LTE_UART_RX_PIPE_SIZE 1024          // size in bytes
-#define LTE_UART_RX_TIMEOUT 25              // time in ms
-#define LTE_BOOT_TIME 15                    // time in seconds
-#define LTE_DEFAULT_RESPONSE_WAIT_TIME 7000 // time in ms
+#define LTE_UART_RX_READ_SIZE 64                    // size in bytes
+#define LTE_UART_RX_PIPE_SIZE 1024                  // size in bytes
+#define LTE_UART_RX_TIMEOUT 25                      // time in ms
+#define LTE_BOOT_TIME 10                            // time in seconds
+#define LTE_DEFAULT_RESPONSE_WAIT_TIME K_MSEC(7000) // time in ms
 
 enum LteProcessCmdStates
 {

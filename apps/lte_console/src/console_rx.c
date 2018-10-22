@@ -43,20 +43,19 @@ static void parse_cmd(char *cmdStr)
     }
     else
     {
-        char sendCmd[len];
-        memset(sendCmd, 0, sizeof(sendCmd));
-        switch (cmdStr[0])
+        if (cmdStr[0] == 'a' && cmdStr[1] == 't')
         {
-        case CMD_S:
-            // strip s
-            strncpy(sendCmd, cmdStr + 1, len - 1);
+            char sendCmd[len + 1];
+            memset(sendCmd, 0, sizeof(sendCmd));
+            // copy bytes
+            strncpy(sendCmd, cmdStr, len);
             // add cmd ending
             strcat(sendCmd, "\r");
             sendLteCmd(sendCmd);
-            break;
-        default:
+        }
+        else
+        {
             printk("Unknown cmd \"%s\"\n#", cmdStr);
-            break;
         }
     }
 }
