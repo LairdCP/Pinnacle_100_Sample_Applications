@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Linaro Limited
+ * Copyright (c) 2018 Laird Technologies
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,7 +8,7 @@
 #include <nordic/nrf52840_qiaa.dtsi>
 
 / {
-	model = "Newcastle Dev Kit";
+	model = "Sirrus 100 Dev Kit";
 	compatible = "nordic,pca10056-dk", "nordic,nrf52840-qiaa",
 		     "nordic,nrf52840";
 

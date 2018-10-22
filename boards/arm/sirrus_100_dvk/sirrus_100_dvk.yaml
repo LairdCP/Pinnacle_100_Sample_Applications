@@ -1,5 +1,5 @@
-identifier: newcastle
-name: newcastle
+identifier: sirrus_100_dvk
+name: sirrus_100_dvk
 type: mcu
 arch: arm
 toolchain:

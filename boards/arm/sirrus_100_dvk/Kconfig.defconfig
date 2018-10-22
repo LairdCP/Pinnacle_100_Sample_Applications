@@ -1,13 +1,13 @@
-# Kconfig - nRF52 PCA10056 board configuration
+# Kconfig - Sirrus(TM) 100 DVK board configuration
 #
-# Copyright (c) 2016 Nordic Semiconductor ASA
+# Copyright (c) 2018 Laird Technologies
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if BOARD_NEWCASTLE
+if BOARD_SIRRUS_100_DVK
 
 config BOARD
-	default "newcastle"
+	default "sirrus_100_dvk"
 
 if USB
 
@@ -72,4 +72,4 @@ config SPI_FLASH_W25QXXDV_DEVICE_ID
 endif # FLASH
 
 
-endif # BOARD_NEWCASTLE
+endif # BOARD_SIRRUS_100_DVK

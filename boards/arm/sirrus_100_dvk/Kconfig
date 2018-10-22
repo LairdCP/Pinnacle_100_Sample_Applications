@@ -1,14 +1,14 @@
-# Kconfig - nRF52840 PCA10056 board configuration
+# Kconfig - Sirrus(TM) 100 DVK board configuration
 #
-# Copyright (c) 2016 Nordic Semiconductor ASA
+# Copyright (c) 2018 Laird Technologies
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if BOARD_NEWCASTLE
+if BOARD_SIRRUS_100_DVK
 
 config BOARD_ENABLE_DCDC
         bool "Enable DCDC mode"
         select SOC_DCDC_NRF52X
         default y
 
-endif # BOARD_NEWCASTLE
+endif # BOARD_SIRRUS_100_DVK
