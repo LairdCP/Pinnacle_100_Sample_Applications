@@ -1,6 +1,7 @@
 #include <string.h>
 #include <zephyr.h>
 #include <misc/printk.h>
+#include <misc/reboot.h>
 #include <console.h>
 
 #include "console_rx.h"
@@ -35,6 +36,9 @@ static void parse_cmd(char *cmdStr)
             break;
         case CMD_W:
             toggleLteWake();
+            break;
+        case CMD_B:
+            sys_reboot(GPREGRET_ENTER_BOOTLOADER);
             break;
         default:
             printk("Unknown cmd \"%s\"\n#", cmdStr);
