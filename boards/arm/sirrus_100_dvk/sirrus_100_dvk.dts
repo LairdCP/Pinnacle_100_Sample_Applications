@@ -179,21 +179,22 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 
-		boot_partition: partition@0 {
+		//Bootloader
+		boot_partition: partition@f2000 {
 			label = "mcuboot";
-			reg = <0x000000000 0x0000C000>;
+			reg = <0x000f2000 0x0000C000>;
 		};
-		slot0_partition: partition@c000 {
+
+		//Zephyr application
+		slot0_partition: partition@1000 {
 			label = "image-0";
-			reg = <0x0000C000 0x000069000>;
+			reg = <0x00001000 0x00060000>;
 		};
-		slot1_partition: partition@75000 {
-			label = "image-1";
-			reg = <0x00075000 0x000069000>;
-		};
-		scratch_partition: partition@de000 {
+
+		scratch_partition: partition@b3000 {
 			label = "image-scratch";
-			reg = <0x000de000 0x0001e000>;
+			reg = <0x000b3000 0x00001000>;
+
 		};
 
 #if defined(CONFIG_FS_FLASH_MAP_STORAGE)
