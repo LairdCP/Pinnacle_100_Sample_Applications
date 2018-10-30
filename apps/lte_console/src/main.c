@@ -2,13 +2,15 @@
 
 #include <zephyr.h>
 #include <misc/printk.h>
+#include <version.h>
 
 #include "app_led.h"
 
-
 void main(void)
 {
-    printk("Newcastle Test App\nSystem up time %d us\n", SYS_CLOCK_HW_CYCLES_TO_NS(k_cycle_get_32())/1000);
+    printk("Sirrus 100 LTE Console %d.%d.%d\nBranch: %s\nCommit: %s\nSystem up time %d us\n\n",
+           APP_MAJOR, APP_MINOR, APP_PATCH,
+           GIT_BRANCH, GIT_COMMIT_HASH, SYS_CLOCK_HW_CYCLES_TO_NS(k_cycle_get_32()) / 1000);
     led_init();
 
     while (1)
