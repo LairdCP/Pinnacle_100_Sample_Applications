@@ -10,9 +10,21 @@
             "problemMatcher": []
         },
         {
-            "label": "flash",
+            "label": "flash MBR",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash",
+            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase --reset",
+            "problemMatcher": []
+        },
+        {
+            "label": "flash application",
+            "type": "shell",
+            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash && nrfjprog -f NRF52 --reset",
+            "problemMatcher": []
+        },
+        {
+            "label": "flash MBR + application",
+            "type": "shell",
+            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash && nrfjprog -f NRF52 --reset",
             "problemMatcher": []
         },
         {
