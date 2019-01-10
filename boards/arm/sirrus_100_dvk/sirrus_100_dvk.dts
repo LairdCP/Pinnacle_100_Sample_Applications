@@ -9,7 +9,7 @@
 
 / {
 	model = "Sirrus 100 Dev Kit";
-	compatible = "nordic,pca10056-dk", "nordic,nrf52840-qiaa",
+	compatible = "laird,sirrus100-dvk", "nordic,nrf52840-qiaa",
 		     "nordic,nrf52840";
 
 	chosen {
@@ -107,6 +107,20 @@
 	rx-pin = <16>;
 	rts-pin = <13>;
 	cts-pin = <15>;
+	hl7800 {
+		compatible = "swi,hl7800";
+		label = "hl7800";
+		mdm-reset-gpios = <&gpio1 15 0>;
+		mdm-wake-gpios = <&gpio1 13 0>;
+		mdm-pwr-on-gpios = <&gpio1 2 0>;
+		mdm-fast-shutd-gpios = <&gpio1 14 0>;
+		mdm-uart-dtr-gpios = <&gpio0 31 0>;
+		mdm-lte-tx-on-gpios = <&gpio1 3 0>;
+		mdm-gps-ext-lna-en-gpios = <&gpio1 12 0>;
+		mdm-uart-cts-gpios = <&gpio0 15 0>;
+		mdm-vgpio-gpios = <&gpio1 11 0>;  // Set to button 4 GPIO for now because of easy board mod.  Change this later
+		status = "ok";
+	};    
 };
 
 &i2c0 {

@@ -18,7 +18,8 @@
                 "${workspaceFolder}/boards/arm/newcastle",
                 "${workspaceFolder}/zephyr/arch/arm/soc/nordic_nrf/include",
                 "${workspaceFolder}/zephyr/ext/hal/nordic/nrfx/mdk",
-                "${workspaceFolder}/build/lte_console/zephyr/include/generated"
+                "${workspaceFolder}/build/lte_console/zephyr/include/generated",
+                "${workspaceFolder}/apps/lte_console/include"
             ],
             "defines": [
                 "_DEBUG",

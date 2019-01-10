@@ -12,7 +12,10 @@
         "initializer_list": "c",
         "type_traits": "c",
         "xutility": "c",
-        "device.h": "c"
+        "device.h": "c",
+        "modem_receiver.h": "c",
+        "hl7800.h": "c",
+        "buf.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

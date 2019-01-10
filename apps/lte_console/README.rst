@@ -1,25 +1,20 @@
-.. _ble_peripheral:
+.. _sirrus100_lte_console:
 
-Bluetooth: Peripheral
+Sirrus 100: LTE Console
 #####################
 
 Overview
 ********
 
-Application demonstrating the BLE Peripheral role. It has several well-known and
-vendor-specific GATT services that it exposes.
+TODO
 
 
 Requirements
 ************
 
-* BlueZ running on the host, or
-* A board with BLE support
+TODO
 
 Building and Running
 ********************
 
-This sample can be found under :file:`samples/bluetooth/peripheral` in the
-Zephyr tree.
-
-See :ref:`bluetooth setup section <bluetooth_setup>` for details.
+TODO
