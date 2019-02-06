@@ -26,6 +26,42 @@ void led_init(void)
     {
         printk("Error setting GPIO %d!\n", HEARTBEAT_LED);
     }
+
+    ret = gpio_pin_configure(gpio_dev, LED1, (GPIO_DIR_OUT));
+    if (ret)
+    {
+        printk("Error configuring GPIO %d!\n", LED1);
+    }
+
+    ret = gpio_pin_write(gpio_dev, LED1, LED_OFF);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", LED1);
+    }
+
+    ret = gpio_pin_configure(gpio_dev, LED2, (GPIO_DIR_OUT));
+    if (ret)
+    {
+        printk("Error configuring GPIO %d!\n", LED2);
+    }
+
+    ret = gpio_pin_write(gpio_dev, LED2, LED_OFF);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", LED2);
+    }
+
+    ret = gpio_pin_configure(gpio_dev, LED3, (GPIO_DIR_OUT));
+    if (ret)
+    {
+        printk("Error configuring GPIO %d!\n", LED3);
+    }
+
+    ret = gpio_pin_write(gpio_dev, LED3, LED_OFF);
+    if (ret)
+    {
+        printk("Error setting GPIO %d!\n", LED3);
+    }
 }
 
 void ledHeartBeat(void)
