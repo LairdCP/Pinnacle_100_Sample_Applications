@@ -5,7 +5,6 @@
 #include <bluetooth/gatt.h>
 
 #include <gatt/hrs.h>
-#include <gatt/dis.h>
 #include <gatt/bas.h>
 #include <gatt/cts.h>
 
@@ -290,7 +289,6 @@ static void bt_ready(int err)
     hrs_init(0x01);
     bas_init();
     cts_init();
-    dis_init(CONFIG_SOC, "Laird");
     bt_gatt_service_register(&vnd_svc);
 
     if (IS_ENABLED(CONFIG_SETTINGS))
@@ -493,5 +491,6 @@ void app_bt_thread()
     }
 }
 
+// BT thread is currently disabled. Uncomment below to add BT thread.
 // K_THREAD_DEFINE(app_bt_id, 512, app_bt_thread, NULL, NULL, NULL,
 //                 7, 0, K_NO_WAIT);

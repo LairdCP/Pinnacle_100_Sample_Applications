@@ -1,6 +1,6 @@
 # Kconfig - Sirrus(TM) 100 DVK board configuration
 #
-# Copyright (c) 2018 Laird Technologies
+# Copyright (c) 2019 Laird Connectivity
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,6 +8,30 @@ if BOARD_SIRRUS_100_DVK
 
 config BOARD
 	default "sirrus_100_dvk"
+
+config GPIO
+	default y
+
+if ADC
+
+config ADC_0
+	default y
+
+endif # ADC
+
+if I2C
+
+config I2C_0
+	default y
+
+endif # I2C
+
+if SPI
+
+config SPI_0
+	default y
+
+endif # SPI
 
 if USB
 
@@ -19,57 +43,25 @@ config USB_DEVICE_STACK
 
 endif # USB
 
-if FLASH
+if IEEE802154
 
-config FLASH_HAS_DRIVER_ENABLED
-	def_bool y
+config IEEE802154_NRF5
+	default y
 
-config FLASH_HAS_PAGE_LAYOUT
-	def_bool y
+endif # IEEE802154
 
-config SOC_FLASH_NRF
-	def_bool y
-
-config SOC_FLASH_NRF_RADIO_SYNC
-	def_bool y
+if FLASH && SPI
 
 config SPI_FLASH_W25QXXDV
-	def_bool y
+	default y
 
-config SPI_FLASH_W25QXXDV_SPI_NAME
-	default "SPI_0"
-
-config SPI_FLASH_W25QXXDV_DRV_NAME
-	default "W25QXXDV"
-
-config SPI_FLASH_W25QXXDV_INIT_PRIORITY
-	default 80
-
-config SPI_FLASH_W25QXXDV_SPI_FREQ_0
-	default 8000000
-
-config SPI_FLASH_W25QXXDV_SPI_SLAVE
-	default 1
+if SPI_FLASH_W25QXXDV
 
 config SPI_FLASH_W25QXXDV_GPIO_SPI_CS
-	def_bool y
+	default y
 
-config SPI_FLASH_W25QXXDV_GPIO_SPI_CS_DRV_NAME
-	default "GPIO_0"
+endif # SPI_FLASH_W25QXXDV
 
-config SPI_FLASH_W25QXXDV_GPIO_SPI_CS_PIN
-	default 17
-
-config SPI_FLASH_W25QXXDV_GPIO_CS_WAIT_DELAY
-	default 50
-
-config SPI_FLASH_W25QXXDV_FLASH_SIZE
-	default 67108864
-
-config SPI_FLASH_W25QXXDV_DEVICE_ID
-	default 0x00c22817
-
-endif # FLASH
-
+endif # FLASH && SPI
 
 endif # BOARD_SIRRUS_100_DVK

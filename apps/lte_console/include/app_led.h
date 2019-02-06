@@ -1,8 +1,6 @@
 #ifndef APP_LED_H
 #define APP_LED_H
 
-#include <board.h>
-
 #define LED_OFF 0
 #define LED_ON  1
 #define HEARTBEAT_LED_PORT  LED1_GPIO_CONTROLLER
