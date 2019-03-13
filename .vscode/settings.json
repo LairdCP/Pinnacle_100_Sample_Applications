@@ -15,7 +15,8 @@
         "device.h": "c",
         "modem_receiver.h": "c",
         "hl7800.h": "c",
-        "buf.h": "c"
+        "buf.h": "c",
+        "led_strip.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
