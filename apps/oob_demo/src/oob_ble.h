@@ -15,3 +15,8 @@
 #include <misc/byteorder.h>
 
 void oob_ble_initialise(void);
+
+void bt_scan(void);
+
+void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
+		  struct net_buf_simple *ad);
