@@ -15,15 +15,23 @@
 
 #include "oob_ble.h"
 
-void oob_ble_initialise(void)
+static void bt_ready(int err)
 {
-	int err;
-
-	err = bt_enable(NULL);
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
 
 	printk("Bluetooth initialized\n");
+}
+
+void oob_ble_initialise(void)
+{
+	int err;
+
+	err = bt_enable(bt_ready);
+	if (err) {
+		printk("Bluetooth init failed (err %d)\n", err);
+		return;
+	}
 }
