@@ -3,3 +3,4 @@ build/
 *.nul.old
 .reviewboardrc
 .west/
+.vscode/ipch/
