@@ -119,6 +119,7 @@
 		mdm-gps-ext-lna-en-gpios = <&gpio1 12 0>;
 		mdm-uart-cts-gpios = <&gpio0 15 0>;
 		mdm-vgpio-gpios = <&gpio1 11 0>;  // Set to button 4 GPIO for now because of easy board mod.  Change this later
+		mdm-uart-dsr-gpios = <&gpio0 2 0>; // This IO may change later
 		status = "ok";
 	};    
 };
@@ -150,37 +151,38 @@
 &flash0 {
 	/*
 	 * For more information, see:
-	 * http://docs.zephyrproject.org/devices/dts/flash_partitions.html
+	 * http://docs.zephyrproject.org/latest/guides/dts/index.html#flash-partitions
 	 */
 	partitions {
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
 
-		//Bootloader
-		boot_partition: partition@f2000 {
-			label = "mcuboot";
-			reg = <0x000f2000 0x0000C000>;
+		mbr_partition: partition@0 {
+			label = "nordic-mbr";
+			reg = <0x000000000 0x00001000>;
 		};
-
-		//Zephyr application
 		slot0_partition: partition@1000 {
-			label = "image-0";
-			reg = <0x00001000 0x00060000>;
+			label = "app-img";
+			reg = <0x00001000 0x0000D1000>;
 		};
-
-		scratch_partition: partition@b3000 {
-			label = "image-scratch";
-			reg = <0x000b3000 0x00001000>;
-
-		};
-
-#if defined(CONFIG_FS_FLASH_MAP_STORAGE)
-		storage_partition: partition@fc000 {
+		/*
+		 * The flash starting at 0x000d1000 and ending at
+		 * 0x000d9000 is reserved for use by the application.
+		 */
+		/* Storage partition will be used by FCB/NFFS/NVS if enabled. */
+		storage_partition: partition@D1000 {
 			label = "storage";
-			reg = <0x000fc000 0x00004000>;
+			reg = <0x000D1000 0x00008000>;
 		};
-#endif
+		boot_upgrade_partition: partition@D9000 {
+			label = "boot-upgrade";
+			reg = <0x000D9000 0x000012000>;
+		};
+		bootloader_partition: partition@EB000 {
+			label = "bootloader-img";
+			reg = <0x000EB000 0x000015000>;
+		};
 	};
 };
 

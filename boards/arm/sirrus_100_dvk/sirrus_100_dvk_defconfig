@@ -41,7 +41,7 @@ CONFIG_MODEM_HL7800=y
 # Networking
 CONFIG_NETWORKING=y
 CONFIG_NET_IPV4=y
-
-# Hack: disable IPv6 for now
+CONFIG_NET_TCP=y
+# disable IPv6 for now
 CONFIG_NET_IPV6=n
 CONFIG_NET_CONFIG_NEED_IPV6=n
