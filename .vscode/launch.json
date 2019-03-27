@@ -6,7 +6,7 @@
     "configurations": [
         {
             "cwd": "${workspaceRoot}",
-            "executable": "build/lte_console/zephyr/zephyr.elf",
+            "executable": "build/${input:app}/zephyr/zephyr.elf",
             "name": "Debug",
             "request": "launch",
             "type": "cortex-debug",
@@ -14,6 +14,19 @@
             "device": "nRF52840_xxAA",
             "svdFile": "${workspaceRoot}/zephyr/ext/hal/nordic/nrfx/mdk/nrf52840.svd",
             "interface": "swd"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "app",
+            "description": "Select an app to debug",
+            "default": "apps/lte_console",
+            "type": "pickString",
+            "options": [
+                "apps/lte_console",
+                "tests/udp_echo_client",
+                "tests/http_get"
+            ]
         }
     ]
 }

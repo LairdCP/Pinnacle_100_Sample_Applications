@@ -2,11 +2,34 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
+    "windows": {
+        "options": {
+            "shell": {
+                "executable": "cmd.exe",
+                "args": [
+                    "/d",
+                    "/c"
+                ]
+            }
+        }
+    },
     "tasks": [
         {
             "label": "build",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja all",
+            "command": "source zephyr/zephyr-env.sh && west build -b sirrus_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+            "windows": {
+                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -b sirrus_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+            },
+            "problemMatcher": [],
+        },
+        {
+            "label": "flash application",
+            "type": "shell",
+            "command": "source zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
+            "windows": {
+                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west flash -d ${workspaceRoot}\\build\\${input:buildApp} && nrfjprog -f NRF52 --reset"
+            },
             "problemMatcher": []
         },
         {
@@ -16,28 +39,41 @@
             "problemMatcher": []
         },
         {
-            "label": "flash application",
-            "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash && nrfjprog -f NRF52 --reset",
-            "problemMatcher": []
-        },
-        {
             "label": "flash MBR + application",
             "type": "shell",
-            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja flash && nrfjprog -f NRF52 --reset",
+            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
             "problemMatcher": []
         },
         {
             "label": "clean",
             "type": "shell",
-            "command": "cd zephyr && source zephyr-env.sh && cd ../build/lte_console && ninja clean",
+            "command": "source zephyr/zephyr-env.sh && west build -t clean -d build/${input:buildApp}",
+            "windows": {
+                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
+            },
             "problemMatcher": []
         },
         {
-            "label": "cmake",
+            "label": "pristine",
             "type": "shell",
-            "command": "mkdir build/lte_console -p && cd zephyr && source zephyr-env.sh && cd ../build/lte_console && rm -rf * && cmake -GNinja ../../apps/lte_console",
+            "command": "source zephyr/zephyr-env.sh && west build -t pristine -d build/${input:buildApp}",
+            "windows": {
+                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
+            },
             "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "buildApp",
+            "description": "Select an app to build",
+            "default": "apps/lte_console",
+            "type": "pickString",
+            "options": [
+                "apps/lte_console",
+                "tests/udp_echo_client",
+                "tests/http_get"
+            ]
         }
     ]
 }
