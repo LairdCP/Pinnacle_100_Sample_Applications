@@ -25,7 +25,8 @@
             "options": [
                 "apps/lte_console",
                 "tests/udp_echo_client",
-                "tests/http_get"
+                "tests/http_get",
+                "tests/tcp_echo_client",
             ]
         }
     ]
