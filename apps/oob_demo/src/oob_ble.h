@@ -20,3 +20,7 @@ void bt_scan(void);
 
 void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 		  struct net_buf_simple *ad);
+void disconnected(struct bt_conn *conn, u8_t reason);
+
+void connected(struct bt_conn *conn, u8_t err);
+
