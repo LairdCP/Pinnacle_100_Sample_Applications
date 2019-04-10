@@ -11,15 +11,16 @@ LOG_MODULE_REGISTER(http_get);
 #include <net/net_mgmt.h>
 #include <net/socket.h>
 
-#define HTTP_HOST_IP "172.217.164.142"
 #define HTTP_HOST "www.google.com"
-#define HTTP_PORT 80
+#define HTTP_PORT_STR "80"
 /* HTTP path to request */
-#define HTTP_PATH "/index.html"
+#define HTTP_PATH "/"
 
 #define REQUEST                                                                \
 	"GET " HTTP_PATH " HTTP/1.1\r\nHost: " HTTP_HOST                       \
 	"\r\nAccept: text\r\nConnection: Close\r\n\r\n"
+
+#define DNS_RETRIES 3
 
 static char response[1501];
 
@@ -36,41 +37,45 @@ static void iface_evt_handler(struct net_mgmt_event_callback *cb,
 	k_sem_give(&iface_ready);
 }
 
-static int test_http_get()
+static int test_http_get_dns()
 {
-	int ret, len, sock = 0;
-	struct sockaddr_in dest;
+	int ret, len, sock, dns_retries = 0;
+	static struct addrinfo hints;
+	struct addrinfo *res;
 
-	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+
+	dns_retries = DNS_RETRIES;
+	do {
+		ret = getaddrinfo(HTTP_HOST, HTTP_PORT_STR, &hints, &res);
+		if (ret != 0) {
+			k_sleep(K_SECONDS(2));
+		}
+		dns_retries--;
+	} while (ret != 0 && dns_retries != 0);
+	if (ret != 0) {
+		printk("Unable to resolve address, quitting\n");
+		goto done;
+	}
+
+	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock < 0) {
 		LOG_ERR("creating socket failed");
-		return 1;
+		ret = 1;
+		goto done;
 	}
 
-	// 	/* Put the socket in non-blocking mode */
-	// 	if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK) < 0) {
-	// 		LOG_ERR("Err setting socket to non-blocking");
-	// 		return 1;
-	// 	}
-
-	dest.sin_family = AF_INET;
-	ret = net_addr_pton(AF_INET, HTTP_HOST_IP, &dest.sin_addr);
-	if (ret < 0) {
-		LOG_ERR("setting dest IP addr failed (%d)", ret);
-		return ret;
-	}
-	dest.sin_port = htons(HTTP_PORT);
-
-	ret = connect(sock, (struct sockaddr *)&dest, sizeof(dest));
+	ret = connect(sock, res->ai_addr, res->ai_addrlen);
 	if (ret < 0) {
 		LOG_ERR("connect socket failed (%d)", ret);
-		return ret;
+		goto done;
 	}
 
 	ret = send(sock, REQUEST, strlen(REQUEST), 0);
 	if (ret < 1) {
 		LOG_ERR("sending data failed (%d)", ret);
-		return ret;
+		goto close;
 	}
 
 	printk("\r\n\r\nResponse:\r\n\r\n");
@@ -79,18 +84,17 @@ static int test_http_get()
 
 		if (len == -EAGAIN) {
 			LOG_ERR("RX timeout (%d)", len);
-			return len;
+			goto close;
 		} else if (len == -EWOULDBLOCK) {
 			LOG_ERR("RX EWOULDBLOCK (%d)", len);
-			return len;
-		} else {
+			goto close;
+		} else if (len < 0) {
 			LOG_ERR("RX unknown err (%d)", len);
-			return len;
-		}
-
-		if (len == 0) {
+			goto close;
+		} else if (len == 0) {
 			/* socket shutdown properly */
-			break;
+			LOG_INF("Server closed socket");
+			goto done;
 		}
 
 		response[len] = 0;
@@ -99,12 +103,15 @@ static int test_http_get()
 
 	printk("\r\n");
 
+close:
+	LOG_INF("Closing socket");
 	ret = close(sock);
 	if (ret < 0) {
 		LOG_ERR("closing socket failed");
-		return ret;
+		goto done;
 	}
 
+done:
 	return ret;
 }
 
@@ -143,10 +150,10 @@ void main(void)
 	LOG_INF("Starting tests...");
 	/* run tests */
 
-	LOG_INF("Run test_http_get");
-	ret = test_http_get();
+	LOG_INF("Run test_http_get_dns");
+	ret = test_http_get_dns();
 	if (ret < 0) {
-		LOG_ERR("test_http_get failed");
+		LOG_ERR("test_http_get_dns failed");
 		return;
 	}
 

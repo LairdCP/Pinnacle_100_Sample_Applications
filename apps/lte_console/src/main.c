@@ -1,4 +1,6 @@
 /* main.c - Application main entry point */
+#include <logging/log.h>
+LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
 #include <zephyr.h>
 #include <misc/printk.h>
@@ -60,9 +62,10 @@ SHELL_CMD_REGISTER(hl, &hl_cmds, "HL7800 commands", NULL);
 
 void main(void)
 {
-	printk("Sirrus 100 LTE Console %d.%d.%d\r\nBranch: %s\r\nCommit: %s\r\nSystem up time %d us\r\n\r\n",
-	       APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH,
-	       SYS_CLOCK_HW_CYCLES_TO_NS(k_cycle_get_32()) / 1000);
+	LOG_INF("Sirrus 100 LTE Console %d.%d.%d\r\n"
+		"Branch: %s\r\n"
+		"Commit: %s\r\n",
+		APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
 	led_init();
 
 	while (1) {
