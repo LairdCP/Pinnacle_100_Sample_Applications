@@ -74,6 +74,7 @@
                 "tests/udp_echo_client",
                 "tests/http_get",
                 "tests/tcp_echo_client",
+                "tests/aws_connect",
             ]
         }
     ]
