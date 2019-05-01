@@ -28,6 +28,7 @@ struct bt_conn_cb conn_callbacks = {
 	.disconnected = disconnected,
 };
 
+/* This callback is triggered after recieving BLE adverts */
 void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 		  struct net_buf_simple *ad)
 {
@@ -85,6 +86,8 @@ void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 }
 
 
+
+/* This callback is triggered when a BLE connection occurs */
 void connected(struct bt_conn *conn, u8_t err)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
@@ -99,6 +102,7 @@ void connected(struct bt_conn *conn, u8_t err)
 	}
 }
 
+/* This callback is triggered when a BLE disconnection occurs */
 void disconnected(struct bt_conn *conn, u8_t reason)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
@@ -118,7 +122,7 @@ void disconnected(struct bt_conn *conn, u8_t reason)
 	bt_scan();
 }
 
-
+/* Function for starting BLE scan */
 void bt_scan(void)
 {
 	uint8_t err;
@@ -132,6 +136,7 @@ void bt_scan(void)
 	printk("Scanning for remote BLE devices started\n");
 }
 
+/* This callback is triggered when BLE stack is initalised */
 static void bt_ready(int err)
 {
 	if (err) {
@@ -147,6 +152,7 @@ static void bt_ready(int err)
 	bt_scan();
 }
 
+/* Function for initialising the BLE portion of the OOB demo */
 void oob_ble_initialise(void)
 {
 	int err;
