@@ -297,6 +297,7 @@ static int try_to_connect(struct mqtt_client *client)
 		mqtt_input(client);
 
 		if (!connected) {
+			connectFailures++;
 			mqtt_abort(client);
 		}
 	}
