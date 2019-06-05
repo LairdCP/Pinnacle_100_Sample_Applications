@@ -3,13 +3,13 @@
 
 #define LED_OFF 0
 #define LED_ON  1
-#define HEARTBEAT_LED_PORT  LED4_GPIO_CONTROLLER
-#define HEARTBEAT_LED       LED4_GPIO_PIN
+#define HEARTBEAT_LED_PORT  LED3_GPIO_CONTROLLER
+#define HEARTBEAT_LED       LED3_GPIO_PIN
 
-#define LED_CONTROLLER      LED1_GPIO_CONTROLLER
-#define LED1                LED1_GPIO_PIN
-#define LED2                LED2_GPIO_PIN
-#define LED3                LED3_GPIO_PIN
+#define LED_CONTROLLER      LED0_GPIO_CONTROLLER
+#define LED1                LED0_GPIO_PIN
+#define LED2                LED1_GPIO_PIN
+#define LED3                LED2_GPIO_PIN
 
 /**
  *  Init the LEDs for the board
