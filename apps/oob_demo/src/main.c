@@ -13,6 +13,7 @@
 #include <misc/printk.h>
 
 #include "oob_common.h"
+#include "led.h"
 #include "oob_ble.h"
 
 /* This function is used to send the latest sensor data out to the server */
@@ -83,6 +84,9 @@ void SensorUpdated(u8_t sensor, s32_t reading)
 
 void main(void)
 {
+	/* init LEDS */
+	led_init();
+	
 	/* Start up BLE portion of the demo */
 	oob_ble_initialise();
 	oob_ble_set_callback(SensorUpdated);

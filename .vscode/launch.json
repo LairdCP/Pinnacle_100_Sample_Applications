@@ -20,10 +20,11 @@
         {
             "id": "app",
             "description": "Select an app to debug",
-            "default": "apps/lte_console",
+            "default": "apps/oob_demo",
             "type": "pickString",
             "options": [
                 "apps/lte_console",
+                "apps/oob_demo",
                 "tests/udp_echo_client",
                 "tests/http_get",
                 "tests/tcp_echo_client",

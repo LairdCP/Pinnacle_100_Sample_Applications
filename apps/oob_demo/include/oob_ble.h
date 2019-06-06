@@ -6,6 +6,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#ifndef __OOB_BLE_H__
+#define __OOB_BLE_H__
+
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/conn.h>
@@ -14,11 +17,16 @@
 #include <misc/byteorder.h>
 
 struct remote_ble_sensor {
-	uint8_t app_state;						/* State of app, see BT_DEMO_APP_STATE_XXX */
-	uint8_t ess_service_handle;					/* Handle of ESS service, used when searching for chars */
-	struct bt_gatt_subscribe_params temperature_subscribe_params;	/* Temperature gatt subscribe parameters, see gatt.h for contents */
-	struct bt_gatt_subscribe_params pressure_subscribe_params;	/* Pressure gatt subscribe parameters, see gatt.h for contents */
-	struct bt_gatt_subscribe_params humidity_subscribe_params;	/* Humidity gatt subscribe parameters, see gatt.h for contents */
+	/* State of app, see BT_DEMO_APP_STATE_XXX */
+	uint8_t app_state;
+	/* Handle of ESS service, used when searching for chars */
+	uint8_t ess_service_handle;
+	/* Temperature gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params temperature_subscribe_params;
+	/* Pressure gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params pressure_subscribe_params;
+	/* Humidity gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params humidity_subscribe_params;
 };
 
 /* Function for starting BLE scan */
@@ -45,13 +53,11 @@ u8_t service_discover_func(struct bt_conn *conn,
 			   struct bt_gatt_discover_params *params);
 
 /* This callback is triggered when remote characteristics are discovered */
-u8_t char_discover_func(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
+u8_t char_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 			struct bt_gatt_discover_params *params);
 
 /* This callback is triggered when remote descriptors are discovered */
-u8_t desc_discover_func(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
+u8_t desc_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 			struct bt_gatt_discover_params *params);
 
 /* This callback is triggered when a BLE disconnection occurs */
@@ -67,7 +73,10 @@ u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid);
 u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid);
 
 /* This function is used to discover descriptors in remote device */
-u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle);
+u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid,
+	       u16_t start_handle);
 
 /* Function for setting the sensor read callback function */
 void oob_ble_set_callback(void * func);
+
+#endif /* __OOB_BLE_H__ */
