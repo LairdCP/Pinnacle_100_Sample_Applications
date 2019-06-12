@@ -15,7 +15,7 @@
 
 #include "oob_ble.h"
 
-#define BT_REMOTE_DEVICE_NAME_STR                       "BL654 SENSOR"
+#define BT_REMOTE_DEVICE_NAME_STR                       "BL654 BME280 Sensor"
 
 #define BT_DEMO_APP_STATE_FINDING_DEVICE                0			/* Scanning for remote sensor */
 #define BT_DEMO_APP_STATE_FINDING_SERVICE               1			/* Searching for ESS service */
