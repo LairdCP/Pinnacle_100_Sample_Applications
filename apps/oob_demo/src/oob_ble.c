@@ -13,6 +13,7 @@
 #include <misc/printk.h>
 #include <bluetooth/uuid.h>
 
+#include "oob_common.h"
 #include "oob_ble.h"
 
 #define BT_REMOTE_DEVICE_NAME_STR                       "BL654 BME280 Sensor"
@@ -40,16 +41,18 @@ struct bt_conn_cb conn_callbacks = {
 
 struct remote_ble_sensor remote_ble_sensor_params;
 
+sensor_updated_function_t SensorCallbackFunction = NULL;
+
 /* This callback is triggered after recieving BLE adverts */
 void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 		  struct net_buf_simple *ad)
 {
 	static const char devname_expected[] = BT_REMOTE_DEVICE_NAME_STR;
 	char devname_found[sizeof(devname_expected) - 1];
-	uint8_t ad_element_id;
-	uint8_t ad_element_len;
-	uint8_t ad_element_indx = 0;
-	uint8_t err;
+	u8_t ad_element_id;
+	u8_t ad_element_len;
+	u8_t ad_element_indx = 0;
+	u8_t err;
 
 	/* Leave this function if already connected */
 	if (default_conn) {
@@ -111,23 +114,38 @@ u8_t notify_func_callback(struct bt_conn *conn,
 	/* Check if the notifications received have the temperature handle */
 	if (params->value_handle == remote_ble_sensor_params.temperature_subscribe_params.value_handle) {
 		/* Temperature is a 16 bit value */
-		uint8_t temperature_data[2];
+		u8_t temperature_data[2];
 		memcpy(temperature_data, data, length);
 		printk("ESS Temperature value = %d\n", ((temperature_data[1]<<8 & 0xFF00)) + (temperature_data[0]));
+		if (SensorCallbackFunction != NULL)
+		{
+			//Pass data to callback function
+			SensorCallbackFunction(SENSOR_TYPE_TEMPERATURE, ((temperature_data[1]<<8 & 0xFF00)) + (temperature_data[0]));
+		}
 	}
 	/* Check if the notifications received have the humidity handle */
 	else if (params->value_handle == remote_ble_sensor_params.humidity_subscribe_params.value_handle) {
 		/* Humidity is a 16 bit value */
-		uint8_t humidity_data[2];
+		u8_t humidity_data[2];
 		memcpy(humidity_data, data, length);
 		printk("ESS Humidity value = %d\n", ((humidity_data[1]<<8) & 0xFF00) + humidity_data[0]);
+		if (SensorCallbackFunction != NULL)
+		{
+			//Pass data to callback function
+			SensorCallbackFunction(SENSOR_TYPE_HUMIDITY, ((humidity_data[1]<<8) & 0xFF00) + humidity_data[0]);
+		}
 	}
 	/* Check if the notifications received have the pressure handle */
 	else if (params->value_handle == remote_ble_sensor_params.pressure_subscribe_params.value_handle) {
 		/*Pressure is a 32 bit value */
-		uint8_t pressure_data[4];
+		u8_t pressure_data[4];
 		memcpy(pressure_data, data, length);
 		printk("ESS Pressure value = %d\n", (((pressure_data[3]<<24) & 0xFF000000) + ((pressure_data[2]<<16) & 0xFF0000) + ((pressure_data[1]<<8) & 0xFF00) + pressure_data[0]));
+		if (SensorCallbackFunction != NULL)
+		{
+			//Pass data to callback function
+			SensorCallbackFunction(SENSOR_TYPE_PRESSURE, (((pressure_data[3]<<24) & 0xFF000000) + ((pressure_data[2]<<16) & 0xFF0000) + ((pressure_data[1]<<8) & 0xFF00) + pressure_data[0]));
+		}
 	}
 
 	return BT_GATT_ITER_CONTINUE;
@@ -136,7 +154,7 @@ u8_t notify_func_callback(struct bt_conn *conn,
 /* This function is used to discover descriptors in remote device */
 u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle)
 {
-	uint8_t err;
+	u8_t err;
 
 	/* Update discover parameters before initiating discovery */
 	discover_params.type = BT_GATT_DISCOVER_DESCRIPTOR;
@@ -153,7 +171,7 @@ u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle)
 /* This function is used to discover characteristics in remote device */
 u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 {
-	uint8_t err;
+	u8_t err;
 
 	/* Update discover parameters before initiating discovery */
 	discover_params.type = BT_GATT_DISCOVER_CHARACTERISTIC;
@@ -171,7 +189,7 @@ u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 {
 
-	uint8_t err;
+	u8_t err;
 
 	/* Update discover parameters before initiating discovery */
 	discover_params.type = BT_GATT_DISCOVER_PRIMARY;
@@ -190,7 +208,7 @@ u8_t desc_discover_func(struct bt_conn *conn,
 			const struct bt_gatt_attr *attr,
 			struct bt_gatt_discover_params *params)
 {
-	uint8_t err;
+	u8_t err;
 
 	if (remote_ble_sensor_params.app_state == BT_DEMO_APP_STATE_FINDING_TEMP_CHAR) {
 		/* Found temperature CCCD, enable notifications and move on */
@@ -263,7 +281,7 @@ u8_t char_discover_func(struct bt_conn *conn,
 			const struct bt_gatt_attr *attr,
 			struct bt_gatt_discover_params *params)
 {
-	uint8_t err;
+	u8_t err;
 
 	if (!bt_uuid_cmp(discover_params.uuid, BT_UUID_TEMPERATURE)) {
 		printk("Found ESS Temperature characteristic\n");
@@ -392,7 +410,7 @@ void disconnected(struct bt_conn *conn, u8_t reason)
 /* Function for starting BLE scan */
 void bt_scan(void)
 {
-	uint8_t err;
+	u8_t err;
 
 	err = bt_le_scan_start(BT_LE_SCAN_ACTIVE, device_found);
 	if (err) {
@@ -432,4 +450,10 @@ void oob_ble_initialise(void)
 		printk("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
+}
+
+/* Function for setting the sensor read callback function */
+void oob_ble_set_callback(void * func)
+{
+	SensorCallbackFunction = (sensor_updated_function_t)func;
 }

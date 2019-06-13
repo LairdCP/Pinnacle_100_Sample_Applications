@@ -1,5 +1,4 @@
-
-/* oob_ble.c - Header file for the BLE portion for out of box demo */
+/* oob_ble.h - Header file for the BLE portion for out of box demo */
 
 /*
  * Copyright (c) 2019 Laird Connectivity
@@ -70,3 +69,5 @@ u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid);
 /* This function is used to discover descriptors in remote device */
 u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle);
 
+/* Function for setting the sensor read callback function */
+void oob_ble_set_callback(void * func);
