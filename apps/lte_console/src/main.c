@@ -62,7 +62,7 @@ SHELL_CMD_REGISTER(hl, &hl_cmds, "HL7800 commands", NULL);
 
 void main(void)
 {
-	LOG_INF("Sirrus 100 LTE Console %d.%d.%d\r\n"
+	LOG_INF("Pinnacle 100 LTE Console %d.%d.%d\r\n"
 		"Branch: %s\r\n"
 		"Commit: %s\r\n",
 		APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);

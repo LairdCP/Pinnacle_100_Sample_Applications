@@ -17,9 +17,9 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "source zephyr/zephyr-env.sh && west build -b sirrus_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+            "command": "source zephyr/zephyr-env.sh && west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
             "windows": {
-                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -b sirrus_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
             },
             "problemMatcher": [],
         },

@@ -127,7 +127,7 @@ SHELL_CMD_REGISTER(ubldr, &ubldr_cmds, "Universal Bootloader commands", NULL);
 
 void main(void)
 {
-	printk("Sirrus 100 Bootloader Regression Test\r\nBranch: %s\r\nCommit: %s\r\nSystem up time %d us\r\n\r\n",
+	printk("Pinnacle 100 Bootloader Regression Test\r\nBranch: %s\r\nCommit: %s\r\nSystem up time %d us\r\n\r\n",
 	       GIT_BRANCH, GIT_COMMIT_HASH,
 	       SYS_CLOCK_HW_CYCLES_TO_NS(k_cycle_get_32()) / 1000);
 }

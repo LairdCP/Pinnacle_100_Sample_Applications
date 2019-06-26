@@ -1,13 +1,13 @@
-# Kconfig - Sirrus(TM) 100 DVK board configuration
+# Kconfig - Pinnacle(TM) 100 DVK board configuration
 #
 # Copyright (c) 2019 Laird Connectivity
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if BOARD_SIRRUS_100_DVK
+if BOARD_PINNACLE_100_DVK
 
 config BOARD
-	default "sirrus_100_dvk"
+	default "pinnacle_100_dvk"
 
 if ADC
 
@@ -70,4 +70,4 @@ endif # SPI_NOR
 
 endif # FLASH && SPI
 
-endif # BOARD_SIRRUS_100_DVK
+endif # BOARD_PINNACLE_100_DVK

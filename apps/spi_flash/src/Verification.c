@@ -1,7 +1,7 @@
 /******************************************************************************
 **              Copyright (C) 2019 Laird Connectivity
 **
-** Project:     Sirrus 100 Zephyr
+** Project:     Pinnacle 100 Zephyr
 **
 ** Module:	Verification.c
 **

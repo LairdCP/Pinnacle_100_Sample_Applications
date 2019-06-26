@@ -1,6 +1,6 @@
-.. _sirrus100_oob_demo:
+.. _pinnacle100_oob_demo:
 
-Sirrus100 : OOB Demo
+Pinnacle100 : OOB Demo
 ##################
 
 Overview
@@ -13,7 +13,7 @@ sensor data  over a cellular network.
 Requirements
 ************
 
-* Sirrus100 development kit
+* Pinnacle100 development kit
 
 Building and Running
 ********************

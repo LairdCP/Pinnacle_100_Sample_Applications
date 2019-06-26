@@ -8,8 +8,8 @@
 #include <nordic/nrf52840_qiaa.dtsi>
 
 / {
-	model = "Sirrus 100 Dev Kit";
-	compatible = "laird,sirrus100-dvk", "nordic,nrf52840-qiaa",
+	model = "Pinnacle 100 Dev Kit";
+	compatible = "laird,pinnacle100-dvk", "nordic,nrf52840-qiaa",
 		     "nordic,nrf52840";
 
 	chosen {

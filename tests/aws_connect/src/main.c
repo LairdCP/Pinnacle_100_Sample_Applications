@@ -204,7 +204,7 @@ static char *get_mqtt_payload(enum mqtt_qos qos)
 
 static char *get_mqtt_topic(void)
 {
-	return "sirrus100/data";
+	return "pinnacle100/data";
 }
 
 static int publish(struct mqtt_client *client, enum mqtt_qos qos)

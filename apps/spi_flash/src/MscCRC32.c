@@ -1,7 +1,7 @@
 /******************************************************************************
 **              Copyright (C) 2019 Laird Connectivity
 **
-** Project:     Sirrus 100
+** Project:     Pinnacle 100
 **
 ** Module:	MscCRC32.c
 **

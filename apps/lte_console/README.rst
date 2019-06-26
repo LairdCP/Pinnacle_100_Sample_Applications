@@ -1,6 +1,6 @@
-.. _sirrus100_lte_console:
+.. _pinnacle100_lte_console:
 
-Sirrus 100: LTE Console
+Pinnacle 100: LTE Console
 #####################
 
 Overview

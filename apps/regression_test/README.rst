@@ -1,6 +1,6 @@
-.. _sirrus100_regression_test:
+.. _pinnacle100_regression_test:
 
-Sirrus 100: Regression test
+Pinnacle 100: Regression test
 #####################
 
 Overview

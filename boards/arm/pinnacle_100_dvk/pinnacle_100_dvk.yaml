@@ -1,5 +1,5 @@
-identifier: sirrus_100_dvk
-name: sirrus_100_dvk
+identifier: pinnacle_100_dvk
+name: pinnacle_100_dvk
 type: mcu
 arch: arm
 toolchain:
