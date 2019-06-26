@@ -78,3 +78,27 @@ void led_init(void)
 		LED_LOG_ERR("Error setting GPIO %s!", STRINGIFY(LED4));
 	}
 }
+
+void flash_led(struct device *dev, int pin)
+{
+	int rc;
+	rc = gpio_pin_write(dev, pin, LED_ON);
+	if (rc) {
+		LED_LOG_ERR("Error setting GPIO %d!", pin);
+	}
+	k_sleep(LED_ON_TIME);
+	rc = gpio_pin_write(dev, pin, LED_OFF);
+	if (rc) {
+		LED_LOG_ERR("Error setting GPIO %d!", pin);
+	}
+}
+
+void led_flash_green(void)
+{
+	flash_led(led4_dev, GREEN_LED);
+}
+
+void led_flash_red(void)
+{
+	flash_led(led3_dev, RED_LED);
+}

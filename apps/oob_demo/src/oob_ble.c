@@ -24,7 +24,7 @@ LOG_MODULE_REGISTER(oob_ble);
 #define BLE_LOG_INF(...) LOG_INF(__VA_ARGS__)
 #define BLE_LOG_DBG(...) LOG_DBG(__VA_ARGS__)
 
-#define BT_REMOTE_DEVICE_NAME_STR                       "BL654 BME280 Sensor"
+#define BT_REMOTE_DEVICE_NAME_STR "BL654 BME280 Sensor"
 
 #define BT_DEMO_APP_STATE_FINDING_DEVICE 0 /* Scanning for remote sensor */
 #define BT_DEMO_APP_STATE_FINDING_SERVICE 1 /* Searching for ESS service */
@@ -140,10 +140,12 @@ u8_t notify_func_callback(struct bt_conn *conn,
 		BLE_LOG_INF("ESS Temperature value = %d",
 			    ((temperature_data[1] << 8 & 0xFF00)) +
 				    (temperature_data[0]));
-		if (SensorCallbackFunction != NULL)
-		{
+		if (SensorCallbackFunction != NULL) {
 			//Pass data to callback function
-			SensorCallbackFunction(SENSOR_TYPE_TEMPERATURE, ((temperature_data[1]<<8 & 0xFF00)) + (temperature_data[0]));
+			SensorCallbackFunction(
+				SENSOR_TYPE_TEMPERATURE,
+				((temperature_data[1] << 8 & 0xFF00)) +
+					(temperature_data[0]));
 		}
 	}
 	/* Check if the notifications received have the humidity handle */
@@ -156,10 +158,12 @@ u8_t notify_func_callback(struct bt_conn *conn,
 		BLE_LOG_INF("ESS Humidity value = %d",
 			    ((humidity_data[1] << 8) & 0xFF00) +
 				    humidity_data[0]);
-		if (SensorCallbackFunction != NULL)
-		{
+		if (SensorCallbackFunction != NULL) {
 			//Pass data to callback function
-			SensorCallbackFunction(SENSOR_TYPE_HUMIDITY, ((humidity_data[1]<<8) & 0xFF00) + humidity_data[0]);
+			SensorCallbackFunction(SENSOR_TYPE_HUMIDITY,
+					       ((humidity_data[1] << 8) &
+						0xFF00) +
+						       humidity_data[0]);
 		}
 	}
 	/* Check if the notifications received have the pressure handle */
@@ -174,10 +178,14 @@ u8_t notify_func_callback(struct bt_conn *conn,
 			     ((pressure_data[2] << 16) & 0xFF0000) +
 			     ((pressure_data[1] << 8) & 0xFF00) +
 			     pressure_data[0]));
-		if (SensorCallbackFunction != NULL)
-		{
+		if (SensorCallbackFunction != NULL) {
 			//Pass data to callback function
-			SensorCallbackFunction(SENSOR_TYPE_PRESSURE, (((pressure_data[3]<<24) & 0xFF000000) + ((pressure_data[2]<<16) & 0xFF0000) + ((pressure_data[1]<<8) & 0xFF00) + pressure_data[0]));
+			SensorCallbackFunction(
+				SENSOR_TYPE_PRESSURE,
+				(((pressure_data[3] << 24) & 0xFF000000) +
+				 ((pressure_data[2] << 16) & 0xFF0000) +
+				 ((pressure_data[1] << 8) & 0xFF00) +
+				 pressure_data[0]));
 		}
 	}
 
@@ -424,7 +432,7 @@ u8_t service_discover_func(struct bt_conn *conn,
 /* This callback is triggered when a BLE connection occurs */
 void connected(struct bt_conn *conn, u8_t err)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+	static char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
@@ -516,7 +524,7 @@ void oob_ble_initialise(void)
 }
 
 /* Function for setting the sensor read callback function */
-void oob_ble_set_callback(void * func)
+void oob_ble_set_callback(void *func)
 {
 	SensorCallbackFunction = (sensor_updated_function_t)func;
 }

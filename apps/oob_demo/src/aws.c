@@ -45,6 +45,8 @@ struct addrinfo *saddr;
 
 static sec_tag_t m_sec_tags[] = { APP_CA_CERT_TAG, APP_DEVICE_CERT_TAG };
 
+static struct shadow_reported_struct shadow_persistent_data;
+
 static int tls_init(void)
 {
 	int err = -EINVAL;
@@ -150,29 +152,26 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 	}
 }
 
-static char *get_mqtt_payload(enum mqtt_qos qos)
-{
-	// static char payload[30];
-
-	// snprintk(payload, sizeof(payload),
-	// 	 "{\"state\":{\"reported\":{\"model\":\"Pinnacle 100\"}}}");
-
-	return "{\"state\":{\"reported\":{\"model\":\"Pinnacle 100\"}}}";
-}
-
 static char *get_mqtt_topic(void)
 {
-	return "$aws/things/imei-354616090197570/shadow/update";
+	static char topic[sizeof(
+		"$aws/things/deviceId-###############/shadow/update")];
+
+	snprintk(topic, sizeof(topic), "$aws/things/deviceId-%s/shadow/update",
+		 shadow_persistent_data.state.reported.IMEI);
+
+	return topic;
 }
 
-static int publish(struct mqtt_client *client, enum mqtt_qos qos)
+static int publish_string(struct mqtt_client *client, enum mqtt_qos qos,
+			  char *data)
 {
 	struct mqtt_publish_param param;
 
 	param.message.topic.qos = qos;
 	param.message.topic.topic.utf8 = (u8_t *)get_mqtt_topic();
 	param.message.topic.topic.size = strlen(param.message.topic.topic.utf8);
-	param.message.payload.data = get_mqtt_payload(qos);
+	param.message.payload.data = data;
 	param.message.payload.len = strlen(param.message.payload.data);
 	param.message_id = sys_rand32_get();
 	param.dup_flag = 0U;
@@ -261,11 +260,11 @@ static int process_mqtt_and_sleep(struct mqtt_client *client, int timeout)
 	while (remaining > 0 && connected) {
 		wait(remaining);
 
-		rc = mqtt_live(client);
-		if (rc != 0) {
-			AWS_LOG_ERR("mqtt_live (%d)", rc);
-			return rc;
-		}
+		// rc = mqtt_live(client);
+		// if (rc != 0) {
+		// 	AWS_LOG_ERR("mqtt_live (%d)", rc);
+		// 	return rc;
+		// }
 
 		rc = mqtt_input(client);
 		if (rc != 0) {
@@ -283,6 +282,12 @@ int awsInit(void)
 {
 	int rc;
 	rc = tls_init();
+
+	/* init shadow data */
+	shadow_persistent_data.state.reported.firmware_version = "";
+	shadow_persistent_data.state.reported.os_version = "";
+	shadow_persistent_data.state.reported.radio_version = "";
+	shadow_persistent_data.state.reported.IMEI = "";
 
 	return rc;
 }
@@ -312,7 +317,7 @@ int awsGetServerAddr(void)
 
 int awsConnect(void)
 {
-	AWS_LOG_INF("\r\n\r\nattempting to connect...");
+	AWS_LOG_INF("Attempting to connect to AWS...");
 	int rc = try_to_connect(&client_ctx);
 	if (rc != 0) {
 		AWS_LOG_ERR("AWS connect err (%d)", rc);
@@ -323,42 +328,95 @@ int awsConnect(void)
 void awsDisconnect(void)
 {
 	mqtt_disconnect(&client_ctx);
-	wait(APP_SLEEP_MSECS);
-	mqtt_input(&client_ctx);
+	process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
 }
 
 int awsKeepAlive(void)
 {
 	int rc;
 
+	rc = mqtt_live(&client_ctx);
+	if (rc != 0) {
+		AWS_LOG_ERR("mqtt_live (%d)", rc);
+		goto done;
+	}
+
 	rc = process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
 	if (rc != 0) {
-		goto disconnect;
+		goto done;
 	}
-	goto done;
-disconnect:
-	awsDisconnect();
 done:
 	return rc;
 }
 
-int awsSendData(u32_t data)
+int awsSetShadowKernelVersion(const char *version)
+{
+	shadow_persistent_data.state.reported.os_version = version;
+
+	return 0;
+}
+
+int awsSetShadowIMEI(const char *imei)
+{
+	shadow_persistent_data.state.reported.IMEI = imei;
+
+	return 0;
+}
+
+int awsSetShadowRadioFirmwareVersion(const char *version)
+{
+	shadow_persistent_data.state.reported.radio_version = version;
+
+	return 0;
+}
+
+int awsSetShadowAppFirmwareVersion(const char *version)
+{
+	shadow_persistent_data.state.reported.firmware_version = version;
+
+	return 0;
+}
+
+static int sendData(char *data)
 {
 	int rc;
 
-	rc = publish(&client_ctx, MQTT_QOS_0_AT_MOST_ONCE);
+	rc = publish_string(&client_ctx, MQTT_QOS_0_AT_MOST_ONCE, data);
 	if (rc != 0) {
 		AWS_LOG_ERR("MQTT publish err (%d)", rc);
-		goto disconnect;
+		goto done;
 	}
 
 	rc = process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
 	if (rc != 0) {
-		goto disconnect;
+		AWS_LOG_ERR("process MQTT err (%d)", rc);
+		goto done;
 	}
-	goto done;
-disconnect:
-	awsDisconnect();
+done:
+	return rc;
+}
+
+int awsSendData(char *data)
+{
+	return sendData(data);
+}
+
+int awsPublishShadowPersistentData()
+{
+	int rc;
+	size_t buf_len;
+
+	buf_len = json_calc_encoded_len(shadow_descr, ARRAY_SIZE(shadow_descr),
+					&shadow_persistent_data);
+	char msg[buf_len];
+
+	rc = json_obj_encode_buf(shadow_descr, ARRAY_SIZE(shadow_descr),
+				 &shadow_persistent_data, msg, sizeof(msg));
+	if (rc < 0) {
+		goto done;
+	}
+
+	rc = sendData(msg);
 done:
 	return rc;
 }

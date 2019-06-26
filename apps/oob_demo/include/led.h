@@ -13,9 +13,17 @@
 #define LED4_DEV LED3_GPIO_CONTROLLER
 #define LED4 LED3_GPIO_PIN
 
+#define GREEN_LED LED4
+#define RED_LED LED3
+
+#define LED_ON_TIME 25 // mseconds
+
 /**
  *  Init the LEDs for the board
  */
 void led_init(void);
+
+void led_flash_green(void);
+void led_flash_red(void);
 
 #endif /* LED_H */
