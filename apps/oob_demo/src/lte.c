@@ -15,7 +15,7 @@ LOG_MODULE_REGISTER(oob_lte);
 #include <net/net_context.h>
 #include <net/net_mgmt.h>
 
-#include <drivers/modem/modem_receiver.h>
+#include <modem_receiver.h>
 
 #include <net/socket.h>
 #include <net/mqtt.h>

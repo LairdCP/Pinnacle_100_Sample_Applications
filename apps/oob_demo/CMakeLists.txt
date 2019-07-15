@@ -6,6 +6,7 @@ project(oob_demo)
 FILE(GLOB app_sources src/*.c)
 target_sources(app PRIVATE ${app_sources})
 include_directories(${CMAKE_SOURCE_DIR}/include)
+zephyr_include_directories(${ZEPHYR_BASE}/drivers/modem)
 
 zephyr_library_include_directories($ENV{ZEPHYR_BASE}/samples/bluetooth)
 
