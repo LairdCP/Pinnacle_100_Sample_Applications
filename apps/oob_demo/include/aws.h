@@ -20,7 +20,7 @@
 
 #define APP_MQTT_BUFFER_SIZE 128
 
-#define MQTT_CLIENTID "pinnacle100_oob_demo"
+#define MQTT_CLIENTID_PREFIX "pinnacle100_oob_"
 
 #define SHADOW_REPORTED_START "{\"state\":{\"reported\":{"
 #define SHADOW_END "}}}"
@@ -66,7 +66,7 @@ static const struct json_obj_descr shadow_descr[] = {
 
 int awsInit(void);
 int awsGetServerAddr(void);
-int awsConnect(void);
+int awsConnect(const char *clientId);
 void awsDisconnect(void);
 int awsKeepAlive(void);
 int awsSendData(char *data);

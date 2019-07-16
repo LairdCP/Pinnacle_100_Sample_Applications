@@ -10,6 +10,7 @@ LOG_MODULE_REGISTER(oob_aws);
 #include <net/socket.h>
 #include <net/mqtt.h>
 
+#include "oob_common.h"
 #include "certificate.h"
 #include "aws.h"
 
@@ -28,6 +29,9 @@ LOG_MODULE_REGISTER(oob_aws);
 /* Buffers for MQTT client. */
 static u8_t rx_buffer[APP_MQTT_BUFFER_SIZE];
 static u8_t tx_buffer[APP_MQTT_BUFFER_SIZE];
+
+/* mqtt client id */
+static u8_t mqtt_client_id[sizeof(MQTT_CLIENTID_PREFIX) + IMEI_LENGTH];
 
 /* The mqtt client struct */
 static struct mqtt_client client_ctx;
@@ -198,8 +202,8 @@ static void client_init(struct mqtt_client *client)
 	/* MQTT client configuration */
 	client->broker = &broker;
 	client->evt_cb = mqtt_evt_handler;
-	client->client_id.utf8 = (u8_t *)MQTT_CLIENTID;
-	client->client_id.size = strlen(MQTT_CLIENTID);
+	client->client_id.utf8 = mqtt_client_id;
+	client->client_id.size = strlen(mqtt_client_id);
 	client->password = NULL;
 	client->user_name = NULL;
 
@@ -315,9 +319,12 @@ int awsGetServerAddr(void)
 	return rc;
 }
 
-int awsConnect(void)
+int awsConnect(const char *clientId)
 {
-	AWS_LOG_INF("Attempting to connect to AWS...");
+	snprintk(mqtt_client_id, sizeof(mqtt_client_id), "%s%s",
+		 MQTT_CLIENTID_PREFIX, clientId);
+
+	AWS_LOG_INF("Attempting to connect %s to AWS...", mqtt_client_id);
 	int rc = try_to_connect(&client_ctx);
 	if (rc != 0) {
 		AWS_LOG_ERR("AWS connect err (%d)", rc);

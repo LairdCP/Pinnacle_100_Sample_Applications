@@ -432,15 +432,16 @@ u8_t service_discover_func(struct bt_conn *conn,
 /* This callback is triggered when a BLE connection occurs */
 void connected(struct bt_conn *conn, u8_t err)
 {
-	static char addr[BT_ADDR_LE_STR_LEN];
+	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if (err) {
-		BLE_LOG_ERR("Failed to connect to %s (%u)", addr, err);
+		BLE_LOG_ERR("Failed to connect to %s (%u)", log_strdup(addr),
+			    err);
 		return;
 	} else {
-		BLE_LOG_INF("Connected: %s", addr);
+		BLE_LOG_INF("Connected: %s", log_strdup(addr));
 	}
 
 	if (conn == default_conn) {
@@ -469,7 +470,7 @@ void disconnected(struct bt_conn *conn, u8_t reason)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	BLE_LOG_INF("Disconnected: %s (reason %u)", addr, reason);
+	BLE_LOG_INF("Disconnected: %s (reason %u)", log_strdup(addr), reason);
 
 	bt_conn_unref(default_conn);
 	default_conn = NULL;

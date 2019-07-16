@@ -50,11 +50,11 @@ static bool connectedToAws = false;
 static void iface_ready_evt_handler(struct net_mgmt_event_callback *cb,
 				    u32_t mgmt_event, struct net_if *iface)
 {
-	if (mgmt_event != NET_EVENT_IPV4_ADDR_ADD) {
+	if (mgmt_event != NET_EVENT_DNS_SERVER_ADD) {
 		return;
 	}
 
-	LTE_LOG_DBG("iface IPv4 addr added!");
+	LTE_LOG_DBG("iface DNS addr added!");
 	k_sem_give(&iface_ready_sem);
 }
 
@@ -71,7 +71,7 @@ static void iface_down_evt_handler(struct net_mgmt_event_callback *cb,
 }
 
 static struct mgmt_events iface_events[] = {
-	{ .event = NET_EVENT_IPV4_ADDR_ADD,
+	{ .event = NET_EVENT_DNS_SERVER_ADD,
 	  .handler = iface_ready_evt_handler },
 	{ .event = NET_EVENT_IF_DOWN, .handler = iface_down_evt_handler },
 	{ 0 }
@@ -114,9 +114,9 @@ static void getAwsServerAddress()
  * @brief This function blocks until a connection to AWS is successful
  * 
  */
-static void connectAws()
+static void connectAws(const char *clientId)
 {
-	while (awsConnect() != 0) {
+	while (awsConnect(clientId) != 0) {
 		LTE_LOG_ERR("Could not connect to aws, retrying in %d seconds",
 			    LTE_RETRY_AWS_ACTION_TIMEOUT_SECONDS);
 		/* wait some time before trying again */
@@ -151,9 +151,12 @@ int lteSendSensorData(float temperature, float humidity, int pressure)
 	return rc;
 }
 
+static struct dns_resolve_context *dns;
+
 void lte_thread(void *param1, void *param2, void *param3)
 {
 	int rc;
+	struct sockaddr_in *dnsAddr;
 
 	setup_iface_events();
 
@@ -161,20 +164,35 @@ void lte_thread(void *param1, void *param2, void *param3)
 	iface = net_if_get_default();
 	if (!iface) {
 		LTE_LOG_ERR("Could not get iface");
-		return;
+		goto exit;
 	}
 
 	cfg = net_if_get_config(iface);
 	if (!cfg) {
 		LTE_LOG_ERR("Could not get iface config");
-		return;
+		goto exit;
 	}
 
-	/* check if the iface has an IP */
-	if (!cfg->ip.ipv4) {
-		/* if no IP yet, wait for one */
-		LTE_LOG_INF("Waiting for network IP addr...");
-		k_sem_take(&iface_ready_sem, K_FOREVER);
+	dns = dns_resolve_get_default();
+	if (!dns) {
+		LTE_LOG_ERR("Could not get DNS context");
+		goto exit;
+	}
+
+	/* Get the modem receive context */
+	mdm_rcvr = mdm_receiver_context_from_id(0);
+	if (mdm_rcvr == NULL) {
+		LTE_LOG_ERR("Invalid modem receiver");
+		goto exit;
+	}
+
+	if (&dns->servers[0] != NULL) {
+		dnsAddr = net_sin(&dns->servers[0].dns_server);
+		if (net_ipv4_is_addr_unspecified(&dnsAddr->sin_addr)) {
+			// we need to wait for DNS addr
+			LTE_LOG_INF("Waiting for DNS addr...");
+			k_sem_take(&iface_ready_sem, K_FOREVER);
+		}
 	}
 
 	LTE_LOG_INF("LTE ready");
@@ -185,16 +203,9 @@ void lte_thread(void *param1, void *param2, void *param3)
 	}
 
 	getAwsServerAddress();
-	connectAws();
+	connectAws(mdm_rcvr->data_imei);
 
 	/* Fill in base shadow info and publish */
-	/* Get the modem receive context */
-	mdm_rcvr = mdm_receiver_context_from_id(0);
-	if (mdm_rcvr == NULL) {
-		LTE_LOG_ERR("Invalid modem receiver");
-		goto exit;
-	}
-
 	awsSetShadowAppFirmwareVersion(APP_VERSION_STRING);
 	awsSetShadowKernelVersion(KERNEL_VERSION_STRING);
 	awsSetShadowIMEI(mdm_rcvr->data_imei);
@@ -216,7 +227,7 @@ void lte_thread(void *param1, void *param2, void *param3)
 			k_sem_take(&iface_ready_sem, K_FOREVER);
 		}
 		LTE_LOG_INF("Connecting to AWS...");
-		connectAws();
+		connectAws(mdm_rcvr->data_imei);
 		LTE_LOG_INF("Connected to AWS");
 	}
 exit:
