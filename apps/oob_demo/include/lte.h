@@ -7,12 +7,28 @@
 #ifndef __LTE_H__
 #define __LTE_H__
 
-#define LTE_STACK_SIZE 4096
-#define LTE_THREAD_PRIORITY K_PRIO_COOP(1)
-#define LTE_RETRY_AWS_ACTION_TIMEOUT_SECONDS 10
+enum lte_errors {
+	LTE_ERR_NONE = 0,
+	LTE_ERR_NO_IFACE = -1,
+	LTE_ERR_IFACE_CFG = -2,
+	LTE_ERR_DNS_CFG = -3,
+	LTE_ERR_MDM_CTX = -4,
+};
 
-enum lte_errors { LTE_ERROR_NONE = 0, LTE_ERROR_NOT_CONNECTED = -1 };
+enum lte_event { LTE_EVT_READY, LTE_EVT_DISCONNECTED };
 
-int lteSendSensorData(float temperature, float humidity, int pressure);
+struct lte_status {
+	const char *radio_version;
+	const char *IMEI;
+	int rssi;
+};
+
+/* Callback function for LTE events */
+typedef void (*lte_event_function_t)(enum lte_event event);
+
+void lteRegisterEventCallback(lte_event_function_t callback);
+int lteInit(void);
+bool lteIsReady(void);
+struct lte_status *lteGetStatus(void);
 
 #endif

@@ -525,7 +525,7 @@ void oob_ble_initialise(void)
 }
 
 /* Function for setting the sensor read callback function */
-void oob_ble_set_callback(void *func)
+void oob_ble_set_callback(sensor_updated_function_t func)
 {
-	SensorCallbackFunction = (sensor_updated_function_t)func;
+	SensorCallbackFunction = func;
 }

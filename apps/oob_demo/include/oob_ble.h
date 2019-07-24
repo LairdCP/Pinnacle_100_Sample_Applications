@@ -16,6 +16,9 @@
 #include <bluetooth/gatt.h>
 #include <misc/byteorder.h>
 
+/* Callback function for passing sensor data */
+typedef void (*sensor_updated_function_t)(u8_t sensor, s32_t reading);
+
 struct remote_ble_sensor {
 	/* State of app, see BT_DEMO_APP_STATE_XXX */
 	uint8_t app_state;
@@ -77,6 +80,6 @@ u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid,
 	       u16_t start_handle);
 
 /* Function for setting the sensor read callback function */
-void oob_ble_set_callback(void * func);
+void oob_ble_set_callback(sensor_updated_function_t func);
 
 #endif /* __OOB_BLE_H__ */

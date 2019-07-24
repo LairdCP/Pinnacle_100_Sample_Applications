@@ -30,6 +30,9 @@
 #define SHADOW_PRESSURE "\"pressure\":"
 #define SHADOW_RADIO_RSSI "\"radio_rssi\":"
 
+#define AWS_RX_THREAD_STACK_SIZE 1024
+#define AWS_RX_THREAD_PRIORITY K_PRIO_COOP(1)
+
 struct shadow_persistent_values {
 	const char *firmware_version;
 	const char *os_version;
@@ -48,10 +51,12 @@ struct shadow_reported_struct {
 static const struct json_obj_descr shadow_persistent_values_descr[] = {
 	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, firmware_version,
 			    JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, os_version, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, os_version,
+			    JSON_TOK_STRING),
 	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, radio_version,
 			    JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, IMEI, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, IMEI,
+			    JSON_TOK_STRING),
 };
 
 static const struct json_obj_descr shadow_state_reported_descr[] = {
@@ -75,5 +80,7 @@ int awsSetShadowKernelVersion(const char *version);
 int awsSetShadowIMEI(const char *imei);
 int awsSetShadowRadioFirmwareVersion(const char *version);
 int awsSetShadowAppFirmwareVersion(const char *version);
+int awsPublishSensorData(float temperature, float humidity, int pressure,
+			 int radioRssi);
 
 #endif /* __AWS_H__ */

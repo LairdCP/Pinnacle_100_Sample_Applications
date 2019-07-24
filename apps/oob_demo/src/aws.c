@@ -9,6 +9,7 @@ LOG_MODULE_REGISTER(oob_aws);
 
 #include <net/socket.h>
 #include <net/mqtt.h>
+#include <stdio.h>
 
 #include "oob_common.h"
 #include "certificate.h"
@@ -26,6 +27,11 @@ LOG_MODULE_REGISTER(oob_aws);
 #define AWS_LOG_INF(...) LOG_INF(__VA_ARGS__)
 #define AWS_LOG_DBG(...) LOG_DBG(__VA_ARGS__)
 
+K_THREAD_STACK_DEFINE(rxThreadStack, AWS_RX_THREAD_STACK_SIZE);
+static struct k_thread rxThread;
+
+K_SEM_DEFINE(connected_sem, 0, 1);
+
 /* Buffers for MQTT client. */
 static u8_t rx_buffer[APP_MQTT_BUFFER_SIZE];
 static u8_t tx_buffer[APP_MQTT_BUFFER_SIZE];
@@ -42,7 +48,7 @@ static struct sockaddr_storage broker;
 static struct pollfd fds[1];
 static int nfds;
 
-static bool connected;
+static bool connected = false;
 
 static struct addrinfo server_addr;
 struct addrinfo *saddr;
@@ -114,6 +120,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 		}
 
 		connected = true;
+		k_sem_give(&connected_sem);
 		AWS_LOG_INF("[%s:%d] MQTT client connected!", __func__,
 			    __LINE__);
 
@@ -255,31 +262,25 @@ static int try_to_connect(struct mqtt_client *client)
 	return -EINVAL;
 }
 
-static int process_mqtt_and_sleep(struct mqtt_client *client, int timeout)
+static void awsRxThread(void *arg1, void *arg2, void *arg3)
 {
-	s64_t remaining = timeout;
-	s64_t start_time = k_uptime_get();
-	int rc;
+	while (true) {
+		if (connected) {
+			AWS_LOG_DBG("Waiting for MQTT RX data...");
+			/* Wait for socket RX data */
+			wait(K_FOREVER);
 
-	while (remaining > 0 && connected) {
-		wait(remaining);
+			AWS_LOG_DBG("MQTT data RXd");
 
-		// rc = mqtt_live(client);
-		// if (rc != 0) {
-		// 	AWS_LOG_ERR("mqtt_live (%d)", rc);
-		// 	return rc;
-		// }
-
-		rc = mqtt_input(client);
-		if (rc != 0) {
-			AWS_LOG_ERR("mqtt_input (%d)", rc);
-			return rc;
+			/* process MQTT RX data */
+			mqtt_input(&client_ctx);
+		} else {
+			AWS_LOG_DBG("Waiting for MQTT connection...");
+			/* Wait for connection */
+			k_sem_reset(&connected_sem);
+			k_sem_take(&connected_sem, K_FOREVER);
 		}
-
-		remaining = timeout + start_time - k_uptime_get();
 	}
-
-	return 0;
 }
 
 int awsInit(void)
@@ -293,6 +294,10 @@ int awsInit(void)
 	shadow_persistent_data.state.reported.radio_version = "";
 	shadow_persistent_data.state.reported.IMEI = "";
 
+	k_thread_create(&rxThread, rxThreadStack,
+			K_THREAD_STACK_SIZEOF(rxThreadStack), awsRxThread, NULL,
+			NULL, NULL, AWS_RX_THREAD_PRIORITY, 0, K_NO_WAIT);
+
 	return rc;
 }
 
@@ -304,10 +309,11 @@ int awsGetServerAddr(void)
 	server_addr.ai_socktype = SOCK_STREAM;
 	dns_retries = DNS_RETRIES;
 	do {
-		LOG_DBG("Get AWS server address");
+		AWS_LOG_DBG("Get AWS server address");
 		rc = getaddrinfo(SERVER_HOST, SERVER_PORT_STR, &server_addr,
 				 &saddr);
 		if (rc != 0) {
+			AWS_LOG_ERR("Get AWS server addr (%d)", rc);
 			k_sleep(K_SECONDS(5));
 		}
 		dns_retries--;
@@ -335,7 +341,6 @@ int awsConnect(const char *clientId)
 void awsDisconnect(void)
 {
 	mqtt_disconnect(&client_ctx);
-	process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
 }
 
 int awsKeepAlive(void)
@@ -348,10 +353,6 @@ int awsKeepAlive(void)
 		goto done;
 	}
 
-	rc = process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
-	if (rc != 0) {
-		goto done;
-	}
 done:
 	return rc;
 }
@@ -394,11 +395,6 @@ static int sendData(char *data)
 		goto done;
 	}
 
-	rc = process_mqtt_and_sleep(&client_ctx, APP_SLEEP_MSECS);
-	if (rc != 0) {
-		AWS_LOG_ERR("process MQTT err (%d)", rc);
-		goto done;
-	}
 done:
 	return rc;
 }
@@ -426,4 +422,18 @@ int awsPublishShadowPersistentData()
 	rc = sendData(msg);
 done:
 	return rc;
+}
+
+int awsPublishSensorData(float temperature, float humidity, int pressure,
+			 int radioRssi)
+{
+	char msg[strlen(SHADOW_REPORTED_START) + strlen(SHADOW_TEMPERATURE) +
+		 10 + strlen(SHADOW_HUMIDITY) + 10 + strlen(SHADOW_PRESSURE) +
+		 10 + strlen(SHADOW_RADIO_RSSI) + 10 + strlen(SHADOW_END)];
+
+	snprintf(msg, sizeof(msg), "%s%s%.2f,%s%.2f,%s%d,%s%d%s",
+		 SHADOW_REPORTED_START, SHADOW_TEMPERATURE, temperature,
+		 SHADOW_HUMIDITY, humidity, SHADOW_PRESSURE, pressure,
+		 SHADOW_RADIO_RSSI, radioRssi, SHADOW_END);
+	return awsSendData(msg);
 }

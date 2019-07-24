@@ -1,4 +1,4 @@
-/* oob_common.c - Header file for the common portions of demo code */
+/* oob_common.h - Header file for the common portions of demo code */
 
 /*
  * Copyright (c) 2019 Laird Connectivity
@@ -15,8 +15,10 @@
 	STRINGIFY(APP_VERSION_MAJOR)                                           \
 	"." STRINGIFY(APP_VERSION_MINOR) "." STRINGIFY(APP_VERSION_PATCH)
 
-#define DATA_SEND_TIME 10
+#define DATA_SEND_TIME_SECONDS 30
 #define IMEI_LENGTH 15
+
+#define RETRY_AWS_ACTION_TIMEOUT_SECONDS 30
 
 enum SENSOR_TYPES {
 	SENSOR_TYPE_TEMPERATURE = 0,
@@ -27,5 +29,4 @@ enum SENSOR_TYPES {
 	SENSOR_TYPE_MAX
 };
 
-/* Callback function for passing sensor data */
-typedef void (*sensor_updated_function_t)(u8_t sensor, s32_t reading);
+typedef void (*app_state_function_t)(void);
