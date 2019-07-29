@@ -150,7 +150,8 @@ static void appStateAwsSendSenorData(void)
 		     (int)(temperatureReading * 100),
 		     (int)(humidityReading * 100), pressureReading);
 	rc = awsPublishSensorData(temperatureReading, humidityReading,
-				  pressureReading, lteInfo->rssi);
+				  pressureReading, lteInfo->rssi,
+				  lteInfo->sinr);
 	if (rc != 0) {
 		MAIN_LOG_ERR("Could not send sensor data (%d)", rc);
 		led_flash_red();
@@ -285,7 +286,8 @@ static int setAwsCredentials(void)
 		MAIN_LOG_ERR("Reading device key (%d)", rc);
 		return APP_ERR_READ_KEY;
 	}
-
+	devCertSet = true;
+	devKeySet = true;
 	rc = awsSetCredentials(devCert, devKey);
 	return rc;
 }

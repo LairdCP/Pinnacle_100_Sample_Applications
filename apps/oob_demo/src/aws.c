@@ -428,15 +428,17 @@ done:
 }
 
 int awsPublishSensorData(float temperature, float humidity, int pressure,
-			 int radioRssi)
+			 int radioRssi, int radioSinr)
 {
 	char msg[strlen(SHADOW_REPORTED_START) + strlen(SHADOW_TEMPERATURE) +
 		 10 + strlen(SHADOW_HUMIDITY) + 10 + strlen(SHADOW_PRESSURE) +
-		 10 + strlen(SHADOW_RADIO_RSSI) + 10 + strlen(SHADOW_END)];
+		 10 + strlen(SHADOW_RADIO_RSSI) + 10 +
+		 strlen(SHADOW_RADIO_SINR) + 10 + strlen(SHADOW_END)];
 
-	snprintf(msg, sizeof(msg), "%s%s%.2f,%s%.2f,%s%d,%s%d%s",
+	snprintf(msg, sizeof(msg), "%s%s%.2f,%s%.2f,%s%d,%s%d,%s%d%s",
 		 SHADOW_REPORTED_START, SHADOW_TEMPERATURE, temperature,
 		 SHADOW_HUMIDITY, humidity, SHADOW_PRESSURE, pressure,
-		 SHADOW_RADIO_RSSI, radioRssi, SHADOW_END);
+		 SHADOW_RADIO_RSSI, radioRssi, SHADOW_RADIO_SINR, radioSinr,
+		 SHADOW_END);
 	return awsSendData(msg);
 }

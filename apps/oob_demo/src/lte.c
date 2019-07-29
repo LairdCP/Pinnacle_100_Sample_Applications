@@ -16,6 +16,7 @@ LOG_MODULE_REGISTER(oob_lte);
 #include <net/socket.h>
 
 #include <modem_receiver.h>
+#include <drivers/modem/hl7800.h>
 
 #include "lte.h"
 
@@ -147,8 +148,6 @@ bool lteIsReady(void)
 
 struct lte_status *lteGetStatus(void)
 {
-	if (mdm_rcvr != NULL) {
-		lteStatus.rssi = mdm_rcvr->data_rssi;
-	}
+	mdm_hl7800_get_signal_quality(&lteStatus.rssi, &lteStatus.sinr);
 	return &lteStatus;
 }
