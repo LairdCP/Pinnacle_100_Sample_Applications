@@ -50,8 +50,10 @@ static const unsigned char aws_root_ca[] =
 
 #define MQTT_CLIENTID_PREFIX "pinnacle100_oob_"
 
+#define SHADOW_STATE_NULL "{\"state\":null}"
+
 #define SHADOW_REPORTED_START "{\"state\":{\"reported\":{"
-#define SHADOW_END "}}}"
+#define SHADOW_REPORTED_END "}}}"
 
 #define SHADOW_TEMPERATURE "\"temperature\":"
 #define SHADOW_HUMIDITY "\"humidity\":"
@@ -66,6 +68,7 @@ struct shadow_persistent_values {
 	const char *os_version;
 	const char *radio_version;
 	const char *IMEI;
+	const char *ICCID;
 };
 
 struct shadow_state_reported {
@@ -84,6 +87,8 @@ static const struct json_obj_descr shadow_persistent_values_descr[] = {
 	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, radio_version,
 			    JSON_TOK_STRING),
 	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, IMEI,
+			    JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct shadow_persistent_values, ICCID,
 			    JSON_TOK_STRING),
 };
 
@@ -107,6 +112,7 @@ int awsSendData(char *data);
 int awsPublishShadowPersistentData();
 int awsSetShadowKernelVersion(const char *version);
 int awsSetShadowIMEI(const char *imei);
+int awsSetShadowICCID(const char *iccid);
 int awsSetShadowRadioFirmwareVersion(const char *version);
 int awsSetShadowAppFirmwareVersion(const char *version);
 int awsPublishSensorData(float temperature, float humidity, int pressure,

@@ -20,6 +20,7 @@ enum lte_event { LTE_EVT_READY, LTE_EVT_DISCONNECTED };
 struct lte_status {
 	const char *radio_version;
 	const char *IMEI;
+	const char *ICCID;
 	/* This is actually RSRP (Reference Signals Received Power in dBm)*/
 	int rssi;
 	/* Signal to Interference plus Noise Ratio (dBm) */

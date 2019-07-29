@@ -291,6 +291,7 @@ int awsInit(void)
 	shadow_persistent_data.state.reported.os_version = "";
 	shadow_persistent_data.state.reported.radio_version = "";
 	shadow_persistent_data.state.reported.IMEI = "";
+	shadow_persistent_data.state.reported.ICCID = "";
 
 	k_thread_create(&rxThread, rxThreadStack,
 			K_THREAD_STACK_SIZEOF(rxThreadStack), awsRxThread, NULL,
@@ -388,6 +389,13 @@ int awsSetShadowAppFirmwareVersion(const char *version)
 	return 0;
 }
 
+int awsSetShadowICCID(const char *iccid)
+{
+	shadow_persistent_data.state.reported.ICCID = iccid;
+
+	return 0;
+}
+
 static int sendData(char *data)
 {
 	int rc;
@@ -422,7 +430,17 @@ int awsPublishShadowPersistentData()
 		goto done;
 	}
 
+	/* Clear the shadow and start fresh */
+	rc = sendData(SHADOW_STATE_NULL);
+	if (rc < 0) {
+		goto done;
+	}
+
 	rc = sendData(msg);
+	if (rc < 0) {
+		goto done;
+	}
+
 done:
 	return rc;
 }
@@ -433,12 +451,12 @@ int awsPublishSensorData(float temperature, float humidity, int pressure,
 	char msg[strlen(SHADOW_REPORTED_START) + strlen(SHADOW_TEMPERATURE) +
 		 10 + strlen(SHADOW_HUMIDITY) + 10 + strlen(SHADOW_PRESSURE) +
 		 10 + strlen(SHADOW_RADIO_RSSI) + 10 +
-		 strlen(SHADOW_RADIO_SINR) + 10 + strlen(SHADOW_END)];
+		 strlen(SHADOW_RADIO_SINR) + 10 + strlen(SHADOW_REPORTED_END)];
 
 	snprintf(msg, sizeof(msg), "%s%s%.2f,%s%.2f,%s%d,%s%d,%s%d%s",
 		 SHADOW_REPORTED_START, SHADOW_TEMPERATURE, temperature,
 		 SHADOW_HUMIDITY, humidity, SHADOW_PRESSURE, pressure,
 		 SHADOW_RADIO_RSSI, radioRssi, SHADOW_RADIO_SINR, radioSinr,
-		 SHADOW_END);
+		 SHADOW_REPORTED_END);
 	return awsSendData(msg);
 }

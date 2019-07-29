@@ -129,6 +129,8 @@ int lteInit(void)
 
 	lteStatus.radio_version = mdm_rcvr->data_revision;
 	lteStatus.IMEI = mdm_rcvr->data_imei;
+	lteStatus.ICCID = (const char *)mdm_hl7800_get_iccid();
+
 exit:
 	return rc;
 }
