@@ -10,17 +10,21 @@
 #define LOG_LEVEL LOG_LEVEL_DBG
 LOG_MODULE_REGISTER(oob_main);
 
+#include <stdio.h>
 #include <zephyr/types.h>
 #include <stddef.h>
 #include <errno.h>
 #include <zephyr.h>
 #include <version.h>
+#include <shell/shell.h>
+#include <shell/shell_uart.h>
 
 #include "oob_common.h"
 #include "led.h"
 #include "oob_ble.h"
 #include "lte.h"
 #include "aws.h"
+#include "nv.h"
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
@@ -36,11 +40,13 @@ static void appStateAwsConnect(void);
 static void appStateAwsDisconnect(void);
 static void appStateAwsResolveServer(void);
 static void appStateWaitForLte(void);
+static void appStateCommissionDevice(void);
 
 K_TIMER_DEFINE(SendDataTimer, SendDataTimerExpired, NULL);
 K_SEM_DEFINE(send_data_sem, 0, 1);
 K_MUTEX_DEFINE(sensor_data_lock);
 K_SEM_DEFINE(lte_ready_sem, 0, 1);
+K_SEM_DEFINE(rx_cert_sem, 0, 1);
 
 static float temperatureReading = 0;
 static float humidityReading = 0;
@@ -52,6 +58,14 @@ static bool resolveAwsServer = true;
 static bool bUpdatedTemperature = false;
 static bool bUpdatedHumidity = false;
 static bool bUpdatedPressure = false;
+
+static bool commissioned;
+static bool allowCommissioning = false;
+static bool appReady = false;
+static bool devCertSet;
+static bool devKeySet;
+static u8_t devCert[AWS_DEV_CERT_MAX_LENGTH];
+static u8_t devKey[AWS_DEV_KEY_MAX_LENGTH];
 
 static app_state_function_t appState;
 struct lte_status *lteInfo;
@@ -186,12 +200,15 @@ static void appStateAwsConnect(void)
 		return;
 	}
 
-	while (awsConnect(lteInfo->IMEI) != 0) {
+	if (awsConnect(lteInfo->IMEI) != 0) {
 		MAIN_LOG_ERR("Could not connect to aws, retrying in %d seconds",
 			     RETRY_AWS_ACTION_TIMEOUT_SECONDS);
 		/* wait some time before trying again */
 		k_sleep(K_SECONDS(RETRY_AWS_ACTION_TIMEOUT_SECONDS));
+		return;
 	}
+
+	nvStoreCommissioned(true);
 
 	if (initShadow) {
 		/* Init the shadow once, the first time we connect */
@@ -208,19 +225,29 @@ static void appStateAwsDisconnect(void)
 	MAIN_LOG_DBG("AWS disconnect state");
 	stopSendDataTimer();
 	awsDisconnect();
-	appState = appStateAwsConnect;
+	if (devCertSet && devKeySet) {
+		appState = appStateAwsConnect;
+	} else {
+		appState = appStateCommissionDevice;
+	}
 }
 
 static void appStateAwsResolveServer(void)
 {
 	MAIN_LOG_DBG("AWS resolve server state");
 
-	while (awsGetServerAddr() != 0) {
+	if (!lteIsReady()) {
+		appState = appStateWaitForLte;
+		return;
+	}
+
+	if (awsGetServerAddr() != 0) {
 		MAIN_LOG_ERR(
 			"Could not get server address, retrying in %d seconds",
 			RETRY_AWS_ACTION_TIMEOUT_SECONDS);
 		/* wait some time before trying again */
 		k_sleep(K_SECONDS(RETRY_AWS_ACTION_TIMEOUT_SECONDS));
+		return;
 	}
 	resolveAwsServer = false;
 	appState = appStateAwsConnect;
@@ -243,12 +270,195 @@ static void appStateWaitForLte(void)
 	}
 }
 
+static int setAwsCredentials(void)
+{
+	int rc;
+
+	rc = nvReadDevCert(devCert, sizeof(devCert));
+	if (rc <= 0) {
+		MAIN_LOG_ERR("Reading device cert (%d)", rc);
+		return APP_ERR_READ_CERT;
+	}
+
+	rc = nvReadDevKey(devKey, sizeof(devKey));
+	if (rc <= 0) {
+		MAIN_LOG_ERR("Reading device key (%d)", rc);
+		return APP_ERR_READ_KEY;
+	}
+
+	rc = awsSetCredentials(devCert, devKey);
+	return rc;
+}
+
+static void appStateCommissionDevice(void)
+{
+	MAIN_LOG_DBG("Commission device state");
+	printk("\n\nWaiting to commission device\n\n");
+	allowCommissioning = true;
+
+	k_sem_take(&rx_cert_sem, K_FOREVER);
+	if (setAwsCredentials() == 0) {
+		appState = appStateWaitForLte;
+	}
+}
+
+char *replaceWord(const char *s, const char *oldW, const char *newW, char *dest,
+		  int destSize)
+{
+	int i, cnt = 0;
+	int newWlen = strlen(newW);
+	int oldWlen = strlen(oldW);
+
+	/* Counting the number of times old word
+	*  occur in the string 
+	*/
+	for (i = 0; s[i] != '\0'; i++) {
+		if (strstr(&s[i], oldW) == &s[i]) {
+			cnt++;
+
+			/* Jumping to index after the old word. */
+			i += oldWlen - 1;
+		}
+	}
+
+	/* Make sure new string isnt too big */
+	if ((i + cnt * (newWlen - oldWlen) + 1) > destSize) {
+		return NULL;
+	}
+
+	i = 0;
+	while (*s) {
+		/* compare the substring with the result */
+		if (strstr(s, oldW) == s) {
+			strcpy(&dest[i], newW);
+			i += newWlen;
+			s += oldWlen;
+		} else {
+			dest[i++] = *s++;
+		}
+	}
+
+	dest[i] = '\0';
+	return dest;
+}
+
+static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
+{
+	int rc;
+	int certSize;
+	int expSize = 0;
+	char *newCred = NULL;
+
+	if (!appReady) {
+		printk("App is not ready\n");
+		return APP_ERR_NOT_READY;
+	}
+
+	if (!allowCommissioning) {
+		printk("Not ready for commissioning, decommission device first\n");
+		return APP_ERR_COMMISSION_DISALLOWED;
+	}
+
+	certSize = strlen(cred);
+
+	if (type == CREDENTIAL_CERT) {
+		expSize = sizeof(devCert);
+		newCred = devCert;
+	} else if (type == CREDENTIAL_KEY) {
+		expSize = sizeof(devKey);
+		newCred = devKey;
+	}
+
+	if (certSize > expSize) {
+		printk("Cert is too large (%d)\n", certSize);
+		return APP_ERR_CRED_TOO_LARGE;
+	}
+
+	replaceWord(cred, "\\n", "\n", newCred, expSize);
+	replaceWord(newCred, "\\s", " ", newCred, expSize);
+
+	if (type == CREDENTIAL_CERT) {
+		rc = nvStoreDevCert(newCred, strlen(newCred));
+		if (rc >= 0) {
+			printk("Stored cert:\n%s\n", newCred);
+			devCertSet = true;
+		} else {
+			MAIN_LOG_ERR("Error storing cert (%d)", rc);
+		}
+	} else if (type == CREDENTIAL_KEY) {
+		rc = nvStoreDevKey(newCred, strlen(newCred));
+		if (rc >= 0) {
+			printk("Stored key:\n%s\n", newCred);
+			devKeySet = true;
+		} else {
+			MAIN_LOG_ERR("Error storing key (%d)", rc);
+		}
+	} else {
+		rc = APP_ERR_UNKNOWN_CRED;
+	}
+
+	if (rc >= 0 && devCertSet && devKeySet) {
+		k_sem_give(&rx_cert_sem);
+	}
+
+	return rc;
+}
+
+static int set_aws_device_cert(const struct shell *shell, size_t argc,
+			       char **argv)
+{
+	ARG_UNUSED(argc);
+
+	return setCert(CREDENTIAL_CERT, argv[1]);
+}
+
+static int set_aws_device_key(const struct shell *shell, size_t argc,
+			      char **argv)
+{
+	ARG_UNUSED(argc);
+
+	return setCert(CREDENTIAL_KEY, argv[1]);
+}
+
+static int decommission(const struct shell *shell, size_t argc, char **argv)
+{
+	ARG_UNUSED(argc);
+	ARG_UNUSED(argv);
+
+	if (!appReady) {
+		printk("App is not ready\n");
+		return APP_ERR_NOT_READY;
+	}
+
+	nvDeleteDevCert();
+	nvDeleteDevKey();
+	devCertSet = false;
+	devKeySet = false;
+
+	nvStoreCommissioned(false);
+	commissioned = false;
+	allowCommissioning = true;
+	appState = appStateAwsDisconnect;
+	printk("Device is decommissioned\n");
+
+	return 0;
+}
+
 void main(void)
 {
 	int rc;
 
 	/* init LEDS */
 	led_init();
+
+	/* Init NV storage */
+	rc = nvInit();
+	if (rc < 0) {
+		MAIN_LOG_ERR("NV init (%d)", rc);
+		goto exit;
+	}
+
+	nvReadCommissioned(&commissioned);
 
 	/* init LTE */
 	lteRegisterEventCallback(lteEvent);
@@ -269,7 +479,14 @@ void main(void)
 		goto exit;
 	}
 
-	appState = appStateWaitForLte;
+	appReady = true;
+	printk("\n!!!!!!!! App is ready! !!!!!!!!\n");
+
+	if (commissioned && setAwsCredentials() == 0) {
+		appState = appStateWaitForLte;
+	} else {
+		appState = appStateCommissionDevice;
+	}
 
 	while (true) {
 		appState();
@@ -278,3 +495,15 @@ exit:
 	MAIN_LOG_ERR("Exiting main thread");
 	return;
 }
+
+SHELL_STATIC_SUBCMD_SET_CREATE(oob_cmds,
+			       SHELL_CMD_ARG(set_cert, NULL, "Set device cert",
+					     set_aws_device_cert, 2, 0),
+			       SHELL_CMD_ARG(set_key, NULL, "Set device key",
+					     set_aws_device_key, 2, 0),
+			       SHELL_CMD(reset, NULL,
+					 "Factory reset (decommission) device",
+					 decommission),
+			       SHELL_SUBCMD_SET_END /* Array terminated. */
+);
+SHELL_CMD_REGISTER(oob, &oob_cmds, "OOB Demo commands", NULL);

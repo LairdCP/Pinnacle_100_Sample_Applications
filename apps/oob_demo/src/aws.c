@@ -12,7 +12,6 @@ LOG_MODULE_REGISTER(oob_aws);
 #include <stdio.h>
 
 #include "oob_common.h"
-#include "certificate.h"
 #include "aws.h"
 
 #ifndef CONFIG_MQTT_LIB_TLS
@@ -57,28 +56,32 @@ static sec_tag_t m_sec_tags[] = { APP_CA_CERT_TAG, APP_DEVICE_CERT_TAG };
 
 static struct shadow_reported_struct shadow_persistent_data;
 
-static int tls_init(void)
+static int tls_init(u8_t *cert, u8_t *key)
 {
 	int err = -EINVAL;
 
+	tls_credential_delete(APP_CA_CERT_TAG, TLS_CREDENTIAL_CA_CERTIFICATE);
 	err = tls_credential_add(APP_CA_CERT_TAG, TLS_CREDENTIAL_CA_CERTIFICATE,
-				 ca_certificate, sizeof(ca_certificate));
+				 aws_root_ca, strlen(aws_root_ca) + 1);
 	if (err < 0) {
 		AWS_LOG_ERR("Failed to register public certificate: %d", err);
 		return err;
 	}
 
+	tls_credential_delete(APP_DEVICE_CERT_TAG,
+			      TLS_CREDENTIAL_SERVER_CERTIFICATE);
 	err = tls_credential_add(APP_DEVICE_CERT_TAG,
-				 TLS_CREDENTIAL_SERVER_CERTIFICATE,
-				 dev_certificate, sizeof(dev_certificate));
+				 TLS_CREDENTIAL_SERVER_CERTIFICATE, cert,
+				 strlen(cert) + 1);
 	if (err < 0) {
 		AWS_LOG_ERR("Failed to register device certificate: %d", err);
 		return err;
 	}
 
+	tls_credential_delete(APP_DEVICE_CERT_TAG, TLS_CREDENTIAL_PRIVATE_KEY);
 	err = tls_credential_add(APP_DEVICE_CERT_TAG,
-				 TLS_CREDENTIAL_PRIVATE_KEY, dev_key,
-				 sizeof(dev_key));
+				 TLS_CREDENTIAL_PRIVATE_KEY, key,
+				 strlen(key) + 1);
 	if (err < 0) {
 		AWS_LOG_ERR("Failed to register device key: %d", err);
 		return err;
@@ -121,14 +124,12 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 
 		connected = true;
 		k_sem_give(&connected_sem);
-		AWS_LOG_INF("[%s:%d] MQTT client connected!", __func__,
-			    __LINE__);
+		AWS_LOG_INF("MQTT client connected!");
 
 		break;
 
 	case MQTT_EVT_DISCONNECT:
-		AWS_LOG_INF("[%s:%d] MQTT client disconnected %d", __func__,
-			    __LINE__, evt->result);
+		AWS_LOG_INF("MQTT client disconnected %d", evt->result);
 
 		connected = false;
 		clear_fds();
@@ -141,7 +142,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-		AWS_LOG_INF("[%s:%d] PUBACK packet id: %u", __func__, __LINE__,
+		AWS_LOG_INF("PUBACK packet id: %u",
 			    evt->param.puback.message_id);
 
 		break;
@@ -285,9 +286,6 @@ static void awsRxThread(void *arg1, void *arg2, void *arg3)
 
 int awsInit(void)
 {
-	int rc;
-	rc = tls_init();
-
 	/* init shadow data */
 	shadow_persistent_data.state.reported.firmware_version = "";
 	shadow_persistent_data.state.reported.os_version = "";
@@ -298,7 +296,12 @@ int awsInit(void)
 			K_THREAD_STACK_SIZEOF(rxThreadStack), awsRxThread, NULL,
 			NULL, NULL, AWS_RX_THREAD_PRIORITY, 0, K_NO_WAIT);
 
-	return rc;
+	return 0;
+}
+
+int awsSetCredentials(u8_t *cert, u8_t *key)
+{
+	return tls_init(cert, key);
 }
 
 int awsGetServerAddr(void)
