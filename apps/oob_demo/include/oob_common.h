@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #define APP_VERSION_MAJOR 0
-#define APP_VERSION_MINOR 2
+#define APP_VERSION_MINOR 3
 #define APP_VERSION_PATCH 0
 #define APP_VERSION_STRING                                                     \
 	STRINGIFY(APP_VERSION_MAJOR)                                           \
