@@ -396,6 +396,13 @@ int awsSetShadowICCID(const char *iccid)
 	return 0;
 }
 
+int awsSetShadowRadioSerialNumber(const char *sn)
+{
+	shadow_persistent_data.state.reported.radio_sn = sn;
+
+	return 0;
+}
+
 static int sendData(char *data)
 {
 	int rc;

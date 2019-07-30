@@ -176,6 +176,7 @@ static void appStateAwsInitShadow(void)
 	awsSetShadowIMEI(lteInfo->IMEI);
 	awsSetShadowICCID(lteInfo->ICCID);
 	awsSetShadowRadioFirmwareVersion(lteInfo->radio_version);
+	awsSetShadowRadioSerialNumber(lteInfo->serialNumber);
 
 	MAIN_LOG_INF("Send persistent shadow data");
 	rc = awsPublishShadowPersistentData();
