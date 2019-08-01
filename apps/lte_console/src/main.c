@@ -3,6 +3,7 @@
 LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
 #include <zephyr.h>
+#include <stdlib.h>
 #include <misc/printk.h>
 #include <version.h>
 #include <gpio.h>
@@ -34,7 +35,7 @@ static int hl7800_wake(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argc);
 
-	int val = atoi(argv[1]);
+	int val = strtol(argv[1], NULL, 10);
 	mdm_hl7800_wakeup(val);
 
 	return 0;

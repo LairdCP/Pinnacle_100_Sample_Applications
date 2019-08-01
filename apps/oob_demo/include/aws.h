@@ -59,6 +59,7 @@ static const unsigned char aws_root_ca[] =
 #define SHADOW_HUMIDITY "\"humidity\":"
 #define SHADOW_PRESSURE "\"pressure\":"
 #define SHADOW_RADIO_RSSI "\"radio_rssi\":"
+#define SHADOW_RADIO_SINR "\"radio_sinr\":"
 
 #define AWS_RX_THREAD_STACK_SIZE 1024
 #define AWS_RX_THREAD_PRIORITY K_PRIO_COOP(1)
@@ -120,6 +121,6 @@ int awsSetShadowRadioSerialNumber(const char *sn);
 int awsSetShadowRadioFirmwareVersion(const char *version);
 int awsSetShadowAppFirmwareVersion(const char *version);
 int awsPublishSensorData(float temperature, float humidity, int pressure,
-			 int radioRssi);
+			 int radioRssi, int radioSinr);
 
 #endif /* __AWS_H__ */
