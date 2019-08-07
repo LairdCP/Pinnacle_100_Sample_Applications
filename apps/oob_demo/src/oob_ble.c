@@ -10,11 +10,13 @@
 #define LOG_LEVEL LOG_LEVEL_DBG
 LOG_MODULE_REGISTER(oob_ble);
 
+#include <zephyr.h>
 #include <zephyr/types.h>
 #include <stddef.h>
 #include <errno.h>
-#include <zephyr.h>
 #include <bluetooth/uuid.h>
+#include <settings/settings.h>
+#include <version.h>
 
 #include "oob_common.h"
 #include "oob_ble.h"
@@ -39,7 +41,14 @@ LOG_MODULE_REGISTER(oob_ble);
 #define BT_AD_ELEMENT_COMPLETE_LOCAL_NAME_ID 9
 #define BT_AD_SET_DATA_SIZE_MAX 31
 
-struct bt_conn *default_conn;
+static const struct bt_data ad[] = {
+	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, 0x36, 0xa3, 0x4d, 0x40, 0xb6, 0x70,
+		      0x69, 0xa6, 0xb1, 0x4e, 0x84, 0x9e, 0x60, 0x7c, 0x78,
+		      0x43),
+};
+
+struct bt_conn *sensor_conn;
 
 struct bt_uuid_16 uuid = BT_UUID_INIT_16(0);
 
@@ -54,10 +63,22 @@ struct remote_ble_sensor remote_ble_sensor_params;
 
 sensor_updated_function_t SensorCallbackFunction = NULL;
 
+static int zephyr_settings_fw_load(struct settings_store *cs,
+				   const char *subtree);
+
+static const struct settings_store_itf zephyr_settings_fw_itf = {
+	.csi_load = zephyr_settings_fw_load,
+};
+
+static struct settings_store zephyr_settings_fw_store = {
+	.cs_itf = &zephyr_settings_fw_itf
+};
+
 /* This callback is triggered after recieving BLE adverts */
 void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 		  struct net_buf_simple *ad)
 {
+	char bt_addr[BT_ADDR_LE_STR_LEN];
 	static const char devname_expected[] = BT_REMOTE_DEVICE_NAME_STR;
 	char devname_found[sizeof(devname_expected) - 1];
 	u8_t ad_element_id;
@@ -66,7 +87,7 @@ void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 	u8_t err;
 
 	/* Leave this function if already connected */
-	if (default_conn) {
+	if (sensor_conn) {
 		return;
 	}
 
@@ -74,6 +95,8 @@ void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 	if (type != BT_LE_ADV_IND && type != BT_LE_ADV_DIRECT_IND) {
 		return;
 	}
+
+	bt_addr_le_to_str(addr, bt_addr, sizeof(bt_addr));
 
 	/* Get device name from adverts */
 	while (ad_element_indx < BT_AD_SET_DATA_SIZE_MAX) {
@@ -102,14 +125,18 @@ void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 					}
 
 					/* Connect to device */
-					default_conn = bt_conn_create_le(
+					sensor_conn = bt_conn_create_le(
 						addr, BT_LE_CONN_PARAM_DEFAULT);
-					if (default_conn != NULL) {
+					if (sensor_conn != NULL) {
 						BLE_LOG_INF(
-							"Attempting to connect to remote BLE device");
+							"Attempting to connect to remote BLE device %s",
+							log_strdup(bt_addr));
 					} else {
 						BLE_LOG_ERR(
-							"Failed to connect to remote BLE device");
+							"Failed to connect to remote BLE device %s",
+							log_strdup(bt_addr));
+						/* restart scanning */
+						bt_scan();
 					}
 				}
 				break;
@@ -240,7 +267,7 @@ u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 	discover_params.func = service_discover_func;
 
 	/* Call zephyr library function */
-	err = bt_gatt_discover(default_conn, &discover_params);
+	err = bt_gatt_discover(sensor_conn, &discover_params);
 	return err;
 }
 
@@ -432,31 +459,58 @@ u8_t service_discover_func(struct bt_conn *conn,
 /* This callback is triggered when a BLE connection occurs */
 void connected(struct bt_conn *conn, u8_t err)
 {
+	int rc;
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if (err) {
-		BLE_LOG_ERR("Failed to connect to %s (%u)", log_strdup(addr),
-			    err);
-		return;
-	} else {
-		BLE_LOG_INF("Connected: %s", log_strdup(addr));
+		goto fail;
 	}
 
-	if (conn == default_conn) {
+	if (conn == sensor_conn) {
+		BLE_LOG_INF("Connected sensor: %s", log_strdup(addr));
+
 		memcpy(&uuid, BT_UUID_ESS, sizeof(uuid));
 
 		err = find_service(conn, uuid);
 
 		if (err) {
 			BLE_LOG_ERR("Discover failed(err %d)", err);
-			return;
+			goto fail;
+		}
+		/* Reaching here means all is good, update state */
+		remote_ble_sensor_params.app_state =
+			BT_DEMO_APP_STATE_FINDING_SERVICE;
+
+	} else {
+		/* In this case a central device connected to us */
+		BLE_LOG_INF("Connected central: %s", log_strdup(addr));
+		rc = bt_conn_security(conn, BT_SECURITY_MEDIUM);
+		if (rc) {
+			BLE_LOG_ERR("Failed to set security (%d)", rc);
 		}
 	}
 
-	/* Reaching here means all is good, update state */
-	remote_ble_sensor_params.app_state = BT_DEMO_APP_STATE_FINDING_SERVICE;
+	return;
+fail:
+	bt_conn_unref(conn);
+	if (conn == sensor_conn) {
+		BLE_LOG_ERR("Failed to connect to sensor %s (%u)",
+			    log_strdup(addr), err);
+		sensor_conn = NULL;
+		/* Set state to searching */
+		remote_ble_sensor_params.app_state =
+			BT_DEMO_APP_STATE_FINDING_DEVICE;
+
+		/* Restart scanning */
+		bt_scan();
+	} else {
+		BLE_LOG_ERR("Failed to connect to central %s (%u)",
+			    log_strdup(addr), err);
+	}
+
+	return;
 }
 
 /* This callback is triggered when a BLE disconnection occurs */
@@ -464,19 +518,25 @@ void disconnected(struct bt_conn *conn, u8_t reason)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
 
-	if (conn != default_conn) {
-		return;
-	}
-
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	BLE_LOG_INF("Disconnected: %s (reason %u)", log_strdup(addr), reason);
+	bt_conn_unref(conn);
+	if (conn == sensor_conn) {
+		BLE_LOG_INF("Disconnected sensor: %s (reason %u)",
+			    log_strdup(addr), reason);
 
-	bt_conn_unref(default_conn);
-	default_conn = NULL;
+		sensor_conn = NULL;
 
-	/* Restart scanning */
-	bt_scan();
+		/* Set state to searching */
+		remote_ble_sensor_params.app_state =
+			BT_DEMO_APP_STATE_FINDING_DEVICE;
+
+		/* Restart scanning */
+		bt_scan();
+	} else {
+		BLE_LOG_INF("Disconnected central: %s (reason %u)",
+			    log_strdup(addr), reason);
+	}
 }
 
 /* Function for starting BLE scan */
@@ -493,23 +553,29 @@ void bt_scan(void)
 	BLE_LOG_INF("Scanning for remote BLE devices started");
 }
 
-/* This callback is triggered when BLE stack is initalised */
-void bt_ready(int err)
+static int zephyr_settings_fw_load(struct settings_store *cs,
+				   const char *subtree)
 {
-	if (err) {
-		BLE_LOG_ERR("Bluetooth init failed (err %d)", err);
-		return;
-	}
+#if defined(CONFIG_BT_GATT_DIS_SETTINGS)
 
-	BLE_LOG_INF("Bluetooth initialized");
+#if defined(CONFIG_BT_GATT_DIS_FW_REV)
+	settings_runtime_set("bt/dis/fw", KERNEL_VERSION_STRING,
+			     sizeof(KERNEL_VERSION_STRING));
+#endif
 
-	bt_conn_cb_register(&conn_callbacks);
+#if defined(CONFIG_BT_GATT_DIS_SW_REV)
+	settings_runtime_set("bt/dis/sw", APP_VERSION_STRING,
+			     sizeof(APP_VERSION_STRING));
+#endif
 
-	/* Initialize the state to 'looking for device' */
-	remote_ble_sensor_params.app_state = BT_DEMO_APP_STATE_FINDING_DEVICE;
+#endif
+	return 0;
+}
 
-	/* Start scanning for Bluetooth devices */
-	bt_scan();
+int settings_backend_init(void)
+{
+	settings_src_register(&zephyr_settings_fw_store);
+	return 0;
 }
 
 /* Function for initialising the BLE portion of the OOB demo */
@@ -517,11 +583,31 @@ void oob_ble_initialise(void)
 {
 	int err;
 
-	err = bt_enable(bt_ready);
+	err = bt_enable(NULL);
 	if (err) {
 		BLE_LOG_ERR("Bluetooth init failed (err %d)", err);
 		return;
 	}
+
+	BLE_LOG_INF("Bluetooth initialized");
+
+	/* Load settings.
+    *  DIS uses settings framework to set some charateristics at runtime.
+    */
+	settings_load();
+
+	bt_conn_cb_register(&conn_callbacks);
+
+	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
+	if (err) {
+		BLE_LOG_ERR("Advertising failed to start (%d)", err);
+	}
+
+	/* Initialize the state to 'looking for device' */
+	remote_ble_sensor_params.app_state = BT_DEMO_APP_STATE_FINDING_DEVICE;
+
+	/* Start scanning for Bluetooth devices */
+	bt_scan();
 }
 
 /* Function for setting the sensor read callback function */
