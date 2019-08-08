@@ -2,6 +2,7 @@
 
 ## Advertisement
 The advertisement includes the UUID of the Cellular Profile.
+The device name is "Pinnacle 100 OOB".
 
 ## AWS Provisioning Profile
 ### UUID: ae7203f0-55a9-4a14-bcd7-7c59f234a9b5

@@ -25,6 +25,7 @@ LOG_MODULE_REGISTER(oob_main);
 #include "lte.h"
 #include "aws.h"
 #include "nv.h"
+#include "ble_cellular_service.h"
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
@@ -474,6 +475,7 @@ void main(void)
 	lteInfo = lteGetStatus();
 
 	/* Start up BLE portion of the demo */
+	cell_svc_set_imei(lteInfo->IMEI);
 	oob_ble_initialise();
 	oob_ble_set_callback(SensorUpdated);
 
