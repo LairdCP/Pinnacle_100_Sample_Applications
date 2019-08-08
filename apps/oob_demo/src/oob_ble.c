@@ -152,6 +152,7 @@ u8_t notify_func_callback(struct bt_conn *conn,
 			  struct bt_gatt_subscribe_params *params,
 			  const void *data, u16_t length)
 {
+	s32_t reading;
 	if (!data) {
 		BLE_LOG_INF("Unsubscribed");
 		params->value_handle = 0;
@@ -162,17 +163,15 @@ u8_t notify_func_callback(struct bt_conn *conn,
 	if (params->value_handle ==
 	    remote_ble_sensor_params.temperature_subscribe_params.value_handle) {
 		/* Temperature is a 16 bit value */
-		u8_t temperature_data[2];
+		s8_t temperature_data[2];
 		memcpy(temperature_data, data, length);
-		BLE_LOG_INF("ESS Temperature value = %d",
-			    ((temperature_data[1] << 8 & 0xFF00)) +
-				    (temperature_data[0]));
+		reading = (s16_t)((temperature_data[1] << 8 & 0xFF00) +
+			  temperature_data[0]);
+		BLE_LOG_INF("ESS Temperature value = %d", reading);
 		if (SensorCallbackFunction != NULL) {
-			//Pass data to callback function
-			SensorCallbackFunction(
-				SENSOR_TYPE_TEMPERATURE,
-				((temperature_data[1] << 8 & 0xFF00)) +
-					(temperature_data[0]));
+			/* Pass data to callback function */
+			SensorCallbackFunction(SENSOR_TYPE_TEMPERATURE,
+					       reading);
 		}
 	}
 	/* Check if the notifications received have the humidity handle */
@@ -182,37 +181,27 @@ u8_t notify_func_callback(struct bt_conn *conn,
 		/* Humidity is a 16 bit value */
 		u8_t humidity_data[2];
 		memcpy(humidity_data, data, length);
-		BLE_LOG_INF("ESS Humidity value = %d",
-			    ((humidity_data[1] << 8) & 0xFF00) +
-				    humidity_data[0]);
+		reading = ((humidity_data[1] << 8) & 0xFF00) + humidity_data[0];
+		BLE_LOG_INF("ESS Humidity value = %d", reading);
 		if (SensorCallbackFunction != NULL) {
-			//Pass data to callback function
-			SensorCallbackFunction(SENSOR_TYPE_HUMIDITY,
-					       ((humidity_data[1] << 8) &
-						0xFF00) +
-						       humidity_data[0]);
+			/* Pass data to callback function */
+			SensorCallbackFunction(SENSOR_TYPE_HUMIDITY, reading);
 		}
 	}
 	/* Check if the notifications received have the pressure handle */
 	else if (params->value_handle ==
 		 remote_ble_sensor_params.pressure_subscribe_params
 			 .value_handle) {
-		/*Pressure is a 32 bit value */
+		/* Pressure is a 32 bit value */
 		u8_t pressure_data[4];
 		memcpy(pressure_data, data, length);
-		BLE_LOG_INF("ESS Pressure value = %d",
-			    (((pressure_data[3] << 24) & 0xFF000000) +
-			     ((pressure_data[2] << 16) & 0xFF0000) +
-			     ((pressure_data[1] << 8) & 0xFF00) +
-			     pressure_data[0]));
+		reading = ((pressure_data[3] << 24) & 0xFF000000) +
+			  ((pressure_data[2] << 16) & 0xFF0000) +
+			  ((pressure_data[1] << 8) & 0xFF00) + pressure_data[0];
+		BLE_LOG_INF("ESS Pressure value = %d", reading);
 		if (SensorCallbackFunction != NULL) {
-			//Pass data to callback function
-			SensorCallbackFunction(
-				SENSOR_TYPE_PRESSURE,
-				(((pressure_data[3] << 24) & 0xFF000000) +
-				 ((pressure_data[2] << 16) & 0xFF0000) +
-				 ((pressure_data[1] << 8) & 0xFF00) +
-				 pressure_data[0]));
+			/* Pass data to callback function */
+			SensorCallbackFunction(SENSOR_TYPE_PRESSURE, reading);
 		}
 	}
 
