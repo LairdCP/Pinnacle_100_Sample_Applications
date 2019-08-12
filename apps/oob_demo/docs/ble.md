@@ -31,3 +31,4 @@ Characteristics:
 | APN Username | 43787c63-9e84-4eb1-a669-70b6404da336 | ASCII string representing the APN username (24 characters max) |
 | APN Password | 43787c64-9e84-4eb1-a669-70b6404da336 | ASCII string representing the APN password (24 characters max) |
 | Status | 43787c65-9e84-4eb1-a669-70b6404da336 | One byte representing the current status of cellular radio: 0 - Not connected, 1 - connected to a network |
+| Firmware Version | 43787c66-9e84-4eb1-a669-70b6404da336 | Firmware version of the LTE modem |

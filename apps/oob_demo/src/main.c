@@ -127,11 +127,16 @@ static void lteEvent(enum lte_event event)
 	switch (event) {
 	case LTE_EVT_READY:
 		k_sem_give(&lte_ready_sem);
+		cell_svc_notify_status(oob_ble_get_central_connection(),
+				       CELL_STATUS_CONNECTED);
 		break;
 	case LTE_EVT_DISCONNECTED:
 		/* No need to trigger a reconnect.
 		*  If next sensor data TX fails we will reconnect. 
 		*/
+		cell_svc_notify_status(oob_ble_get_central_connection(),
+				       CELL_STATUS_DISCONNECTED);
+
 		break;
 	}
 }
@@ -265,6 +270,8 @@ static void appStateWaitForLte(void)
 		/* Wait for LTE read evt */
 		k_sem_reset(&lte_ready_sem);
 		k_sem_take(&lte_ready_sem, K_FOREVER);
+	} else {
+		cell_svc_set_status(CELL_STATUS_CONNECTED);
 	}
 
 	if (resolveAwsServer) {
@@ -476,6 +483,7 @@ void main(void)
 
 	/* Start up BLE portion of the demo */
 	cell_svc_set_imei(lteInfo->IMEI);
+	cell_svc_set_fw_ver(lteInfo->radio_version);
 	oob_ble_initialise();
 	oob_ble_set_callback(SensorUpdated);
 

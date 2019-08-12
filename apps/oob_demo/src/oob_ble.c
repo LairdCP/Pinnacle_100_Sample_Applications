@@ -41,6 +41,49 @@ LOG_MODULE_REGISTER(oob_ble);
 #define BT_AD_ELEMENT_COMPLETE_LOCAL_NAME_ID 9
 #define BT_AD_SET_DATA_SIZE_MAX 31
 
+/* Function for starting BLE scan */
+static void bt_scan(void);
+
+/* This callback is triggered after recieving BLE adverts */
+static void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
+			 struct net_buf_simple *ad);
+
+/* This callback is triggered when notifications from remote device are received */
+static u8_t notify_func_callback(struct bt_conn *conn,
+				 struct bt_gatt_subscribe_params *params,
+				 const void *data, u16_t length);
+
+/* This callback is triggered when remote services are discovered */
+static u8_t service_discover_func(struct bt_conn *conn,
+				  const struct bt_gatt_attr *attr,
+				  struct bt_gatt_discover_params *params);
+
+/* This callback is triggered when remote characteristics are discovered */
+static u8_t char_discover_func(struct bt_conn *conn,
+			       const struct bt_gatt_attr *attr,
+			       struct bt_gatt_discover_params *params);
+
+/* This callback is triggered when remote descriptors are discovered */
+static u8_t desc_discover_func(struct bt_conn *conn,
+			       const struct bt_gatt_attr *attr,
+			       struct bt_gatt_discover_params *params);
+
+/* This callback is triggered when a BLE disconnection occurs */
+static void disconnected(struct bt_conn *conn, u8_t reason);
+
+/* This callback is triggered when a BLE connection occurs */
+static void connected(struct bt_conn *conn, u8_t err);
+
+/* This function is used to discover services in remote device */
+static u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid);
+
+/* This function is used to discover characteristics in remote device */
+static u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid);
+
+/* This function is used to discover descriptors in remote device */
+static u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid,
+		      u16_t start_handle);
+
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID128_ALL, 0x36, 0xa3, 0x4d, 0x40, 0xb6, 0x70,
@@ -48,7 +91,21 @@ static const struct bt_data ad[] = {
 		      0x43),
 };
 
-struct bt_conn *sensor_conn;
+struct remote_ble_sensor {
+	/* State of app, see BT_DEMO_APP_STATE_XXX */
+	u8_t app_state;
+	/* Handle of ESS service, used when searching for chars */
+	u16_t ess_service_handle;
+	/* Temperature gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params temperature_subscribe_params;
+	/* Pressure gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params pressure_subscribe_params;
+	/* Humidity gatt subscribe parameters, see gatt.h for contents */
+	struct bt_gatt_subscribe_params humidity_subscribe_params;
+};
+
+struct bt_conn *sensor_conn = NULL;
+struct bt_conn *central_conn = NULL;
 
 struct bt_uuid_16 uuid = BT_UUID_INIT_16(0);
 
@@ -74,9 +131,23 @@ static struct settings_store zephyr_settings_fw_store = {
 	.cs_itf = &zephyr_settings_fw_itf
 };
 
+/* Function for starting BLE scan */
+static void bt_scan(void)
+{
+	u8_t err;
+
+	err = bt_le_scan_start(BT_LE_SCAN_ACTIVE, device_found);
+	if (err) {
+		BLE_LOG_ERR("BLE Scan failed to start (err %d)", err);
+		return;
+	}
+
+	BLE_LOG_INF("Scanning for remote BLE devices started");
+}
+
 /* This callback is triggered after recieving BLE adverts */
-void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
-		  struct net_buf_simple *ad)
+static void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
+			 struct net_buf_simple *ad)
 {
 	char bt_addr[BT_ADDR_LE_STR_LEN];
 	static const char devname_expected[] = BT_REMOTE_DEVICE_NAME_STR;
@@ -148,9 +219,9 @@ void device_found(const bt_addr_le_t *addr, s8_t rssi, u8_t type,
 }
 
 /* This callback is triggered when notifications from remote device are received */
-u8_t notify_func_callback(struct bt_conn *conn,
-			  struct bt_gatt_subscribe_params *params,
-			  const void *data, u16_t length)
+static u8_t notify_func_callback(struct bt_conn *conn,
+				 struct bt_gatt_subscribe_params *params,
+				 const void *data, u16_t length)
 {
 	s32_t reading;
 	if (!data) {
@@ -166,7 +237,7 @@ u8_t notify_func_callback(struct bt_conn *conn,
 		s8_t temperature_data[2];
 		memcpy(temperature_data, data, length);
 		reading = (s16_t)((temperature_data[1] << 8 & 0xFF00) +
-			  temperature_data[0]);
+				  temperature_data[0]);
 		BLE_LOG_INF("ESS Temperature value = %d", reading);
 		if (SensorCallbackFunction != NULL) {
 			/* Pass data to callback function */
@@ -209,7 +280,8 @@ u8_t notify_func_callback(struct bt_conn *conn,
 }
 
 /* This function is used to discover descriptors in remote device */
-u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle)
+static u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid,
+		      u16_t start_handle)
 {
 	u8_t err;
 
@@ -226,7 +298,7 @@ u8_t find_desc(struct bt_conn *conn, struct bt_uuid_16 uuid, u16_t start_handle)
 }
 
 /* This function is used to discover characteristics in remote device */
-u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
+static u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 {
 	u8_t err;
 
@@ -244,9 +316,9 @@ u8_t find_char(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 }
 
 /* This function is used to discover services in remote device */
-u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
+static u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 {
-	uint8_t err;
+	u8_t err;
 
 	/* Update discover parameters before initiating discovery */
 	discover_params.type = BT_GATT_DISCOVER_PRIMARY;
@@ -261,8 +333,9 @@ u8_t find_service(struct bt_conn *conn, struct bt_uuid_16 n_uuid)
 }
 
 /* This callback is triggered when remote descriptors are discovered */
-u8_t desc_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-			struct bt_gatt_discover_params *params)
+static u8_t desc_discover_func(struct bt_conn *conn,
+			       const struct bt_gatt_attr *attr,
+			       struct bt_gatt_discover_params *params)
 {
 	u8_t err;
 
@@ -358,8 +431,9 @@ u8_t desc_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 /* This callback is triggered when remote characteristics are discovered */
-u8_t char_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-			struct bt_gatt_discover_params *params)
+static u8_t char_discover_func(struct bt_conn *conn,
+			       const struct bt_gatt_attr *attr,
+			       struct bt_gatt_discover_params *params)
 {
 	u8_t err;
 
@@ -409,9 +483,9 @@ u8_t char_discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 /* This callback is triggered when remote services are discovered */
-u8_t service_discover_func(struct bt_conn *conn,
-			   const struct bt_gatt_attr *attr,
-			   struct bt_gatt_discover_params *params)
+static u8_t service_discover_func(struct bt_conn *conn,
+				  const struct bt_gatt_attr *attr,
+				  struct bt_gatt_discover_params *params)
 {
 	int err;
 
@@ -445,8 +519,14 @@ u8_t service_discover_func(struct bt_conn *conn,
 	return BT_GATT_ITER_STOP;
 }
 
+static int startAdvertising(void)
+{
+	return bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL,
+			       0);
+}
+
 /* This callback is triggered when a BLE connection occurs */
-void connected(struct bt_conn *conn, u8_t err)
+static void connected(struct bt_conn *conn, u8_t err)
 {
 	int rc;
 	char addr[BT_ADDR_LE_STR_LEN];
@@ -475,6 +555,9 @@ void connected(struct bt_conn *conn, u8_t err)
 	} else {
 		/* In this case a central device connected to us */
 		BLE_LOG_INF("Connected central: %s", log_strdup(addr));
+		central_conn = bt_conn_ref(conn);
+		/* stop advertising so another cental cannot connect */
+		bt_le_adv_stop();
 		rc = bt_conn_security(conn, BT_SECURITY_MEDIUM);
 		if (rc) {
 			BLE_LOG_ERR("Failed to set security (%d)", rc);
@@ -497,14 +580,16 @@ fail:
 	} else {
 		BLE_LOG_ERR("Failed to connect to central %s (%u)",
 			    log_strdup(addr), err);
+		central_conn = NULL;
 	}
 
 	return;
 }
 
 /* This callback is triggered when a BLE disconnection occurs */
-void disconnected(struct bt_conn *conn, u8_t reason)
+static void disconnected(struct bt_conn *conn, u8_t reason)
 {
+	int rc;
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -525,21 +610,12 @@ void disconnected(struct bt_conn *conn, u8_t reason)
 	} else {
 		BLE_LOG_INF("Disconnected central: %s (reason %u)",
 			    log_strdup(addr), reason);
+		rc = startAdvertising();
+		if (rc != 0) {
+			BLE_LOG_ERR("Could not start advertising (%d)", rc);
+		}
+		central_conn = NULL;
 	}
-}
-
-/* Function for starting BLE scan */
-void bt_scan(void)
-{
-	u8_t err;
-
-	err = bt_le_scan_start(BT_LE_SCAN_ACTIVE, device_found);
-	if (err) {
-		BLE_LOG_ERR("BLE Scan failed to start (err %d)", err);
-		return;
-	}
-
-	BLE_LOG_INF("Scanning for remote BLE devices started");
 }
 
 static int zephyr_settings_fw_load(struct settings_store *cs,
@@ -587,7 +663,7 @@ void oob_ble_initialise(void)
 
 	bt_conn_cb_register(&conn_callbacks);
 
-	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
+	err = startAdvertising();
 	if (err) {
 		BLE_LOG_ERR("Advertising failed to start (%d)", err);
 	}
@@ -603,4 +679,9 @@ void oob_ble_initialise(void)
 void oob_ble_set_callback(sensor_updated_function_t func)
 {
 	SensorCallbackFunction = func;
+}
+
+struct bt_conn *oob_ble_get_central_connection(void)
+{
+	return central_conn;
 }
