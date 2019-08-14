@@ -36,7 +36,7 @@ static u8_t rx_buffer[APP_MQTT_BUFFER_SIZE];
 static u8_t tx_buffer[APP_MQTT_BUFFER_SIZE];
 
 /* mqtt client id */
-static u8_t mqtt_client_id[sizeof(MQTT_CLIENTID_PREFIX) + IMEI_LENGTH];
+static char *mqtt_client_id;
 
 /* The mqtt client struct */
 static struct mqtt_client client_ctx;
@@ -56,13 +56,16 @@ static sec_tag_t m_sec_tags[] = { APP_CA_CERT_TAG, APP_DEVICE_CERT_TAG };
 
 static struct shadow_reported_struct shadow_persistent_data;
 
-static int tls_init(u8_t *cert, u8_t *key)
+static char *server_endpoint;
+static char *root_ca;
+
+static int tls_init(const u8_t *cert, const u8_t *key)
 {
 	int err = -EINVAL;
 
 	tls_credential_delete(APP_CA_CERT_TAG, TLS_CREDENTIAL_CA_CERTIFICATE);
 	err = tls_credential_add(APP_CA_CERT_TAG, TLS_CREDENTIAL_CA_CERTIFICATE,
-				 aws_root_ca, strlen(aws_root_ca) + 1);
+				 root_ca, strlen(root_ca) + 1);
 	if (err < 0) {
 		AWS_LOG_ERR("Failed to register public certificate: %d", err);
 		return err;
@@ -228,7 +231,7 @@ static void client_init(struct mqtt_client *client)
 	tls_config->cipher_list = NULL;
 	tls_config->sec_tag_list = m_sec_tags;
 	tls_config->sec_tag_count = ARRAY_SIZE(m_sec_tags);
-	tls_config->hostname = SERVER_HOST;
+	tls_config->hostname = server_endpoint;
 }
 
 /* In this routine we block until the connected variable is 1 */
@@ -292,6 +295,8 @@ int awsInit(void)
 	shadow_persistent_data.state.reported.radio_version = "";
 	shadow_persistent_data.state.reported.IMEI = "";
 	shadow_persistent_data.state.reported.ICCID = "";
+	server_endpoint = AWS_DEFAULT_ENDPOINT;
+	mqtt_client_id = DEFAULT_MQTT_CLIENTID;
 
 	k_thread_create(&rxThread, rxThreadStack,
 			K_THREAD_STACK_SIZEOF(rxThreadStack), awsRxThread, NULL,
@@ -300,9 +305,24 @@ int awsInit(void)
 	return 0;
 }
 
-int awsSetCredentials(u8_t *cert, u8_t *key)
+int awsSetCredentials(const u8_t *cert, const u8_t *key)
 {
 	return tls_init(cert, key);
+}
+
+void awsSetEndpoint(const char *ep)
+{
+	server_endpoint = (char *)ep;
+}
+
+void awsSetClientId(const char *id)
+{
+	mqtt_client_id = (char *)id;
+}
+
+void awsSetRootCa(const char *cred)
+{
+	root_ca = (char *)cred;
 }
 
 int awsGetServerAddr(void)
@@ -314,7 +334,7 @@ int awsGetServerAddr(void)
 	dns_retries = DNS_RETRIES;
 	do {
 		AWS_LOG_DBG("Get AWS server address");
-		rc = getaddrinfo(SERVER_HOST, SERVER_PORT_STR, &server_addr,
+		rc = getaddrinfo(server_endpoint, SERVER_PORT_STR, &server_addr,
 				 &saddr);
 		if (rc != 0) {
 			AWS_LOG_ERR("Get AWS server addr (%d)", rc);
@@ -323,17 +343,14 @@ int awsGetServerAddr(void)
 		dns_retries--;
 	} while (rc != 0 && dns_retries != 0);
 	if (rc != 0) {
-		AWS_LOG_ERR("Unable to resolve '%s'", SERVER_HOST);
+		AWS_LOG_ERR("Unable to resolve '%s'", server_endpoint);
 	}
 
 	return rc;
 }
 
-int awsConnect(const char *clientId)
+int awsConnect()
 {
-	snprintk(mqtt_client_id, sizeof(mqtt_client_id), "%s%s",
-		 MQTT_CLIENTID_PREFIX, clientId);
-
 	AWS_LOG_INF("Attempting to connect %s to AWS...", mqtt_client_id);
 	int rc = try_to_connect(&client_ctx);
 	if (rc != 0) {

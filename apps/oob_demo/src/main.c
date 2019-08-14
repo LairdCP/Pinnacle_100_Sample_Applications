@@ -26,6 +26,7 @@ LOG_MODULE_REGISTER(oob_main);
 #include "aws.h"
 #include "nv.h"
 #include "ble_cellular_service.h"
+#include "ble_aws_service.h"
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
@@ -65,8 +66,6 @@ static bool allowCommissioning = false;
 static bool appReady = false;
 static bool devCertSet;
 static bool devKeySet;
-static u8_t devCert[AWS_DEV_CERT_MAX_LENGTH];
-static u8_t devKey[AWS_DEV_KEY_MAX_LENGTH];
 
 static app_state_function_t appState;
 struct lte_status *lteInfo;
@@ -127,15 +126,15 @@ static void lteEvent(enum lte_event event)
 	switch (event) {
 	case LTE_EVT_READY:
 		k_sem_give(&lte_ready_sem);
-		cell_svc_notify_status(oob_ble_get_central_connection(),
-				       CELL_STATUS_CONNECTED);
+		cell_svc_set_status(oob_ble_get_central_connection(),
+				    CELL_STATUS_CONNECTED);
 		break;
 	case LTE_EVT_DISCONNECTED:
 		/* No need to trigger a reconnect.
 		*  If next sensor data TX fails we will reconnect. 
 		*/
-		cell_svc_notify_status(oob_ble_get_central_connection(),
-				       CELL_STATUS_DISCONNECTED);
+		cell_svc_set_status(oob_ble_get_central_connection(),
+				    CELL_STATUS_DISCONNECTED);
 
 		break;
 	}
@@ -148,6 +147,11 @@ static void appStateAwsSendSenorData(void)
 	MAIN_LOG_DBG("AWS send sensor data state");
 
 	k_sem_take(&send_data_sem, K_FOREVER);
+
+	if (!commissioned) {
+		/* we were decommissioned, disconnect */
+		appState = appStateAwsDisconnect;
+	}
 
 	lteInfo = lteGetStatus();
 
@@ -209,15 +213,22 @@ static void appStateAwsConnect(void)
 		return;
 	}
 
-	if (awsConnect(lteInfo->IMEI) != 0) {
+	if (awsConnect() != 0) {
 		MAIN_LOG_ERR("Could not connect to aws, retrying in %d seconds",
 			     RETRY_AWS_ACTION_TIMEOUT_SECONDS);
+		aws_svc_set_status(oob_ble_get_central_connection(),
+				   AWS_STATUS_CONNECTION_ERR);
 		/* wait some time before trying again */
 		k_sleep(K_SECONDS(RETRY_AWS_ACTION_TIMEOUT_SECONDS));
 		return;
 	}
 
 	nvStoreCommissioned(true);
+	commissioned = true;
+	allowCommissioning = false;
+
+	aws_svc_set_status(oob_ble_get_central_connection(),
+			   AWS_STATUS_CONNECTED);
 
 	if (initShadow) {
 		/* Init the shadow once, the first time we connect */
@@ -232,6 +243,8 @@ static void appStateAwsConnect(void)
 static void appStateAwsDisconnect(void)
 {
 	MAIN_LOG_DBG("AWS disconnect state");
+	aws_svc_set_status(oob_ble_get_central_connection(),
+			   AWS_STATUS_DISCONNECTED);
 	stopSendDataTimer();
 	awsDisconnect();
 	if (devCertSet && devKeySet) {
@@ -266,12 +279,16 @@ static void appStateWaitForLte(void)
 {
 	MAIN_LOG_DBG("Wait for LTE state");
 
+	aws_svc_set_status(oob_ble_get_central_connection(),
+			   AWS_STATUS_DISCONNECTED);
+
 	if (!lteIsReady()) {
 		/* Wait for LTE read evt */
 		k_sem_reset(&lte_ready_sem);
 		k_sem_take(&lte_ready_sem, K_FOREVER);
 	} else {
-		cell_svc_set_status(CELL_STATUS_CONNECTED);
+		cell_svc_set_status(oob_ble_get_central_connection(),
+				    CELL_STATUS_CONNECTED);
 	}
 
 	if (resolveAwsServer) {
@@ -285,20 +302,17 @@ static int setAwsCredentials(void)
 {
 	int rc;
 
-	rc = nvReadDevCert(devCert, sizeof(devCert));
-	if (rc <= 0) {
-		MAIN_LOG_ERR("Reading device cert (%d)", rc);
+	if (!aws_svc_client_cert_is_stored()) {
 		return APP_ERR_READ_CERT;
 	}
 
-	rc = nvReadDevKey(devKey, sizeof(devKey));
-	if (rc <= 0) {
-		MAIN_LOG_ERR("Reading device key (%d)", rc);
+	if (!aws_svc_client_key_is_stored()) {
 		return APP_ERR_READ_KEY;
 	}
 	devCertSet = true;
 	devKeySet = true;
-	rc = awsSetCredentials(devCert, devKey);
+	rc = awsSetCredentials(aws_svc_get_client_cert(),
+			       aws_svc_get_client_key());
 	return rc;
 }
 
@@ -306,6 +320,8 @@ static void appStateCommissionDevice(void)
 {
 	MAIN_LOG_DBG("Commission device state");
 	printk("\n\nWaiting to commission device\n\n");
+	aws_svc_set_status(oob_ble_get_central_connection(),
+			   AWS_STATUS_NOT_PROVISIONED);
 	allowCommissioning = true;
 
 	k_sem_take(&rx_cert_sem, K_FOREVER);
@@ -354,6 +370,7 @@ char *replaceWord(const char *s, const char *oldW, const char *newW, char *dest,
 	return dest;
 }
 
+#ifdef CONFIG_SHELL
 static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
 {
 	int rc;
@@ -374,11 +391,13 @@ static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
 	certSize = strlen(cred);
 
 	if (type == CREDENTIAL_CERT) {
-		expSize = sizeof(devCert);
-		newCred = devCert;
+		expSize = AWS_CLIENT_CERT_MAX_LENGTH;
+		newCred = (char *)aws_svc_get_client_cert();
 	} else if (type == CREDENTIAL_KEY) {
-		expSize = sizeof(devKey);
-		newCred = devKey;
+		expSize = AWS_CLIENT_KEY_MAX_LENGTH;
+		newCred = (char *)aws_svc_get_client_key();
+	} else {
+		return APP_ERR_UNKNOWN_CRED;
 	}
 
 	if (certSize > expSize) {
@@ -389,24 +408,16 @@ static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
 	replaceWord(cred, "\\n", "\n", newCred, expSize);
 	replaceWord(newCred, "\\s", " ", newCred, expSize);
 
-	if (type == CREDENTIAL_CERT) {
-		rc = nvStoreDevCert(newCred, strlen(newCred));
-		if (rc >= 0) {
-			printk("Stored cert:\n%s\n", newCred);
-			devCertSet = true;
-		} else {
-			MAIN_LOG_ERR("Error storing cert (%d)", rc);
-		}
+	rc = aws_svc_save_clear_settings(true);
+	if (rc < 0) {
+		MAIN_LOG_ERR("Error storing credential (%d)", rc);
+	} else if (type == CREDENTIAL_CERT) {
+		printk("Stored cert:\n%s\n", newCred);
+		devCertSet = true;
+
 	} else if (type == CREDENTIAL_KEY) {
-		rc = nvStoreDevKey(newCred, strlen(newCred));
-		if (rc >= 0) {
-			printk("Stored key:\n%s\n", newCred);
-			devKeySet = true;
-		} else {
-			MAIN_LOG_ERR("Error storing key (%d)", rc);
-		}
-	} else {
-		rc = APP_ERR_UNKNOWN_CRED;
+		printk("Stored key:\n%s\n", newCred);
+		devKeySet = true;
 	}
 
 	if (rc >= 0 && devCertSet && devKeySet) {
@@ -442,8 +453,7 @@ static int decommission(const struct shell *shell, size_t argc, char **argv)
 		return APP_ERR_NOT_READY;
 	}
 
-	nvDeleteDevCert();
-	nvDeleteDevKey();
+	aws_svc_save_clear_settings(false);
 	devCertSet = false;
 	devKeySet = false;
 
@@ -452,9 +462,12 @@ static int decommission(const struct shell *shell, size_t argc, char **argv)
 	allowCommissioning = true;
 	appState = appStateAwsDisconnect;
 	printk("Device is decommissioned\n");
+	/* trigger send data in case we are waiting in that state */
+	k_sem_give(&send_data_sem);
 
 	return 0;
 }
+#endif /* CONFIG_SHELL */
 
 void main(void)
 {
@@ -481,17 +494,27 @@ void main(void)
 	}
 	lteInfo = lteGetStatus();
 
-	/* Start up BLE portion of the demo */
-	cell_svc_set_imei(lteInfo->IMEI);
-	cell_svc_set_fw_ver(lteInfo->radio_version);
-	oob_ble_initialise();
-	oob_ble_set_callback(SensorUpdated);
-
 	/* init AWS */
 	rc = awsInit();
 	if (rc != 0) {
 		goto exit;
 	}
+
+	/* Start up BLE portion of the demo */
+	cell_svc_set_imei(lteInfo->IMEI);
+	cell_svc_set_fw_ver(lteInfo->radio_version);
+	rc = aws_svc_init(lteInfo->IMEI);
+	if (rc != 0) {
+		goto exit;
+	}
+	if (commissioned) {
+		aws_svc_set_status(NULL, AWS_STATUS_DISCONNECTED);
+
+	} else {
+		aws_svc_set_status(NULL, AWS_STATUS_NOT_PROVISIONED);
+	}
+	oob_ble_initialise();
+	oob_ble_set_callback(SensorUpdated);
 
 	appReady = true;
 	printk("\n!!!!!!!! App is ready! !!!!!!!!\n");
@@ -510,6 +533,7 @@ exit:
 	return;
 }
 
+#ifdef CONFIG_SHELL
 SHELL_STATIC_SUBCMD_SET_CREATE(oob_cmds,
 			       SHELL_CMD_ARG(set_cert, NULL, "Set device cert",
 					     set_aws_device_cert, 2, 0),
@@ -521,3 +545,4 @@ SHELL_STATIC_SUBCMD_SET_CREATE(oob_cmds,
 			       SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 SHELL_CMD_REGISTER(oob, &oob_cmds, "OOB Demo commands", NULL);
+#endif /* CONFIG_SHELL */

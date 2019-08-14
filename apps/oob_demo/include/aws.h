@@ -37,7 +37,7 @@ static const unsigned char aws_root_ca[] =
 	"rqXRfboQnoZsG4q5WTP468SQvvG5\n"
 	"-----END CERTIFICATE-----\n";
 
-#define SERVER_HOST "a3273rvo818l4w-ats.iot.us-east-1.amazonaws.com"
+#define AWS_DEFAULT_ENDPOINT "a3273rvo818l4w-ats.iot.us-east-1.amazonaws.com"
 
 #define SERVER_PORT_STR "8883"
 
@@ -48,7 +48,7 @@ static const unsigned char aws_root_ca[] =
 
 #define APP_MQTT_BUFFER_SIZE 128
 
-#define MQTT_CLIENTID_PREFIX "pinnacle100_oob_"
+#define DEFAULT_MQTT_CLIENTID "pinnacle100_oob"
 
 #define SHADOW_STATE_NULL "{\"state\":null}"
 
@@ -107,9 +107,12 @@ static const struct json_obj_descr shadow_descr[] = {
 };
 
 int awsInit(void);
-int awsSetCredentials(u8_t *cert, u8_t *key);
+int awsSetCredentials(const u8_t *cert, const u8_t *key);
+void awsSetRootCa(const char *cred);
+void awsSetEndpoint(const char *ep);
+void awsSetClientId(const char *id);
 int awsGetServerAddr(void);
-int awsConnect(const char *clientId);
+int awsConnect();
 void awsDisconnect(void);
 int awsKeepAlive(void);
 int awsSendData(char *data);

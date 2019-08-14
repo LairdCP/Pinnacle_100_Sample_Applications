@@ -102,27 +102,21 @@ BT_GATT_SERVICE_DEFINE(
 
 void cell_svc_set_imei(const char *imei)
 {
-	memcpy(imei_value, imei, sizeof(imei_value) - 1);
+	if (imei) {
+		memcpy(imei_value, imei, sizeof(imei_value) - 1);
+	}
 }
 
-void cell_svc_set_status(enum cell_status status)
-{
-	status_value = status;
-}
-
-void cell_svc_notify_status(struct bt_conn *conn, enum cell_status status)
+void cell_svc_set_status(struct bt_conn *conn, enum cell_status status)
 {
 	bool notify = false;
 
 	if (status != status_value) {
 		notify = true;
-		cell_svc_set_status(status);
+		status_value = status;
 	}
 
-	if (conn == NULL) {
-		return;
-	}
-	if (status_notify && notify) {
+	if ((conn != NULL) && status_notify && notify) {
 		bt_gatt_notify(conn, &cell_svc.attrs[3], &status,
 			       sizeof(status));
 	}

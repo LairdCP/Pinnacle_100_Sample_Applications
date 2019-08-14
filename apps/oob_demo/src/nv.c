@@ -20,6 +20,15 @@ LOG_MODULE_REGISTER(oob_nv);
 #define NV_LOG_INF(...) LOG_INF(__VA_ARGS__)
 #define NV_LOG_DBG(...) LOG_DBG(__VA_ARGS__)
 
+enum SETTING_ID {
+	SETTING_ID_COMMISSIONED,
+	SETTING_ID_DEV_CERT,
+	SETTING_ID_DEV_KEY,
+	SETTING_ID_AWS_ENDPOINT,
+	SETTING_ID_AWS_CLIENT_ID,
+	SETTING_ID_AWS_ROOT_CA,
+};
+
 static struct nvs_fs fs;
 static bool nvCommissioned;
 
@@ -30,7 +39,7 @@ int nvReadCommissioned(bool *commissioned)
 	rc = nvs_read(&fs, SETTING_ID_COMMISSIONED, &nvCommissioned,
 		      sizeof(nvCommissioned));
 	if (rc <= 0) {
-		NV_LOG_ERR("Error reading commissioned (%d)", rc);
+		*commissioned = false;
 	}
 
 	return rc;
@@ -45,7 +54,7 @@ int nvStoreCommissioned(bool commissioned)
 	if (rc < 0) {
 		NV_LOG_ERR("Error writing commissioned (%d)", rc);
 	}
-    
+
 	return rc;
 }
 
@@ -119,4 +128,49 @@ int nvDeleteDevCert(void)
 int nvDeleteDevKey(void)
 {
 	return nvs_delete(&fs, SETTING_ID_DEV_KEY);
+}
+
+int nvStoreAwsEndpoint(u8_t *ep, u16_t size)
+{
+	return nvs_write(&fs, SETTING_ID_AWS_ENDPOINT, ep, size);
+}
+
+int nvReadAwsEndpoint(u8_t *ep, u16_t size)
+{
+	return nvs_read(&fs, SETTING_ID_AWS_ENDPOINT, ep, size);
+}
+
+int nvStoreAwsClientId(u8_t *id, u16_t size)
+{
+	return nvs_write(&fs, SETTING_ID_AWS_CLIENT_ID, id, size);
+}
+
+int nvReadAwsClientId(u8_t *id, u16_t size)
+{
+	return nvs_read(&fs, SETTING_ID_AWS_CLIENT_ID, id, size);
+}
+
+int nvStoreAwsRootCa(u8_t *cert, u16_t size)
+{
+	return nvs_write(&fs, SETTING_ID_AWS_ROOT_CA, cert, size);
+}
+
+int nvReadAwsRootCa(u8_t *cert, u16_t size)
+{
+	return nvs_read(&fs, SETTING_ID_AWS_ROOT_CA, cert, size);
+}
+
+int nvDeleteAwsEndpoint(void)
+{
+	return nvs_delete(&fs, SETTING_ID_AWS_ENDPOINT);
+}
+
+int nvDeleteAwsClientId(void)
+{
+	return nvs_delete(&fs, SETTING_ID_AWS_CLIENT_ID);
+}
+
+int nvDeleteAwsRootCa(void)
+{
+	return nvs_delete(&fs, SETTING_ID_AWS_ROOT_CA);
 }
