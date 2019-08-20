@@ -25,6 +25,8 @@ LOG_MODULE_REGISTER(oob_aws_svc);
 
 #define SHA256_SIZE 32
 
+enum { SAVE_SETTINGS = 1, CLEAR_SETTINGS };
+
 static struct bt_uuid_128 aws_svc_uuid =
 	BT_UUID_INIT_128(0xb5, 0xa9, 0x34, 0xf2, 0x59, 0x7c, 0xd7, 0xbc, 0x14,
 			 0x4a, 0xa9, 0x55, 0xf0, 0x03, 0x72, 0xae);
@@ -74,6 +76,25 @@ static enum aws_status status_value;
 
 static bool isClientCertStored = false;
 static bool isClientKeyStored = false;
+static u32_t lastCredOffset;
+
+static aws_svc_event_function_t eventCallbackFunc = NULL;
+
+static void onAwsSvcEvent(enum aws_svc_event event)
+{
+	if (eventCallbackFunc != NULL) {
+		eventCallbackFunc(event);
+	}
+}
+
+static bool isCommissioned(void)
+{
+	if (status_value == AWS_STATUS_NOT_PROVISIONED) {
+		return false;
+	} else {
+		return true;
+	}
+}
 
 static ssize_t read_client_id(struct bt_conn *conn,
 			      const struct bt_gatt_attr *attr, void *buf,
@@ -90,6 +111,50 @@ static ssize_t read_client_id(struct bt_conn *conn,
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, value, valueLen);
 }
 
+static ssize_t write_client_id(struct bt_conn *conn,
+			       const struct bt_gatt_attr *attr, const void *buf,
+			       u16_t len, u16_t offset, u8_t flags)
+{
+	u8_t *value = attr->user_data;
+
+	if (isCommissioned()) {
+		/* if we are commissioned, do not allow writing */
+		return BT_GATT_ERR(BT_ATT_ERR_WRITE_NOT_PERMITTED);
+	}
+
+	if (offset + len > (sizeof(client_id_value) - 1)) {
+		return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
+	}
+
+	memcpy(value + offset, buf, len);
+	/* null terminate the value that was written */
+	*(value + offset + len) = 0;
+
+	return len;
+}
+
+static ssize_t write_endpoint(struct bt_conn *conn,
+			      const struct bt_gatt_attr *attr, const void *buf,
+			      u16_t len, u16_t offset, u8_t flags)
+{
+	u8_t *value = attr->user_data;
+
+	if (isCommissioned()) {
+		/* if we are commissioned, do not allow writing */
+		return BT_GATT_ERR(BT_ATT_ERR_WRITE_NOT_PERMITTED);
+	}
+
+	if (offset + len > (sizeof(endpoint_value) - 1)) {
+		return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
+	}
+
+	memcpy(value + offset, buf, len);
+	/* null terminate the value that was written */
+	*(value + offset + len) = 0;
+
+	return len;
+}
+
 static ssize_t read_endpoint(struct bt_conn *conn,
 			     const struct bt_gatt_attr *attr, void *buf,
 			     u16_t len, u16_t offset)
@@ -103,6 +168,78 @@ static ssize_t read_endpoint(struct bt_conn *conn,
 	}
 
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, value, valueLen);
+}
+
+static ssize_t write_credential(struct bt_conn *conn,
+				const struct bt_gatt_attr *attr,
+				const void *buf, u16_t len, u16_t offset,
+				u8_t flags)
+{
+	char *value = attr->user_data;
+	u32_t credOffset = 0;
+	u8_t *data = (u8_t *)buf;
+	u16_t credMaxSize;
+
+	if (isCommissioned()) {
+		/* if we are commissioned, do not allow writing */
+		AWS_SVC_LOG_ERR(
+			"Write not permitted, device is already commissioned");
+		return BT_GATT_ERR(BT_ATT_ERR_WRITE_NOT_PERMITTED);
+	}
+
+	if (len <= 4) {
+		/* There must be a least 5 bytes to contain valid data */
+		AWS_SVC_LOG_ERR(
+			"Invalid length, data must be at least 5 bytes (4 byte offset + 1 byte data)");
+		return BT_GATT_ERR(BT_ATT_ERR_INVALID_PDU);
+	}
+
+	if (value == root_ca_value) {
+		credMaxSize = sizeof(root_ca_value) - 1;
+	} else if (value == client_cert_value) {
+		credMaxSize = sizeof(client_cert_value) - 1;
+	} else if (value == client_key_value) {
+		credMaxSize = sizeof(client_key_value) - 1;
+	} else {
+		credMaxSize = 0;
+	}
+
+	if (offset == 0) {
+		credOffset = data[3] << 24;
+		credOffset |= data[2] << 16;
+		credOffset |= data[1] << 8;
+		credOffset |= data[0];
+		lastCredOffset = credOffset;
+	} else {
+		credOffset = lastCredOffset;
+	}
+
+	if ((value + offset + credOffset - value) > credMaxSize) {
+		AWS_SVC_LOG_ERR(
+			"Invalid offset, data will overrun destination");
+		return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
+	}
+
+	AWS_SVC_LOG_DBG(
+		"Writing cred to 0x%08x, offset 0x%04x, len: %d, cred offset 0x%08x",
+		(u32_t)value, offset, len, credOffset);
+
+	if (offset == 0) {
+		/* This was not a long write.
+        *  skip first 4 bytes of data (address offest) and adjust 
+        *  length by 4 bytes */
+		memcpy(value + offset + credOffset, data + 4, len - 4);
+		/* null terminate the value that was written */
+		*(value + offset + credOffset + (len - 4)) = 0;
+
+	} else {
+		/* This was a long write, the data did not contain a credOffset */
+		memcpy(value + offset + credOffset, data, len);
+		/* null terminate the value that was written */
+		*(value + offset + credOffset + len) = 0;
+	}
+
+	return len;
 }
 
 static ssize_t read_root_ca(struct bt_conn *conn,
@@ -150,6 +287,18 @@ static ssize_t write_save_clear(struct bt_conn *conn,
 
 	memcpy(value + offset, buf, len);
 
+	if (save_clear_value == SAVE_SETTINGS) {
+		if (isCommissioned()) {
+			/* if we are commissioned, do not allow writing */
+			return BT_GATT_ERR(BT_ATT_ERR_WRITE_NOT_PERMITTED);
+		}
+		aws_svc_save_clear_settings(true);
+		onAwsSvcEvent(AWS_SVC_EVENT_SETTINGS_SAVED);
+	} else if (save_clear_value == CLEAR_SETTINGS) {
+		aws_svc_save_clear_settings(false);
+		onAwsSvcEvent(AWS_SVC_EVENT_SETTINGS_CLEARED);
+	}
+
 	return len;
 }
 
@@ -169,22 +318,31 @@ static void status_cfg_changed(const struct bt_gatt_attr *attr, u16_t value)
 }
 
 /* AWS Service Declaration */
+#define AWS_SVC_STATUS_ATT_INDEX 14
 BT_GATT_SERVICE_DEFINE(
 	aws_svc, BT_GATT_PRIMARY_SERVICE(&aws_svc_uuid),
-	BT_GATT_CHARACTERISTIC(&aws_cliend_id_uuid.uuid, BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, read_client_id, NULL,
+	BT_GATT_CHARACTERISTIC(&aws_cliend_id_uuid.uuid,
+			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       read_client_id, write_client_id,
 			       client_id_value),
-	BT_GATT_CHARACTERISTIC(&aws_endpoint_uuid.uuid, BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, read_endpoint, NULL,
-			       endpoint_value),
-	BT_GATT_CHARACTERISTIC(&aws_root_ca_uuid.uuid, BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, read_root_ca, NULL,
-			       root_ca_value),
-	BT_GATT_CHARACTERISTIC(&aws_client_cert_uuid.uuid, BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, read_client_cert, NULL,
+	BT_GATT_CHARACTERISTIC(&aws_endpoint_uuid.uuid,
+			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       read_endpoint, write_endpoint, endpoint_value),
+	BT_GATT_CHARACTERISTIC(&aws_root_ca_uuid.uuid,
+			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       read_root_ca, write_credential, root_ca_value),
+	BT_GATT_CHARACTERISTIC(&aws_client_cert_uuid.uuid,
+			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       read_client_cert, write_credential,
 			       client_cert_value),
-	BT_GATT_CHARACTERISTIC(&aws_client_key_uuid.uuid, BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, read_client_key, NULL,
+	BT_GATT_CHARACTERISTIC(&aws_client_key_uuid.uuid,
+			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       read_client_key, write_credential,
 			       client_key_value),
 	BT_GATT_CHARACTERISTIC(&aws_save_clear_uuid.uuid, BT_GATT_CHRC_WRITE,
 			       BT_GATT_PERM_WRITE, NULL, write_save_clear,
@@ -239,8 +397,8 @@ void aws_svc_set_status(struct bt_conn *conn, enum aws_status status)
 		status_value = status;
 	}
 	if ((conn != NULL) && status_notify && notify) {
-		bt_gatt_notify(conn, &aws_svc.attrs[14], &status,
-			       sizeof(status));
+		bt_gatt_notify(conn, &aws_svc.attrs[AWS_SVC_STATUS_ATT_INDEX],
+			       &status, sizeof(status));
 	}
 }
 
@@ -371,4 +529,9 @@ int aws_svc_save_clear_settings(bool save)
 	}
 exit:
 	return rc;
+}
+
+void aws_svc_set_event_callback(aws_svc_event_function_t func)
+{
+	eventCallbackFunc = func;
 }

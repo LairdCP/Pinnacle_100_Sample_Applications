@@ -528,7 +528,6 @@ static int startAdvertising(void)
 /* This callback is triggered when a BLE connection occurs */
 static void connected(struct bt_conn *conn, u8_t err)
 {
-	int rc;
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -558,10 +557,11 @@ static void connected(struct bt_conn *conn, u8_t err)
 		central_conn = bt_conn_ref(conn);
 		/* stop advertising so another cental cannot connect */
 		bt_le_adv_stop();
-		rc = bt_conn_security(conn, BT_SECURITY_MEDIUM);
-		if (rc) {
+#ifdef CONFIG_BT_SMP
+		if (bt_conn_security(conn, BT_SECURITY_MEDIUM)) {
 			BLE_LOG_ERR("Failed to set security (%d)", rc);
 		}
+#endif /* CONFIG_BT_SMP */
 	}
 
 	return;

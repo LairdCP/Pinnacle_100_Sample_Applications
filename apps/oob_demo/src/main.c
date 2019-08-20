@@ -240,6 +240,11 @@ static void appStateAwsConnect(void)
 	}
 }
 
+static bool areCertsSet(void)
+{
+    return (devCertSet && devKeySet);
+}
+
 static void appStateAwsDisconnect(void)
 {
 	MAIN_LOG_DBG("AWS disconnect state");
@@ -247,7 +252,7 @@ static void appStateAwsDisconnect(void)
 			   AWS_STATUS_DISCONNECTED);
 	stopSendDataTimer();
 	awsDisconnect();
-	if (devCertSet && devKeySet) {
+	if (areCertsSet()) {
 		appState = appStateAwsConnect;
 	} else {
 		appState = appStateCommissionDevice;
@@ -291,10 +296,12 @@ static void appStateWaitForLte(void)
 				    CELL_STATUS_CONNECTED);
 	}
 
-	if (resolveAwsServer) {
+	if (resolveAwsServer && areCertsSet()) {
 		appState = appStateAwsResolveServer;
-	} else {
+	} else if (areCertsSet()) {
 		appState = appStateAwsConnect;
+	} else {
+		appState = appStateCommissionDevice;
 	}
 }
 
@@ -370,8 +377,35 @@ char *replaceWord(const char *s, const char *oldW, const char *newW, char *dest,
 	return dest;
 }
 
+static void decommission(void)
+{
+	nvStoreCommissioned(false);
+	devCertSet = false;
+	devKeySet = false;
+	commissioned = false;
+	allowCommissioning = true;
+	appState = appStateAwsDisconnect;
+	printk("Device is decommissioned\n");
+	/* trigger send data in case we are waiting in that state */
+	k_sem_give(&send_data_sem);
+}
+
+static void awsSvcEvent(enum aws_svc_event event)
+{
+	switch (event) {
+	case AWS_SVC_EVENT_SETTINGS_SAVED:
+		devCertSet = true;
+		devKeySet = true;
+		k_sem_give(&rx_cert_sem);
+		break;
+	case AWS_SVC_EVENT_SETTINGS_CLEARED:
+		decommission();
+		break;
+	}
+}
+
 #ifdef CONFIG_SHELL
-static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
+static int shellSetCert(enum CREDENTIAL_TYPE type, u8_t *cred)
 {
 	int rc;
 	int certSize;
@@ -420,30 +454,31 @@ static int setCert(enum CREDENTIAL_TYPE type, u8_t *cred)
 		devKeySet = true;
 	}
 
-	if (rc >= 0 && devCertSet && devKeySet) {
+	if (rc >= 0 && areCertsSet()) {
 		k_sem_give(&rx_cert_sem);
 	}
 
 	return rc;
 }
 
-static int set_aws_device_cert(const struct shell *shell, size_t argc,
-			       char **argv)
+static int shell_set_aws_device_cert(const struct shell *shell, size_t argc,
+				     char **argv)
 {
 	ARG_UNUSED(argc);
 
-	return setCert(CREDENTIAL_CERT, argv[1]);
+	return shellSetCert(CREDENTIAL_CERT, argv[1]);
 }
 
-static int set_aws_device_key(const struct shell *shell, size_t argc,
+static int shell_set_aws_device_key(const struct shell *shell, size_t argc,
+				    char **argv)
+{
+	ARG_UNUSED(argc);
+
+	return shellSetCert(CREDENTIAL_KEY, argv[1]);
+}
+
+static int shell_decommission(const struct shell *shell, size_t argc,
 			      char **argv)
-{
-	ARG_UNUSED(argc);
-
-	return setCert(CREDENTIAL_KEY, argv[1]);
-}
-
-static int decommission(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -454,16 +489,7 @@ static int decommission(const struct shell *shell, size_t argc, char **argv)
 	}
 
 	aws_svc_save_clear_settings(false);
-	devCertSet = false;
-	devKeySet = false;
-
-	nvStoreCommissioned(false);
-	commissioned = false;
-	allowCommissioning = true;
-	appState = appStateAwsDisconnect;
-	printk("Device is decommissioned\n");
-	/* trigger send data in case we are waiting in that state */
-	k_sem_give(&send_data_sem);
+	decommission();
 
 	return 0;
 }
@@ -507,6 +533,7 @@ void main(void)
 	if (rc != 0) {
 		goto exit;
 	}
+	aws_svc_set_event_callback(awsSvcEvent);
 	if (commissioned) {
 		aws_svc_set_status(NULL, AWS_STATUS_DISCONNECTED);
 
@@ -536,12 +563,12 @@ exit:
 #ifdef CONFIG_SHELL
 SHELL_STATIC_SUBCMD_SET_CREATE(oob_cmds,
 			       SHELL_CMD_ARG(set_cert, NULL, "Set device cert",
-					     set_aws_device_cert, 2, 0),
+					     shell_set_aws_device_cert, 2, 0),
 			       SHELL_CMD_ARG(set_key, NULL, "Set device key",
-					     set_aws_device_key, 2, 0),
+					     shell_set_aws_device_key, 2, 0),
 			       SHELL_CMD(reset, NULL,
 					 "Factory reset (decommission) device",
-					 decommission),
+					 shell_decommission),
 			       SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 SHELL_CMD_REGISTER(oob, &oob_cmds, "OOB Demo commands", NULL);

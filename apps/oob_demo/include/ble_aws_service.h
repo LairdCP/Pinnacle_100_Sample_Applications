@@ -26,6 +26,17 @@ enum aws_svc_err {
 	AWS_SVC_ERR_INIT_ROOT_CA = -3,
 };
 
+enum aws_svc_event {
+    AWS_SVC_EVENT_SETTINGS_SAVED,
+    AWS_SVC_EVENT_SETTINGS_CLEARED,
+};
+
+/**
+ * @brief Callback function prototype for AWS service events
+ * 
+ */
+typedef void (*aws_svc_event_function_t)(enum aws_svc_event event);
+
 int aws_svc_init(const char *clientId);
 void aws_svc_set_client_id(const char *id);
 void aws_svc_set_endpoint(const char *ep);
@@ -38,5 +49,13 @@ bool aws_svc_client_key_is_stored(void);
 const char *aws_svc_get_client_cert(void);
 const char *aws_svc_get_client_key(void);
 int aws_svc_save_clear_settings(bool save);
+
+/**
+ * @brief Set the AWS service callback
+ * 
+ * @param func Callback function
+ */
+void aws_svc_set_event_callback(aws_svc_event_function_t func);
+
 
 #endif
