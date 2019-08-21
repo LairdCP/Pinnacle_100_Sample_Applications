@@ -540,7 +540,7 @@ void main(void)
 	} else {
 		aws_svc_set_status(NULL, AWS_STATUS_NOT_PROVISIONED);
 	}
-	oob_ble_initialise();
+	oob_ble_initialise(lteInfo->IMEI);
 	oob_ble_set_callback(SensorUpdated);
 
 	appReady = true;

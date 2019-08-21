@@ -644,9 +644,12 @@ int settings_backend_init(void)
 }
 
 /* Function for initialising the BLE portion of the OOB demo */
-void oob_ble_initialise(void)
+void oob_ble_initialise(const char *imei)
 {
 	int err;
+	char devName[sizeof("Pinnacle 100 OOB-1234567")];
+	int devNameEnd;
+	int imeiEnd;
 
 	err = bt_enable(NULL);
 	if (err) {
@@ -662,6 +665,16 @@ void oob_ble_initialise(void)
 	settings_load();
 
 	bt_conn_cb_register(&conn_callbacks);
+
+	/* add last 7 digits of IMEI to dev name */
+	strncpy(devName, CONFIG_BT_DEVICE_NAME "-", sizeof(devName) - 1);
+	devNameEnd = strlen(devName);
+	imeiEnd = strlen(imei);
+	strncat(devName + devNameEnd, imei + imeiEnd - 7, 7);
+	err = bt_set_name((const char *)devName);
+	if (err) {
+		BLE_LOG_ERR("Failed to set device name (%d)", err);
+	}
 
 	err = startAdvertising();
 	if (err) {

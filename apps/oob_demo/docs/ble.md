@@ -1,8 +1,8 @@
 # BLE Services and information used in the Pinnacle 100 OOB Demo
 
 ## Advertisement
-The advertisement includes the UUID of the Cellular Profile.
-The device name is "Pinnacle 100 OOB".
+The advertisement includes the UUID of the Cellular Profile. The complete local name is included in the scan response. 
+The complete local name is "Pinnacle 100 OOB-1234567", where "1234567" are replaced with the last 7 digits of the IMEI.
 
 ## AWS Provisioning Profile
 ### UUID: ae7203f0-55a9-4a14-bcd7-7c59f234a9b5

@@ -20,7 +20,7 @@
 typedef void (*sensor_updated_function_t)(u8_t sensor, s32_t reading);
 
 /* Function for initialising the BLE portion of the OOB demo */
-void oob_ble_initialise(void);
+void oob_ble_initialise(const char *imei);
 
 /* Function for setting the sensor read callback function */
 void oob_ble_set_callback(sensor_updated_function_t func);
