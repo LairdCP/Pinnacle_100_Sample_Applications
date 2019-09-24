@@ -167,24 +167,24 @@
 		};
 		slot0_partition: partition@1000 {
 			label = "app-img";
-			reg = <0x00001000 0x0000D0000>;
+			reg = <0x00001000 0x0000CE000>;
 		};
 		/*
-		 * The flash starting at 0x000d1000 and ending at
-		 * 0x000d9000 is reserved for use by the application.
+		 * The flash starting at 0x000cf000 and ending at
+		 * 0x000d7000 is reserved for use by the application.
 		 */
 		/* Storage partition will be used by FCB/NFFS/NVS if enabled. */
 		storage_partition: partition@D1000 {
 			label = "storage";
-			reg = <0x000D1000 0x00008000>;
+			reg = <0x000CF000 0x00008000>;
 		};
 		boot_upgrade_partition: partition@D9000 {
 			label = "boot-upgrade";
-			reg = <0x000D9000 0x000012000>;
+			reg = <0x000D7000 0x000013000>;
 		};
 		bootloader_partition: partition@EB000 {
 			label = "bootloader-img";
-			reg = <0x000EB000 0x000015000>;
+			reg = <0x000EA000 0x000016000>;
 		};
 	};
 };
