@@ -1,0 +1,60 @@
+# The west manifest file for Pinnacle 100.
+#
+# The per-installation west configuration file, .west/config, sets the
+# path to the project containing this file in the [manifest] section's
+# "path" variable.
+#
+# You are free to create your own manifest files and put them in any
+# repository you want, to create your own custom Zephyr installations.
+# For example, you could create a manifest file in your own out of
+# tree application directory, which would pull this zephyr repository
+# in as an ordinary project.
+#
+# You can pass your manifest repositories to west init when creating a
+# new Zephyr installation. See the west documentation for more
+# information.
+
+manifest:
+  defaults:
+    remote: pinnacle100
+
+  remotes:
+    - name: pinnacle100
+      url-base: git@git.devops.lairdtech.com:cp_cellular/cell_iot_zephyr.git
+    - name: laird_zephyr
+      url-base: git@git.devops.lairdtech.com:cp_cellular
+    - name: zephyrproject
+      url-base: https://github.com/zephyrproject-rtos
+
+  # Please add items below based on alphabetical order
+  # Many of these dependencies we taken from the default Zephyr west manifest.
+  # These dependencies may need updating if new features are added to the firmware.
+  projects:
+    - name: ci-tools
+      revision: d56f2dd3510e20fa8cf4aad442495c08a658113f
+      path: tools/ci-tools
+      remote: zephyrproject
+    - name: mbedtls
+      revision: ca32746072ce3381f1c9ae46ba6cd34c69f8c0ee
+      path: modules/crypto/mbedtls
+      remote: zephyrproject
+    - name: net-tools
+      revision: 30b7efa827b04d2e47840716b0372737fe7d6c92
+      path: tools/net-tools
+      remote: zephyrproject
+    - name: segger
+      revision: 6fcf61606d6012d2c44129edc033f59331e268bc
+      path: modules/debug/segger
+      remote: zephyrproject
+    - name: tinycbor
+      path: modules/lib/tinycbor
+      revision: 31ae89e4b768612722620cb6cb173a0de4a19cc9
+      remote: zephyrproject
+    - name: zephyr
+      repo-path: zephyr
+      west-commands: scripts/west-commands.yml
+      revision: ca984f179dcbdacc5a9c6a1fe7570ad4b276c013
+      remote: laird_zephyr
+
+  self:
+    path: pinnacle100

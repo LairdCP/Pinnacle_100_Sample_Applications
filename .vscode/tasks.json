@@ -17,18 +17,20 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "source zephyr/zephyr-env.sh && west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+            // Linux based command is not tested
+            "command": "source ../zephyr/zephyr-env.sh && west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}",
             "windows": {
-                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}"
             },
             "problemMatcher": [],
         },
         {
             "label": "flash application",
             "type": "shell",
-            "command": "source zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
+            // Linux based command is not tested
+            "command": "source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
             "windows": {
-                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west flash -d ${workspaceRoot}\\build\\${input:buildApp} && nrfjprog -f NRF52 --reset"
+                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west flash -d ${workspaceRoot}\\build\\${input:buildApp} && nrfjprog -f NRF52 --reset"
             },
             "problemMatcher": []
         },
@@ -41,24 +43,26 @@
         {
             "label": "flash MBR + application",
             "type": "shell",
-            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
+            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
             "problemMatcher": []
         },
         {
             "label": "clean",
             "type": "shell",
-            "command": "source zephyr/zephyr-env.sh && west build -t clean -d build/${input:buildApp}",
+            // Linux based command is not tested
+            "command": "source ../zephyr/zephyr-env.sh && west build -t clean -d build/${input:buildApp}",
             "windows": {
-                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
+                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
             },
             "problemMatcher": []
         },
         {
             "label": "pristine",
             "type": "shell",
-            "command": "source zephyr/zephyr-env.sh && west build -t pristine -d build/${input:buildApp}",
+            // Linux based command is not tested
+            "command": "source ../zephyr/zephyr-env.sh && west build -t pristine -d build/${input:buildApp}",
             "windows": {
-                "command": "${workspaceRoot}\\zephyr\\zephyr-env.cmd && west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
+                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
             },
             "problemMatcher": []
         }

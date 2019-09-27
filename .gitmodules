@@ -1,3 +1,0 @@
-[submodule "zephyr"]
-	path = zephyr
-url=git@git.devops.lairdtech.com:cp_cellular/zephyr.git
