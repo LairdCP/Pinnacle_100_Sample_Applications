@@ -41,14 +41,14 @@ static int ubldr_get(const struct shell *shell, size_t argc, char **argv)
 
 	const u8_t *cmd = argv[1];
 
-	uint32_t nCmdID = strtol(cmd, NULL, 16);
+	uint32_t nCmdID = strtoul(cmd, NULL, 16);
 
 	bootloader_function_get_t bldrload = (bootloader_function_get_t)BOOTLOADER_STORAGE_FUNCTION_GET_ADDRESS;
 	uint16_t nFlags;
 	uint32_t resCode, nDataAddr, nDataLen;
 	resCode = bldrload(nCmdID, &nDataAddr, &nDataLen, &nFlags, NULL, NULL);
 
-	printk("Ret: %d, Pos: %d, Len: %d, Flg: %x, ", resCode, nDataAddr, nDataLen, nFlags);
+	printk("  Ret: %d, Pos: %d, Len: %d, Flg: %x, ", resCode, nDataAddr, nDataLen, nFlags);
 	if (argc > 2)
 	{
 		const u8_t *cmd = argv[2];
@@ -111,7 +111,7 @@ static int ubldr_get(const struct shell *shell, size_t argc, char **argv)
 			printk("failed.");
 		}
 	}
-	printk("\r\n");
+	printk("  \r\n");
 
 	return 0;
 }
@@ -127,7 +127,7 @@ SHELL_CMD_REGISTER(ubldr, &ubldr_cmds, "Universal Bootloader commands", NULL);
 
 void main(void)
 {
-	printk("Pinnacle 100 Bootloader Regression Test\r\nBranch: %s\r\nCommit: %s\r\nSystem up time %d us\r\n\r\n",
+	printk("Universal Bootloader Regression Test\r\nBranch: %s\r\nCommit: %s\r\nSystem up time %d us\r\n\r\n",
 	       GIT_BRANCH, GIT_COMMIT_HASH,
 	       SYS_CLOCK_HW_CYCLES_TO_NS(k_cycle_get_32()) / 1000);
 }
