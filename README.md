@@ -12,7 +12,7 @@ pip3 install -U west
 
 Once `west` is installed, clone this repository by:
 ```
-west init -m git@git.devops.lairdtech.com:cp_cellular/newcastle_firmware.git
+west init -m git@git.devops.rfpros.com:cp_cellular/newcastle_firmware.git
 west update
 ```
 
