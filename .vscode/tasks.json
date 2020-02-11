@@ -1,86 +1,87 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "windows": {
-        "options": {
-            "shell": {
-                "executable": "cmd.exe",
-                "args": [
-                    "/d",
-                    "/c"
-                ]
-            }
-        }
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "cmd.exe",
+        "args": ["/d", "/c"]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+      "windows": {
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+      },
+      "problemMatcher": []
     },
-    "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            // Linux based command is not tested
-            "command": "source ../zephyr/zephyr-env.sh && west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}",
-            "windows": {
-                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}"
-            },
-            "problemMatcher": [],
-        },
-        {
-            "label": "flash application",
-            "type": "shell",
-            // Linux based command is not tested
-            "command": "source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
-            "windows": {
-                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west flash -d ${workspaceRoot}\\build\\${input:buildApp} && nrfjprog -f NRF52 --reset"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "flash MBR",
-            "type": "shell",
-            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase --reset",
-            "problemMatcher": []
-        },
-        {
-            "label": "flash MBR + application",
-            "type": "shell",
-            "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
-            "problemMatcher": []
-        },
-        {
-            "label": "clean",
-            "type": "shell",
-            // Linux based command is not tested
-            "command": "source ../zephyr/zephyr-env.sh && west build -t clean -d build/${input:buildApp}",
-            "windows": {
-                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "pristine",
-            "type": "shell",
-            // Linux based command is not tested
-            "command": "source ../zephyr/zephyr-env.sh && west build -t pristine -d build/${input:buildApp}",
-            "windows": {
-                "command": "${workspaceRoot}\\..\\zephyr\\zephyr-env.cmd && west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
-            },
-            "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "buildApp",
-            "description": "Select an app to build",
-            "default": "apps/oob_demo",
-            "type": "pickString",
-            "options": [
-                "apps/lte_console",
-                "apps/oob_demo",
-                "tests/udp_echo_client",
-                "tests/http_get",
-                "tests/tcp_echo_client",
-                "tests/aws_connect",
-            ]
-        }
-    ]
+    {
+      "label": "re-build",
+      "type": "shell",
+      "command": "west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}",
+      "windows": {
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "flash application",
+      "type": "shell",
+      "command": "west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
+      "windows": {
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp} && nrfjprog -f NRF52 --reset"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "flash MBR",
+      "type": "shell",
+      "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase --reset",
+      "problemMatcher": []
+    },
+    {
+      "label": "flash MBR + application",
+      "type": "shell",
+      "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
+      "problemMatcher": []
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "west build -t clean -d build/${input:buildApp}",
+      "windows": {
+        "command": "west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "pristine",
+      "type": "shell",
+      "command": "west build -t pristine -d build/${input:buildApp}",
+      "windows": {
+        "command": "west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "buildApp",
+      "description": "Select an app to build",
+      "default": "apps/lte_console",
+      "type": "pickString",
+      "options": [
+        "apps/lte_console",
+        "tests/udp_echo_client",
+        "tests/http_get",
+        "tests/tcp_echo_client",
+        "tests/aws_connect"
+      ]
+    }
+  ]
 }

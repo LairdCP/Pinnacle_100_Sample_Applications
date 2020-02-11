@@ -19,5 +19,6 @@
         "led_strip.h": "c",
         "oob_ble.h": "c"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cmake.configureOnOpen": false
 }
