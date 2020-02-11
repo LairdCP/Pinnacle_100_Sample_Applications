@@ -20,5 +20,6 @@
         "oob_ble.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "restructuredtext.confPath": ""
 }

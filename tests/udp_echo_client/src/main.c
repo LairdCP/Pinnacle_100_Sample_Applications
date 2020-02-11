@@ -11,7 +11,7 @@ LOG_MODULE_REGISTER(udp_echo_c);
 #include <net/net_mgmt.h>
 #include <net/socket.h>
 
-#define SERVER_IP_ADDR "34.211.227.211"
+#define SERVER_IP_ADDR "18.232.90.30"
 #define SERVER_PORT 12345
 #define SEND_MESSAGE "Hello, this is a UDP test message"
 static char response[sizeof(SEND_MESSAGE)];
