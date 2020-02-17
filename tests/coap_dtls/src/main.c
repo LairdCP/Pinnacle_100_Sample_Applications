@@ -17,13 +17,23 @@ LOG_MODULE_REGISTER(coap_dtls, LOG_LEVEL_DBG);
 #include <net/net_ip.h>
 #include <net/udp.h>
 #include <net/coap.h>
+#include <mbedtls/ssl.h>
+#include <net/tls_credentials.h>
 
 #include "net_private.h"
 #include "lte.h"
 
 #define SERVER_IP_ADDR "18.232.90.30"
-#define SERVER_PORT 5683
+#define SERVER_PORT 5684
 #define MAX_COAP_MSG_LEN 256
+
+#define CA_CERTIFICATE_TAG 1
+
+static const unsigned char ca_certificate[] = {
+#include "root_server_cert.der.inc"
+};
+
+static sec_tag_t sock_sec_tags[] = { CA_CERTIFICATE_TAG };
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
@@ -63,15 +73,48 @@ static void prepare_fds(void)
 	nfds++;
 }
 
+static int tls_init()
+{
+	int err = 0;
+
+	err = tls_credential_add(CA_CERTIFICATE_TAG,
+				 TLS_CREDENTIAL_CA_CERTIFICATE, ca_certificate,
+				 sizeof(ca_certificate));
+	if (err < 0) {
+		MAIN_LOG_ERR("Failed to register public certificate: %d", err);
+	}
+
+	return err;
+}
+
 static int start_coap_client(void)
 {
 	int ret = 0;
 	struct sockaddr_in dest;
 
-	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	ret = tls_init();
+	if (ret < 0) {
+		MAIN_LOG_ERR("TLS init (%d)", ret);
+		return ret;
+	}
+
+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_DTLS_1_2);
 	if (sock < 0) {
 		MAIN_LOG_ERR("creating socket failed");
 		return 1;
+	}
+
+	ret = setsockopt(sock, SOL_TLS, TLS_SEC_TAG_LIST, sock_sec_tags,
+			 sizeof(sock_sec_tags));
+	if (ret < 0) {
+		MAIN_LOG_ERR("Socket options (%d)", ret);
+		return ret;
+	}
+
+	ret = setsockopt(sock, SOL_TLS, TLS_HOSTNAME, NULL, 0);
+	if (ret < 0) {
+		MAIN_LOG_ERR("Socket host name (%d)", ret);
+		return ret;
 	}
 
 	dest.sin_family = AF_INET;
@@ -595,7 +638,7 @@ static int register_observer(void)
 
 		/* Unregister */
 		if (counter == 5U) {
-			/* TODO: Functionality can be verified byt waiting for
+			/* TODO: Functionality can be verified by waiting for
 			 * some time and make sure client shouldn't receive
 			 * any notifications. If client still receives
 			 * notifications means, Observer is not removed.
@@ -652,10 +695,11 @@ void main(void)
 	}
 
 	/* Block-wise transfer */
-	r = get_large_coap_msgs();
-	if (r < 0) {
-		goto quit;
-	}
+	// Un-comment if you want to try getting lots of data
+	// r = get_large_coap_msgs();
+	// if (r < 0) {
+	// 	goto quit;
+	// }
 
 	/* Register observer, get notifications and unregister */
 	r = register_observer();

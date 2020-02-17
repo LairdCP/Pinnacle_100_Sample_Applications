@@ -9,3 +9,10 @@ target_sources(app PRIVATE ${app_sources})
 target_include_directories(app PRIVATE $ENV{ZEPHYR_BASE}/subsys/net/ip)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
+generate_inc_file_for_target(
+    app
+    src/certs/root_server_cert.der
+    ${gen_dir}/root_server_cert.der.inc
+    )
+
