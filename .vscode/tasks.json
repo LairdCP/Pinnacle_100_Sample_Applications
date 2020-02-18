@@ -23,9 +23,9 @@
     {
       "label": "re-build",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}",
+      "command": "west build -p -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
       "windows": {
-        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -D BOARD_ROOT=${workspaceRoot}"
+        "command": "west build -p -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
       },
       "problemMatcher": []
     },
