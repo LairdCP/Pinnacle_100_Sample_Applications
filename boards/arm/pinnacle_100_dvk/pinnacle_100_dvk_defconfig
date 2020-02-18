@@ -8,6 +8,9 @@ CONFIG_SOC_SERIES_NRF52X=y
 CONFIG_SOC_NRF52840_QIAA=y
 CONFIG_BOARD_PINNACLE_100_DVK=y
 
+# for use with the Laird Connectivity bootloader
+CONFIG_FLASH_LOAD_OFFSET=0x1000
+
 # Enable MPU
 CONFIG_ARM_MPU=y
 
@@ -35,6 +38,7 @@ CONFIG_FLASH=y
 
 # Spi
 CONFIG_SPI=y
+CONFIG_SPI_1_NRF_SPIM=y
 
 # Modem driver
 CONFIG_MODEM=y
@@ -44,7 +48,8 @@ CONFIG_MODEM_HL7800=y
 # Networking
 CONFIG_NETWORKING=y
 CONFIG_NET_IPV4=y
-CONFIG_NET_TCP=y
-# disable IPv6 for now
+CONFIG_NET_CONFIG_NEED_IPV4=y
+CONFIG_NET_UDP=y
+# disable IPv6 because it is not yet supported for the HL7800 driver
 CONFIG_NET_IPV6=n
 CONFIG_NET_CONFIG_NEED_IPV6=n
