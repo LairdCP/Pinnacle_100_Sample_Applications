@@ -8,7 +8,6 @@
 LOG_MODULE_REGISTER(coap_dtls, LOG_LEVEL_DBG);
 
 #include <errno.h>
-#include <misc/printk.h>
 #include <misc/byteorder.h>
 #include <zephyr.h>
 
@@ -22,18 +21,16 @@ LOG_MODULE_REGISTER(coap_dtls, LOG_LEVEL_DBG);
 
 #include "net_private.h"
 #include "lte.h"
+#include "config.h"
+#include "certificate.h"
 
-#define SERVER_IP_ADDR "18.232.90.30"
-#define SERVER_PORT 5684
 #define MAX_COAP_MSG_LEN 256
 
-#define CA_CERTIFICATE_TAG 1
+#define APP_CA_CERT_TAG CA_TAG
+#define APP_DEVICE_CERT_TAG DEVICE_CERT_TAG
 
-static const unsigned char ca_certificate[] = {
-#include "root_server_cert.der.inc"
-};
-
-static sec_tag_t sock_sec_tags[] = { CA_CERTIFICATE_TAG };
+static const sec_tag_t sock_sec_tags[] = { APP_CA_CERT_TAG,
+					   APP_DEVICE_CERT_TAG };
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
@@ -44,6 +41,11 @@ K_SEM_DEFINE(lte_ready_sem, 0, 1);
 
 /* CoAP socket fd */
 static int sock;
+
+#ifdef USE_DNS
+static struct addrinfo server_addr;
+struct addrinfo *saddr;
+#endif
 
 struct pollfd fds[1];
 static int nfds;
@@ -62,7 +64,7 @@ static struct coap_block_context blk_ctx;
 static void wait(void)
 {
 	if (poll(fds, nfds, K_FOREVER) < 0) {
-		LOG_ERR("Error in poll:%d", errno);
+		MAIN_LOG_ERR("Error in poll:%d", errno);
 	}
 }
 
@@ -75,13 +77,29 @@ static void prepare_fds(void)
 
 static int tls_init()
 {
-	int err = 0;
+	int err = -EINVAL;
 
-	err = tls_credential_add(CA_CERTIFICATE_TAG,
-				 TLS_CREDENTIAL_CA_CERTIFICATE, ca_certificate,
-				 sizeof(ca_certificate));
+	err = tls_credential_add(APP_CA_CERT_TAG, TLS_CREDENTIAL_CA_CERTIFICATE,
+				 ca_certificate, sizeof(ca_certificate));
 	if (err < 0) {
 		MAIN_LOG_ERR("Failed to register public certificate: %d", err);
+		return err;
+	}
+
+	err = tls_credential_add(APP_DEVICE_CERT_TAG,
+				 TLS_CREDENTIAL_SERVER_CERTIFICATE,
+				 dev_certificate, sizeof(dev_certificate));
+	if (err < 0) {
+		MAIN_LOG_ERR("Failed to register device certificate: %d", err);
+		return err;
+	}
+
+	err = tls_credential_add(APP_DEVICE_CERT_TAG,
+				 TLS_CREDENTIAL_PRIVATE_KEY, dev_key,
+				 sizeof(dev_key));
+	if (err < 0) {
+		MAIN_LOG_ERR("Failed to register device key: %d", err);
+		return err;
 	}
 
 	return err;
@@ -111,19 +129,27 @@ static int start_coap_client(void)
 		return ret;
 	}
 
-	ret = setsockopt(sock, SOL_TLS, TLS_HOSTNAME, NULL, 0);
+	ret = setsockopt(sock, SOL_TLS, TLS_HOSTNAME, SERVER_HOST,
+			 sizeof(SERVER_HOST));
 	if (ret < 0) {
 		MAIN_LOG_ERR("Socket host name (%d)", ret);
 		return ret;
 	}
 
+#ifdef USE_DNS
+	dest.sin_family = saddr->ai_family;
+	dest.sin_port = htons(strtol(SERVER_PORT_STR, NULL, 0));
+	net_ipaddr_copy(&dest.sin_addr, &net_sin(saddr->ai_addr)->sin_addr);
+#else
+	// For use with sever IP addr instead of DNS
 	dest.sin_family = AF_INET;
-	dest.sin_port = htons(SERVER_PORT);
+	dest.sin_port = htons(strtol(SERVER_PORT_STR, NULL, 0));
 	ret = net_addr_pton(AF_INET, SERVER_IP_ADDR, &dest.sin_addr);
 	if (ret < 0) {
 		MAIN_LOG_ERR("setting dest IP addr failed (%d)", ret);
 		return ret;
 	}
+#endif // USE_DNS
 
 	ret = connect(sock, (struct sockaddr *)&dest, sizeof(dest));
 	if (ret < 0) {
@@ -170,7 +196,7 @@ static int process_simple_coap_reply(void)
 
 	ret = coap_packet_parse(&reply, data, rcvd, NULL, 0);
 	if (ret < 0) {
-		LOG_ERR("Invalid data received");
+		MAIN_LOG_ERR("Invalid data received");
 	}
 
 end:
@@ -195,7 +221,7 @@ static int send_simple_coap_request(u8_t method)
 	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_CON,
 			     8, coap_next_token(), method, coap_next_id());
 	if (r < 0) {
-		LOG_ERR("Failed to init CoAP message");
+		MAIN_LOG_ERR("Failed to init CoAP message");
 		goto end;
 	}
 
@@ -203,7 +229,7 @@ static int send_simple_coap_request(u8_t method)
 		r = coap_packet_append_option(&request, COAP_OPTION_URI_PATH,
 					      *p, strlen(*p));
 		if (r < 0) {
-			LOG_ERR("Unable add option to request");
+			MAIN_LOG_ERR("Unable add option to request");
 			goto end;
 		}
 	}
@@ -217,14 +243,14 @@ static int send_simple_coap_request(u8_t method)
 	case COAP_METHOD_POST:
 		r = coap_packet_append_payload_marker(&request);
 		if (r < 0) {
-			LOG_ERR("Unable to append payload marker");
+			MAIN_LOG_ERR("Unable to append payload marker");
 			goto end;
 		}
 
 		r = coap_packet_append_payload(&request, (u8_t *)payload,
 					       sizeof(payload) - 1);
 		if (r < 0) {
-			LOG_ERR("Not able to append payload");
+			MAIN_LOG_ERR("Not able to append payload");
 			goto end;
 		}
 
@@ -237,6 +263,9 @@ static int send_simple_coap_request(u8_t method)
 	net_hexdump("Request", request.data, request.offset);
 
 	r = send(sock, request.data, request.offset, 0);
+	if (r < 0) {
+		MAIN_LOG_ERR("Send simple req err [%d]", r);
+	}
 
 end:
 	k_free(data);
@@ -253,7 +282,7 @@ static int send_simple_coap_msgs_and_wait_for_reply(void)
 		switch (test_type) {
 		case 0:
 			/* Test CoAP GET method */
-			printk("\nCoAP client GET\n");
+			MAIN_LOG_INF("CoAP client GET");
 			r = send_simple_coap_request(COAP_METHOD_GET);
 			if (r < 0) {
 				return r;
@@ -262,7 +291,7 @@ static int send_simple_coap_msgs_and_wait_for_reply(void)
 			break;
 		case 1:
 			/* Test CoAP PUT method */
-			printk("\nCoAP client PUT\n");
+			MAIN_LOG_INF("CoAP client PUT");
 			r = send_simple_coap_request(COAP_METHOD_PUT);
 			if (r < 0) {
 				return r;
@@ -271,7 +300,7 @@ static int send_simple_coap_msgs_and_wait_for_reply(void)
 			break;
 		case 2:
 			/* Test CoAP POST method*/
-			printk("\nCoAP client POST\n");
+			MAIN_LOG_INF("CoAP client POST");
 			r = send_simple_coap_request(COAP_METHOD_POST);
 			if (r < 0) {
 				return r;
@@ -280,7 +309,7 @@ static int send_simple_coap_msgs_and_wait_for_reply(void)
 			break;
 		case 3:
 			/* Test CoAP DELETE method*/
-			printk("\nCoAP client DELETE\n");
+			MAIN_LOG_INF("CoAP client DELETE");
 			r = send_simple_coap_request(COAP_METHOD_DELETE);
 			if (r < 0) {
 				return r;
@@ -337,7 +366,7 @@ static int process_large_coap_reply(void)
 
 	ret = coap_packet_parse(&reply, data, rcvd, NULL, 0);
 	if (ret < 0) {
-		LOG_ERR("Invalid data received");
+		MAIN_LOG_ERR("Invalid data received");
 		goto end;
 	}
 
@@ -381,7 +410,7 @@ static int send_large_coap_request(void)
 			     8, coap_next_token(), COAP_METHOD_GET,
 			     coap_next_id());
 	if (r < 0) {
-		LOG_ERR("Failed to init CoAP message");
+		MAIN_LOG_ERR("Failed to init CoAP message");
 		goto end;
 	}
 
@@ -389,14 +418,14 @@ static int send_large_coap_request(void)
 		r = coap_packet_append_option(&request, COAP_OPTION_URI_PATH,
 					      *p, strlen(*p));
 		if (r < 0) {
-			LOG_ERR("Unable add option to request");
+			MAIN_LOG_ERR("Unable add option to request");
 			goto end;
 		}
 	}
 
 	r = coap_append_block2_option(&request, &blk_ctx);
 	if (r < 0) {
-		LOG_ERR("Unable to add block2 option.");
+		MAIN_LOG_ERR("Unable to add block2 option.");
 		goto end;
 	}
 
@@ -416,8 +445,8 @@ static int get_large_coap_msgs(void)
 
 	while (1) {
 		/* Test CoAP Large GET method */
-		printk("\nCoAP client Large GET (block %zd)\n",
-		       blk_ctx.current / 64 /*COAP_BLOCK_64*/);
+		MAIN_LOG_INF("CoAP client Large GET (block %zd)",
+			     blk_ctx.current / 64 /*COAP_BLOCK_64*/);
 		r = send_large_coap_request();
 		if (r < 0) {
 			return r;
@@ -452,7 +481,7 @@ static int send_obs_reply_ack(u16_t id, u8_t *token, u8_t tkl)
 	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_ACK,
 			     tkl, token, 0, id);
 	if (r < 0) {
-		LOG_ERR("Failed to init CoAP message");
+		MAIN_LOG_ERR("Failed to init CoAP message");
 		goto end;
 	}
 
@@ -503,7 +532,7 @@ static int process_obs_coap_reply(void)
 
 	ret = coap_packet_parse(&reply, data, rcvd, NULL, 0);
 	if (ret < 0) {
-		LOG_ERR("Invalid data received");
+		MAIN_LOG_ERR("Invalid data received");
 		goto end;
 	}
 
@@ -538,13 +567,13 @@ static int send_obs_coap_request(void)
 			     8, coap_next_token(), COAP_METHOD_GET,
 			     coap_next_id());
 	if (r < 0) {
-		LOG_ERR("Failed to init CoAP message");
+		MAIN_LOG_ERR("Failed to init CoAP message");
 		goto end;
 	}
 
 	r = coap_append_option_int(&request, COAP_OPTION_OBSERVE, 0);
 	if (r < 0) {
-		LOG_ERR("Failed to append Observe option");
+		MAIN_LOG_ERR("Failed to append Observe option");
 		goto end;
 	}
 
@@ -552,7 +581,7 @@ static int send_obs_coap_request(void)
 		r = coap_packet_append_option(&request, COAP_OPTION_URI_PATH,
 					      *p, strlen(*p));
 		if (r < 0) {
-			LOG_ERR("Unable add option to request");
+			MAIN_LOG_ERR("Unable add option to request");
 			goto end;
 		}
 	}
@@ -583,13 +612,13 @@ static int send_obs_reset_coap_request(void)
 			     COAP_TYPE_RESET, 8, coap_next_token(), 0,
 			     coap_next_id());
 	if (r < 0) {
-		LOG_ERR("Failed to init CoAP message");
+		MAIN_LOG_ERR("Failed to init CoAP message");
 		goto end;
 	}
 
 	r = coap_append_option_int(&request, COAP_OPTION_OBSERVE, 0);
 	if (r < 0) {
-		LOG_ERR("Failed to append Observe option");
+		MAIN_LOG_ERR("Failed to append Observe option");
 		goto end;
 	}
 
@@ -597,7 +626,7 @@ static int send_obs_reset_coap_request(void)
 		r = coap_packet_append_option(&request, COAP_OPTION_URI_PATH,
 					      *p, strlen(*p));
 		if (r < 0) {
-			LOG_ERR("Unable add option to request");
+			MAIN_LOG_ERR("Unable add option to request");
 			goto end;
 		}
 	}
@@ -620,13 +649,13 @@ static int register_observer(void)
 	while (1) {
 		/* Test CoAP OBS GET method */
 		if (!counter) {
-			printk("\nCoAP client OBS GET\n");
+			MAIN_LOG_INF("CoAP client OBS GET");
 			r = send_obs_coap_request();
 			if (r < 0) {
 				return r;
 			}
 		} else {
-			printk("\nCoAP OBS Notification\n");
+			MAIN_LOG_INF("CoAP OBS Notification");
 		}
 
 		r = process_obs_coap_reply();
@@ -667,6 +696,9 @@ static void lteEvent(enum lte_event event)
 void main(void)
 {
 	int r;
+#ifdef USE_DNS
+	int dns_retries;
+#endif
 
 	lteRegisterEventCallback(lteEvent);
 	r = lteInit();
@@ -681,6 +713,25 @@ void main(void)
 		k_sem_reset(&lte_ready_sem);
 		k_sem_take(&lte_ready_sem, K_FOREVER);
 	}
+
+#ifdef USE_DNS
+	/* Resolve server with DNS */
+	server_addr.ai_family = AF_INET;
+	server_addr.ai_socktype = SOCK_DGRAM;
+	dns_retries = DNS_RETRIES;
+	do {
+		r = getaddrinfo(SERVER_HOST, SERVER_PORT_STR, &server_addr,
+				&saddr);
+		if (r != 0) {
+			k_sleep(K_SECONDS(DNS_RETRY_TIME_SECONDS));
+		}
+		dns_retries--;
+	} while (r != 0 && dns_retries != 0);
+	if (r != 0) {
+		MAIN_LOG_ERR("Unable to resolve '%s', quitting", SERVER_HOST);
+		goto quit;
+	}
+#endif // USE_DNS
 
 	MAIN_LOG_DBG("Start CoAP DTLS");
 	r = start_coap_client();
