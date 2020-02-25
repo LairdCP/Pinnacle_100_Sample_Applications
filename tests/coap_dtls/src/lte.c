@@ -35,7 +35,9 @@ struct mgmt_events {
 static struct net_if *iface;
 static struct net_if_config *cfg;
 static struct mdm_receiver_context *mdm_rcvr;
+#ifdef CONFIG_DNS_RESOLVER
 static struct dns_resolve_context *dns;
+#endif
 static struct lte_status lteStatus;
 static lte_event_function_t lteCallbackFunction = NULL;
 
@@ -49,11 +51,17 @@ static void onLteEvent(enum lte_event event)
 static void iface_ready_evt_handler(struct net_mgmt_event_callback *cb,
 				    u32_t mgmt_event, struct net_if *iface)
 {
+#ifdef CONFIG_DNS_RESOLVER
 	if (mgmt_event != NET_EVENT_DNS_SERVER_ADD) {
 		return;
 	}
-
 	LTE_LOG_DBG("LTE DNS addr added!");
+#else
+	if (mgmt_event != NET_EVENT_IPV4_ADDR_ADD) {
+		return;
+	}
+	LTE_LOG_DBG("LTE IP addr added!");
+#endif
 	onLteEvent(LTE_EVT_READY);
 }
 
@@ -69,8 +77,13 @@ static void iface_down_evt_handler(struct net_mgmt_event_callback *cb,
 }
 
 static struct mgmt_events iface_events[] = {
-	{ .event = NET_EVENT_DNS_SERVER_ADD,
-	  .handler = iface_ready_evt_handler },
+	{
+#ifdef CONFIG_DNS_RESOLVER
+		.event = NET_EVENT_DNS_SERVER_ADD,
+#else
+		.event = NET_EVENT_IPV4_ADDR_ADD,
+#endif
+		.handler = iface_ready_evt_handler },
 	{ .event = NET_EVENT_IF_DOWN, .handler = iface_down_evt_handler },
 	{ 0 } // The for loop below requires this extra location.
 };
@@ -179,12 +192,14 @@ int lteInit(void)
 		goto exit;
 	}
 
+#ifdef CONFIG_DNS_RESOLVER
 	dns = dns_resolve_get_default();
 	if (!dns) {
 		LTE_LOG_ERR("Could not get DNS context");
 		rc = LTE_ERR_DNS_CFG;
 		goto exit;
 	}
+#endif
 
 	/* Get the modem receive context */
 	mdm_rcvr = mdm_receiver_context_from_id(0);
@@ -206,6 +221,7 @@ exit:
 
 bool lteIsReady(void)
 {
+#ifdef CONFIG_DNS_RESOLVER
 	struct sockaddr_in *dnsAddr;
 
 	if (iface != NULL && cfg != NULL && &dns->servers[0] != NULL) {
@@ -213,7 +229,11 @@ bool lteIsReady(void)
 		return net_if_is_up(iface) && cfg->ip.ipv4 &&
 		       !net_ipv4_is_addr_unspecified(&dnsAddr->sin_addr);
 	}
-
+#else
+	if (iface != NULL && cfg != NULL) {
+		return net_if_is_up(iface) && cfg->ip.ipv4;
+	}
+#endif /* CONFIG_DNS_RESOLVER */
 	return false;
 }
 

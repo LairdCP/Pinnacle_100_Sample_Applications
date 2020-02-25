@@ -17,7 +17,8 @@
         "hl7800.h": "c",
         "buf.h": "c",
         "led_strip.h": "c",
-        "oob_ble.h": "c"
+        "oob_ble.h": "c",
+        "byteorder.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": false,

@@ -7,9 +7,6 @@
 #ifndef __CERTIFICATE_H__
 #define __CERTIFICATE_H__
 
-#define CA_TAG 1
-#define DEVICE_CERT_TAG 2
-
 static const unsigned char ca_certificate[] = {
 #include "laird-dev-nbiot-caTrustStore.der.inc"
 };

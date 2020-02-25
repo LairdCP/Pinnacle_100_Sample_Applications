@@ -2,10 +2,6 @@
   "configurations": [
     {
       "name": "CConfig",
-      "browse": {
-        "path": ["${workspaceFolder}"],
-        "limitSymbolsToIncludedHeaders": true
-      },
       "includePath": [
         "${workspaceFolder}",
         "${workspaceFolder}/../zephyr/include/zephyr",
@@ -16,10 +12,9 @@
         "${workspaceFolder}/build/apps/lte_console/zephyr/include/generated",
         "${workspaceFolder}/tests/coad_dtls/include"
       ],
-      "defines": ["_DEBUG", "UNICODE", "_UNICODE", "__GNUC__"],
-      "cStandard": "c89",
+      "cStandard": "c99",
       "cppStandard": "c++98",
-      "intelliSenseMode": "msvc-x64"
+      "intelliSenseMode": "gcc-x86"
     }
   ],
   "version": 4
