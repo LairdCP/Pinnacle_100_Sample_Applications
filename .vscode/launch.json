@@ -24,6 +24,7 @@
       "type": "pickString",
       "options": [
         "apps/lte_console",
+        "apps/low_power",
         "tests/udp_echo_client",
         "tests/http_get",
         "tests/tcp_echo_client",

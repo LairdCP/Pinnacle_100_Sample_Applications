@@ -18,7 +18,9 @@
         "buf.h": "c",
         "led_strip.h": "c",
         "oob_ble.h": "c",
-        "byteorder.h": "c"
+        "byteorder.h": "c",
+        "ios": "c",
+        "lte.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": false,

@@ -30,6 +30,15 @@
       "problemMatcher": []
     },
     {
+      "label": "build pca10056",
+      "type": "shell",
+      "command": "west build -p -b nrf52840_pca10056 -d build/${input:buildApp} ${input:buildApp}",
+      "windows": {
+        "command": "west build -p -b nrf52840_pca10056 -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "flash application",
       "type": "shell",
       "command": "west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
@@ -77,11 +86,13 @@
       "type": "pickString",
       "options": [
         "apps/lte_console",
+        "apps/low_power",
         "tests/udp_echo_client",
         "tests/http_get",
         "tests/tcp_echo_client",
         "tests/aws_connect",
-        "tests/coap_dtls"
+        "tests/coap_dtls",
+        "tests/synchronization"
       ]
     }
   ]
