@@ -25,10 +25,33 @@ LOG_MODULE_REGISTER(coap_lte);
 #include "led.h"
 #include "config.h"
 
+#ifdef CONFIG_LOG
 #define LTE_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define LTE_LOG_WRN(...) LOG_WRN(__VA_ARGS__)
 #define LTE_LOG_INF(...) LOG_INF(__VA_ARGS__)
 #define LTE_LOG_DBG(...) LOG_DBG(__VA_ARGS__)
+#else
+#define LTE_LOG_ERR(...)                                                       \
+	{                                                                      \
+		printk(__VA_ARGS__);                                           \
+		printk("\n");                                                  \
+	}
+#define LTE_LOG_WRN(...)                                                       \
+	{                                                                      \
+		printk(__VA_ARGS__);                                           \
+		printk("\n");                                                  \
+	}
+#define LTE_LOG_INF(...)                                                       \
+	{                                                                      \
+		printk(__VA_ARGS__);                                           \
+		printk("\n");                                                  \
+	}
+#define LTE_LOG_DBG(...)                                                       \
+	{                                                                      \
+		printk(__VA_ARGS__);                                           \
+		printk("\n");                                                  \
+	}
+#endif
 
 struct mgmt_events {
 	u32_t event;
@@ -115,11 +138,12 @@ static void setup_iface_events(void)
 
 static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 {
+	u8_t code = ((struct mdm_hl7800_compound_event *)event_data)->code;
+
 	switch (event) {
 	case HL7800_EVENT_NETWORK_STATE_CHANGE:
-		printk("HL7800 network event: %d\n",
-		       ((struct mdm_hl7800_compound_event *)event_data)->code);
-		switch (((struct mdm_hl7800_compound_event *)event_data)->code) {
+		LTE_LOG_DBG("HL7800 network event: %d", code);
+		switch (code) {
 		case HL7800_HOME_NETWORK:
 		case HL7800_ROAMING:
 			led_turn_on(RED_LED3);
@@ -131,10 +155,10 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 			led_blink(RED_LED3, &NETWORK_SEARCH_LED_PATTERN);
 			break;
 
-		case HL7800_OUT_OF_COVERAGE:
-		case HL7800_EMERGENCY:
 		case HL7800_REGISTRATION_DENIED:
 		case HL7800_UNABLE_TO_CONFIGURE:
+		case HL7800_OUT_OF_COVERAGE:
+		case HL7800_EMERGENCY:
 		default:
 			led_turn_off(RED_LED3);
 			onLteEvent(LTE_EVT_DISCONNECTED);
@@ -142,28 +166,40 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 		}
 		break;
 
-	case HL7800_EVENT_APN_UPDATE:
-	case HL7800_EVENT_RSSI:
-	case HL7800_EVENT_SINR:
-		break;
-
 	case HL7800_EVENT_STARTUP_STATE_CHANGE:
-
-		switch (((struct mdm_hl7800_compound_event *)event_data)->code) {
+		switch (code) {
 		case HL7800_STARTUP_STATE_READY:
 		case HL7800_STARTUP_STATE_WAITING_FOR_ACCESS_CODE:
 			break;
-
 		case HL7800_STARTUP_STATE_SIM_NOT_PRESENT:
 		case HL7800_STARTUP_STATE_SIMLOCK:
 		case HL7800_STARTUP_STATE_UNRECOVERABLE_ERROR:
 		case HL7800_STARTUP_STATE_UNKNOWN:
 		case HL7800_STARTUP_STATE_INACTIVE_SIM:
 		default:
+			led_turn_off(RED_LED3);
 			break;
 		}
 		break;
 
+	case HL7800_EVENT_SLEEP_STATE_CHANGE:
+		switch (code) {
+		case HL7800_SLEEP_STATE_ASLEEP:
+			LTE_LOG_DBG("HL7800 asleep");
+			break;
+		case HL7800_SLEEP_STATE_AWAKE:
+			LTE_LOG_DBG("HL7800 awake!");
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case HL7800_EVENT_APN_UPDATE:
+	case HL7800_EVENT_RSSI:
+	case HL7800_EVENT_SINR:
+	case HL7800_EVENT_RAT:
+		break;
 	default:
 		LOG_ERR("Unknown modem event");
 		break;

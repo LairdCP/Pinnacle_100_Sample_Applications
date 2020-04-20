@@ -18,7 +18,10 @@
       "windows": {
         "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
       },
-      "problemMatcher": []
+      "problemMatcher": {
+        "base": "$gcc",
+        "fileLocation": "absolute"
+      }
     },
     {
       "label": "re-build",
@@ -27,7 +30,10 @@
       "windows": {
         "command": "west build -p -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
       },
-      "problemMatcher": []
+      "problemMatcher": {
+        "base": "$gcc",
+        "fileLocation": "absolute"
+      }
     },
     {
       "label": "build pca10056",
@@ -36,7 +42,10 @@
       "windows": {
         "command": "west build -p -b nrf52840_pca10056 -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
       },
-      "problemMatcher": []
+      "problemMatcher": {
+        "base": "$gcc",
+        "fileLocation": "absolute"
+      }
     },
     {
       "label": "flash application",
