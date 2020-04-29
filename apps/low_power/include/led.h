@@ -36,9 +36,6 @@ struct led_blink_pattern {
 // Board definitions
 //=============================================================================
 
-#define LED_OFF 0
-#define LED_ON 1
-
 #define LED1_DEV DT_GPIO_LEDS_LED0_GPIO_CONTROLLER
 #define LED1 DT_GPIO_LEDS_LED0_GPIO_PIN
 #define LED2_DEV DT_GPIO_LEDS_LED1_GPIO_CONTROLLER

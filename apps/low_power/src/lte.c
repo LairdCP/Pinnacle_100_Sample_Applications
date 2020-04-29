@@ -9,7 +9,7 @@
 
 #include <logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_DBG
-LOG_MODULE_REGISTER(coap_lte);
+LOG_MODULE_REGISTER(app_lte);
 
 #include <zephyr.h>
 #include <net/net_if.h>
@@ -147,7 +147,6 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 		case HL7800_HOME_NETWORK:
 		case HL7800_ROAMING:
 			led_turn_on(RED_LED3);
-			onLteEvent(LTE_EVT_READY);
 			break;
 
 		case HL7800_NOT_REGISTERED:

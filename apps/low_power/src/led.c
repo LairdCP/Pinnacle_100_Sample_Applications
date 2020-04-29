@@ -191,7 +191,7 @@ static void led_configure_pin(enum led_index index, u32_t pin)
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO");
 	}
-	ret = gpio_pin_write(led[index].device_handle, led[index].pin, LED_OFF);
+	ret = gpio_pin_write(led[index].device_handle, led[index].pin, OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO state");
 	}
@@ -261,12 +261,12 @@ static void change_state(struct led *pLed, bool state, bool blink)
 
 static void turn_on(struct led *pLed)
 {
-	gpio_pin_write(pLed->device_handle, pLed->pin, LED_ON);
+	gpio_pin_write(pLed->device_handle, pLed->pin, ON);
 }
 
 static void turn_off(struct led *pLed)
 {
-	gpio_pin_write(pLed->device_handle, pLed->pin, LED_OFF);
+	gpio_pin_write(pLed->device_handle, pLed->pin, OFF);
 }
 
 //=============================================================================

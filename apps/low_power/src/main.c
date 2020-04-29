@@ -1,16 +1,19 @@
+#include <stdio.h>
 #include <zephyr.h>
 #include <power.h>
 #include <string.h>
 #include <soc.h>
 #include <device.h>
-#include <misc/printk.h>
 
 #include "led.h"
 #include "lte.h"
+#include "http_get.h"
 
 #define BUSY_WAIT_TIME_SECONDS 5
 #define BUSY_WAIT_TIME (BUSY_WAIT_TIME_SECONDS * 1000000)
 #define SLEEP_TIME_SECONDS 30
+
+#define RESETREAS_REG (volatile u32_t *)0x40000400
 
 #ifdef CONFIG_MODEM_HL7800
 K_SEM_DEFINE(lte_event_sem, 0, 1);
@@ -19,8 +22,8 @@ static enum lte_event lte_status = LTE_EVT_DISCONNECTED;
 
 static void lteEvent(enum lte_event event)
 {
-	k_sem_give(&lte_event_sem);
 	lte_status = event;
+	k_sem_give(&lte_event_sem);
 }
 #else
 #include <gpio.h>
@@ -40,19 +43,19 @@ static void shutdown_uart1(void)
 	int rc = device_set_power_state(uart_dev, DEVICE_PM_OFF_STATE, NULL,
 					NULL);
 	if (rc) {
-		printk("Error disabling UART1 peripheral (%d)\n", rc);
+		printf("Error disabling UART1 peripheral (%d)\n", rc);
 	}
 
 	struct device *gpio = device_get_binding(GPIO0_DEV);
 	/* RTS */
 	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_DIR_IN));
 	if (rc) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 	/* TX */
 	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_DIR_IN));
 	if (rc) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 #endif
 }
@@ -61,7 +64,11 @@ static void shutdown_uart1(void)
 /* Application main Thread */
 void main(void)
 {
-	printk("\n\n*** Power Management Demo on %s ***\n", CONFIG_BOARD);
+	printf("\n\n*** Power Management Demo on %s ***\n", CONFIG_BOARD);
+
+	/* Read the reset reason register */
+	u32_t resetReas = *RESETREAS_REG;
+	printf("Reset reason: 0x%08X\n", resetReas);
 
 	led_init();
 
@@ -70,7 +77,7 @@ void main(void)
 	lteRegisterEventCallback(lteEvent);
 	int rc = lteInit();
 	if (rc < 0) {
-		printk("LTE init (%d)\n", rc);
+		printf("LTE init (%d)\n", rc);
 		goto exit;
 	}
 
@@ -78,42 +85,46 @@ void main(void)
 		while (lte_status != LTE_EVT_READY) {
 			/* Wait for LTE read evt */
 			k_sem_reset(&lte_event_sem);
-			printk("Waiting for LTE to be ready...\n");
+			printf("Waiting for LTE to be ready...\n");
 			k_sem_take(&lte_event_sem, K_FOREVER);
 		}
 	}
-	printk("LTE ready!\n");
+	printf("LTE ready!\n");
 #else
 	shutdown_uart1();
 	struct device *reset_gpio = device_get_binding(MDM_RESET_DEV);
 	int ret = gpio_pin_configure(reset_gpio, MDM_RESET_PIN, GPIO_DIR_OUT);
 	if (ret) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 	/* hold modem in reset */
 	ret = gpio_pin_write(reset_gpio, MDM_RESET_PIN, 0);
 	if (ret) {
-		printk("Error setting GPIO state\n");
+		printf("Error setting GPIO state\n");
 	}
 
 #endif /* CONFIG_MODEM_HL7800 */
 
 	while (1) {
 #ifdef CONFIG_MODEM_HL7800
-		printk("App waiting for event\n");
+		if (lte_status == LTE_EVT_READY) {
+			/* send HTTP GET request */
+			http_get_execute();
+		}
+		printf("App waiting for LTE ready\n");
 		k_sem_take(&lte_event_sem, K_FOREVER);
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
-		printk("App busy waiting for %d seconds\n",
+		printf("App busy waiting for %d seconds\n",
 		       BUSY_WAIT_TIME_SECONDS);
 		k_busy_wait(BUSY_WAIT_TIME);
-		printk("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
+		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
 		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 #endif
 	}
 #ifdef CONFIG_MODEM_HL7800
 exit:
 #endif /* CONFIG_MODEM_HL7800 */
-	printk("Exiting main()\n");
+	printf("Exiting main()\n");
 	return;
 }
