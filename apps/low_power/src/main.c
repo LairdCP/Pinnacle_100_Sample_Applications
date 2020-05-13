@@ -5,13 +5,10 @@
 #include <soc.h>
 #include <device.h>
 
+#include "config.h"
 #include "led.h"
 #include "lte.h"
 #include "http_get.h"
-
-#define BUSY_WAIT_TIME_SECONDS 5
-#define BUSY_WAIT_TIME (BUSY_WAIT_TIME_SECONDS * 1000000)
-#define SLEEP_TIME_SECONDS 30
 
 #define RESETREAS_REG (volatile u32_t *)0x40000400
 
@@ -107,12 +104,9 @@ void main(void)
 
 	while (1) {
 #ifdef CONFIG_MODEM_HL7800
-		if (lte_status == LTE_EVT_READY) {
-			/* send HTTP GET request */
-			http_get_execute();
-		}
-		printf("App waiting for LTE ready\n");
-		k_sem_take(&lte_event_sem, K_FOREVER);
+		http_get_execute();
+		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
+		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
 		printf("App busy waiting for %d seconds\n",

@@ -32,6 +32,12 @@
 	"GET " HTTP_PATH " HTTP/1.1\r\nHost: " HTTP_HOST                       \
 	"\r\nConnection: Close\r\n\r\n"
 
+/* uncomment to test leaving the connection open as long as possible */
+/* #define REQUEST                                                                \
+	"GET " HTTP_PATH " HTTP/1.1\r\nHost: " HTTP_HOST                       \
+	"\r\nConnection: Keep-Alive\r\n\r\n"
+ */
+
 #define RESPONSE_SIZE 1024
 
 static char response[RESPONSE_SIZE];

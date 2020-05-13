@@ -5,6 +5,7 @@
 
 #include "led.h"
 
+#ifdef CONFIG_SYS_POWER_SLEEP_STATES
 static void shutdown_console_uart(void)
 {
 	struct device *uart_dev;
@@ -26,6 +27,7 @@ static void startup_console_uart(void)
 		printk("Error enabling console UART peripheral (%d)\n", rc);
 	}
 }
+#endif
 
 /*
  * Application defined function for doing any target specific operations

@@ -10,7 +10,7 @@
         "${workspaceFolder}/../zephyr/samples/bluetooth",
         "${workspaceFolder}/../zephyr/ext/hal/nordic/nrfx/mdk",
         "${workspaceFolder}/build/apps/lte_console/zephyr/include/generated",
-        "${workspaceFolder}/tests/coad_dtls/include"
+        "${workspaceFolder}/tests/coap_dtls/include"
       ],
       "cStandard": "c99",
       "cppStandard": "c++98",

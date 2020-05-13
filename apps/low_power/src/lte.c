@@ -198,6 +198,8 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 	case HL7800_EVENT_RSSI:
 	case HL7800_EVENT_SINR:
 	case HL7800_EVENT_RAT:
+	case HL7800_EVENT_BANDS:
+	case HL7800_EVENT_ACTIVE_BANDS:
 		break;
 	default:
 		LOG_ERR("Unknown modem event");
