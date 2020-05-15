@@ -23,7 +23,6 @@ LOG_MODULE_REGISTER(app_lte);
 
 #include "lte.h"
 #include "led.h"
-#include "config.h"
 
 #ifdef CONFIG_LOG
 #define LTE_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
@@ -69,8 +68,8 @@ static struct lte_status lteStatus;
 static lte_event_function_t lteCallbackFunction = NULL;
 
 static const struct led_blink_pattern NETWORK_SEARCH_LED_PATTERN = {
-	.on_time = DEFAULT_LED_ON_TIME_FOR_1_SECOND_BLINK,
-	.off_time = DEFAULT_LED_OFF_TIME_FOR_1_SECOND_BLINK,
+	.on_time = K_MSEC(100),
+	.off_time = K_MSEC(900),
 	.repeat_count = REPEAT_INDEFINITELY
 };
 

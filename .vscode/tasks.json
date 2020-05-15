@@ -101,7 +101,8 @@
         "tests/tcp_echo_client",
         "tests/aws_connect",
         "tests/coap_dtls",
-        "tests/synchronization"
+        "tests/synchronization",
+        "tests/edrx_tcp_server_reply"
       ]
     }
   ]
