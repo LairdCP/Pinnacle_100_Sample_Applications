@@ -2,7 +2,7 @@
 #define LOG_LEVEL LOG_LEVEL_INF
 LOG_MODULE_REGISTER(app_led);
 
-#include <gpio.h>
+#include <drivers/gpio.h>
 
 #include "app_led.h"
 
@@ -39,41 +39,41 @@ void led_init(void)
 	}
 
 	/* LED1 */
-	ret = gpio_pin_configure(led1_dev, LED1, GPIO_DIR_OUT);
+	ret = gpio_pin_configure(led1_dev, LED1, GPIO_OUTPUT);
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO %s!", STRINGIFY(LED1));
 	}
-	ret = gpio_pin_write(led1_dev, LED1, LED_OFF);
+	ret = gpio_pin_set(led1_dev, LED1, LED_OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO %s!", STRINGIFY(LED1));
 	}
 
 	/* LED2 */
-	ret = gpio_pin_configure(led2_dev, LED2, GPIO_DIR_OUT);
+	ret = gpio_pin_configure(led2_dev, LED2, GPIO_OUTPUT);
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO %s!", STRINGIFY(LED2));
 	}
-	ret = gpio_pin_write(led2_dev, LED2, LED_OFF);
+	ret = gpio_pin_set(led2_dev, LED2, LED_OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO %s!", STRINGIFY(LED2));
 	}
 
 	/* LED3 */
-	ret = gpio_pin_configure(led3_dev, LED3, GPIO_DIR_OUT);
+	ret = gpio_pin_configure(led3_dev, LED3, GPIO_OUTPUT);
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO %s!", STRINGIFY(LED3));
 	}
-	ret = gpio_pin_write(led3_dev, LED3, LED_OFF);
+	ret = gpio_pin_set(led3_dev, LED3, LED_OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO %s!", STRINGIFY(LED3));
 	}
 
 	/* LED4 */
-	ret = gpio_pin_configure(led4_dev, LED4, GPIO_DIR_OUT);
+	ret = gpio_pin_configure(led4_dev, LED4, GPIO_OUTPUT);
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO %s!", STRINGIFY(LED4));
 	}
-	ret = gpio_pin_write(led4_dev, LED4, LED_OFF);
+	ret = gpio_pin_set(led4_dev, LED4, LED_OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO %s!", STRINGIFY(LED4));
 	}
@@ -83,14 +83,14 @@ void ledHeartBeat(void)
 {
 	int ret;
 	/* flash LED twice quickly */
-	for (u8_t i = 0; i < 2; i++) {
-		ret = gpio_pin_write(led2_dev, HEARTBEAT_LED, LED_ON);
+	for (uint8_t i = 0; i < 2; i++) {
+		ret = gpio_pin_set(led2_dev, HEARTBEAT_LED, LED_ON);
 		if (ret) {
 			LED_LOG_ERR("Error setting GPIO %s!",
 				    STRINGIFY(HEARTBEAT_LED));
 		}
 		k_sleep(HEARTBEAT_ON_TIME);
-		ret = gpio_pin_write(led2_dev, HEARTBEAT_LED, LED_OFF);
+		ret = gpio_pin_set(led2_dev, HEARTBEAT_LED, LED_OFF);
 		if (ret) {
 			LED_LOG_ERR("Error setting GPIO %s!",
 				    STRINGIFY(HEARTBEAT_LED));

@@ -14,7 +14,7 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp}",
       "windows": {
         "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
       },
@@ -85,7 +85,13 @@
         "command": "west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
       },
       "problemMatcher": []
-    }
+    },
+    {
+      "label": "update Zephyr deps",
+      "type": "shell",
+      "command": "sudo pip3 install -r ${workspaceRoot}/../zephyr/scripts/requirements.txt",
+      "problemMatcher": []
+    },    
   ],
   "inputs": [
     {

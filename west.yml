@@ -10,7 +10,7 @@ manifest:
   projects:
     - name: zephyr
       west-commands: scripts/west-commands.yml
-      revision: laird/hl7800
+      revision: laird/hl7800_zephyr_2.3.x
       remote: LairdCellular
       import: true
     - name: zephyr-hal-lairdconnectivity

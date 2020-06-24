@@ -4,9 +4,8 @@ LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
 #include <zephyr.h>
 #include <stdlib.h>
-#include <misc/printk.h>
 #include <version.h>
-#include <gpio.h>
+#include <drivers/gpio.h>
 #include <shell/shell.h>
 #include <shell/shell_uart.h>
 #include <drivers/modem/hl7800.h>
@@ -46,7 +45,7 @@ static int hl7800_send_at_cmd(const struct shell *shell, size_t argc,
 {
 	ARG_UNUSED(argc);
 
-	const u8_t *cmd = argv[1];
+	const uint8_t *cmd = argv[1];
 
 	return mdm_hl7800_send_at_cmd(cmd);
 }
