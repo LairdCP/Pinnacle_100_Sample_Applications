@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../zephyr"
+		},
+		{
+			"path": "../modules/zephyr_lib"
 		}
 	],
 	"settings": {

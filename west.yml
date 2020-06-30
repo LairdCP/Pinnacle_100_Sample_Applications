@@ -21,5 +21,9 @@ manifest:
       path: zephyr/boards/arm
       revision: master
       remote: LairdProdEng
+    - name: zephyr_lib
+      path: modules/zephyr_lib
+      revision: master
+      remote: LairdProdEng
   self:
     path: pinnacle_firmware

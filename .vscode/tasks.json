@@ -6,7 +6,10 @@
     "options": {
       "shell": {
         "executable": "cmd.exe",
-        "args": ["/d", "/c"]
+        "args": [
+          "/d",
+          "/c"
+        ]
       }
     }
   },
@@ -17,6 +20,30 @@
       "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp}",
       "windows": {
         "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+      },
+      "problemMatcher": {
+        "base": "$gcc",
+        "fileLocation": "absolute"
+      }
+    },
+    {
+      "label": "build with mcumgr",
+      "type": "shell",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}/${input:buildApp}/prj.conf ${workspaceRoot}/../modules/zephyr_lib/mcumgr_wrapper/config/overlay-qspi-bt.conf ${workspaceRoot}/../modules/zephyr_lib/mcumgr_wrapper/config/overlay-simple-bluetooth.conf\"",
+      "windows": {
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}\\${input:buildApp}\\prj.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcumgr_wrapper\\config\\overlay-qspi-bt.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcumgr_wrapper\\config\\overlay-simple-bluetooth.conf\""
+      },
+      "problemMatcher": {
+        "base": "$gcc",
+        "fileLocation": "absolute"
+      }
+    },
+    {
+      "label": "build mcuboot",
+      "type": "shell",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/mcuboot ${workspaceRoot}/../bootloader/mcuboot/boot/zephyr -- -DCONF_FILE=\"${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/mcuboot-qspi.conf ${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/overlay-disable-hl7800-modem.conf\"",
+      "windows": {
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\mcuboot ${workspaceRoot}\\..\\bootloader\\mcuboot\\boot\\zephyr -- -DCONF_FILE=\"${workspaceRoot}\\..\\modules\\zephyr_lib\\mcuboot_config\\mcuboot-qspi.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcuboot_config\\overlay-disable-hl7800-modem.conf\""
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -57,6 +84,33 @@
       "problemMatcher": []
     },
     {
+      "label": "flash mcuboot",
+      "type": "shell",
+      "command": "west flash -d build/mcuboot",
+      "windows": {
+        "command": "west flash -d ${workspaceRoot}\\build\\mcuboot"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "flash signed",
+      "type": "shell",
+      "command": "west flash -d build/${input:buildApp} --skip-rebuild --hex-file build/${input:buildApp}/zephyr/zephyr.signed.hex",
+      "windows": {
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp} --skip-rebuild --hex-file ${workspaceRoot}\\build\\${input:buildApp}\\zephyr\\zephyr.signed.hex"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "sign",
+      "type": "shell",
+      "command": "west sign -d build/${input:buildApp} -t imgtool -- --key ${workspaceRoot}/../bootloader/mcuboot/root-rsa-2048.pem",
+      "windows": {
+        "command": "west sign -d ${workspaceRoot}\\build\\${input:buildApp} -t imgtool -- --key ${workspaceRoot}\\..\\bootloader\\mcuboot\\root-rsa-2048.pem"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "flash MBR",
       "type": "shell",
       "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase --reset",
@@ -91,7 +145,18 @@
       "type": "shell",
       "command": "sudo pip3 install -r ${workspaceRoot}/../zephyr/scripts/requirements.txt",
       "problemMatcher": []
-    },    
+    },
+    {
+      "label": "build sign flash",
+      "type": "shell",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "build-with-mcumgr",
+        "sign",
+        "flash signed"
+      ],
+      "problemMatcher": []
+    }
   ],
   "inputs": [
     {

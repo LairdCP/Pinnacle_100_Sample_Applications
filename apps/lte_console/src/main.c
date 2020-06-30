@@ -12,6 +12,10 @@ LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
 #include "app_led.h"
 
+#if CONFIG_MCUMGR
+#include "mcumgr_wrapper.h"
+#endif
+
 #define HEARTBEAT_INTERVAL K_SECONDS(2)
 
 static int hl7800_pwr_off(const struct shell *shell, size_t argc, char **argv)
@@ -67,6 +71,10 @@ void main(void)
 		"Commit: %s\r\n",
 		APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
 	led_init();
+
+#if CONFIG_MCUMGR
+	mcumgr_wrapper_register_subsystems();
+#endif
 
 	while (1) {
 		// TODO: LED heartbeat should use a timer instead of relying on the thread loop.
