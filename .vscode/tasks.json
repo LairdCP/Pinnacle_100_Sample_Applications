@@ -6,10 +6,7 @@
     "options": {
       "shell": {
         "executable": "cmd.exe",
-        "args": [
-          "/d",
-          "/c"
-        ]
+        "args": ["/d", "/c"]
       }
     }
   },
@@ -27,11 +24,11 @@
       }
     },
     {
-      "label": "build with mcumgr",
+      "label": "build for mcuboot",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}/${input:buildApp}/prj.conf ${workspaceRoot}/../modules/zephyr_lib/mcumgr_wrapper/config/overlay-qspi-bt.conf ${workspaceRoot}/../modules/zephyr_lib/mcumgr_wrapper/config/overlay-simple-bluetooth.conf\"",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}/${input:buildApp}/prj.conf ${config:app_mcuboot_config_unix}\"",
       "windows": {
-        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}\\${input:buildApp}\\prj.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcumgr_wrapper\\config\\overlay-qspi-bt.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcumgr_wrapper\\config\\overlay-simple-bluetooth.conf\""
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}\\${input:buildApp}\\prj.conf ${config:app_mcuboot_config_windows}\""
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -41,9 +38,9 @@
     {
       "label": "build mcuboot",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/mcuboot ${workspaceRoot}/../bootloader/mcuboot/boot/zephyr -- -DCONF_FILE=\"${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/mcuboot-qspi.conf ${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/overlay-disable-hl7800-modem.conf\"",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/mcuboot ${workspaceRoot}/../bootloader/mcuboot/boot/zephyr -- -DCONF_FILE=\"${config:mcuboot_config_unix}\"",
       "windows": {
-        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\mcuboot ${workspaceRoot}\\..\\bootloader\\mcuboot\\boot\\zephyr -- -DCONF_FILE=\"${workspaceRoot}\\..\\modules\\zephyr_lib\\mcuboot_config\\mcuboot-qspi.conf ${workspaceRoot}\\..\\modules\\zephyr_lib\\mcuboot_config\\overlay-disable-hl7800-modem.conf\""
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\mcuboot ${workspaceRoot}\\..\\bootloader\\mcuboot\\boot\\zephyr -- -DCONF_FILE=\"${config:mcuboot_config_windows}\""
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -63,7 +60,7 @@
       }
     },
     {
-      "label": "build pca10056",
+      "label": "build for pca10056",
       "type": "shell",
       "command": "west build -p -b nrf52840_pca10056 -d build/${input:buildApp} ${input:buildApp}",
       "windows": {
@@ -95,9 +92,9 @@
     {
       "label": "flash signed",
       "type": "shell",
-      "command": "west flash -d build/${input:buildApp} --skip-rebuild --hex-file build/${input:buildApp}/zephyr/zephyr.signed.hex",
+      "command": "west flash -d build/${input:buildApp} --hex-file build/${input:buildApp}/zephyr/zephyr.signed.hex",
       "windows": {
-        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp} --skip-rebuild --hex-file ${workspaceRoot}\\build\\${input:buildApp}\\zephyr\\zephyr.signed.hex"
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp} --hex-file ${workspaceRoot}\\build\\${input:buildApp}\\zephyr\\zephyr.signed.hex"
       },
       "problemMatcher": []
     },
@@ -108,18 +105,6 @@
       "windows": {
         "command": "west sign -d ${workspaceRoot}\\build\\${input:buildApp} -t imgtool -- --key ${workspaceRoot}\\..\\bootloader\\mcuboot\\root-rsa-2048.pem"
       },
-      "problemMatcher": []
-    },
-    {
-      "label": "flash MBR",
-      "type": "shell",
-      "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase --reset",
-      "problemMatcher": []
-    },
-    {
-      "label": "flash MBR + application",
-      "type": "shell",
-      "command": "cd nordic && nrfjprog -f NRF52 --program s140_nrf52_6.1.0_MBR_only.hex --sectorerase && cd .. && source ../zephyr/zephyr-env.sh && west flash -d build/${input:buildApp} && nrfjprog -f NRF52 --reset",
       "problemMatcher": []
     },
     {
@@ -150,11 +135,58 @@
       "label": "build sign flash",
       "type": "shell",
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "build-with-mcumgr",
-        "sign",
-        "flash signed"
-      ],
+      "dependsOn": ["build for mcuboot", "sign", "flash signed"],
+      "problemMatcher": []
+    },
+    {
+      "label": "menuconfig",
+      "type": "shell",
+      "command": "west build -t menuconfig -d ${workspaceFolder}/build/${input:buildApp} ${workspaceFolder}/${input:buildApp}",
+      "windows": {
+        "command": "west build -t menuconfig -d ${workspaceFolder}\\build\\${input:buildApp} ${workspaceFolder}\\${input:buildApp}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr upload signed app",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} image upload ${workspaceFolder}/build/${input:app}/zephyr/zephyr.signed.bin",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr list images",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} image list",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr test image",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} image test ${input:image-hash}",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr reset",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} reset",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr confirm",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} image confirm",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr echo",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} echo 'hello'",
+      "problemMatcher": []
+    },
+    {
+      "label": "mcumgr upload to fs",
+      "type": "shell",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} fs upload ${input:src_file} ${input:dst_file}",
       "problemMatcher": []
     }
   ],
@@ -175,6 +207,38 @@
         "tests/synchronization",
         "tests/edrx_tcp_server_reply"
       ]
+    },
+    {
+      "id": "mcumgr_cnx",
+      "description": "mcumgr connection params",
+      "type": "pickString",
+      "options": [
+        // Change 'peer_name=' to match your device name
+        "--conntype ble --connstring ctlr_name=hci0,peer_name='Zephyr'",
+        // Change 'dev=' to match your serial device
+        "--conntype serial --connstring dev=/dev/tty.usbserial-A908JLEI"
+      ]
+    },
+    {
+      "id": "image-hash",
+      "description": "hash of firmware image",
+      "type": "promptString",
+      "default": "enter hash here"
+    },
+    {
+      "id": "app_ver",
+      "description": "firmware version",
+      "type": "promptString"
+    },
+    {
+      "id": "src_file",
+      "description": "file",
+      "type": "promptString"
+    },
+    {
+      "id": "dst_file",
+      "description": "file",
+      "type": "promptString"
     }
   ]
 }

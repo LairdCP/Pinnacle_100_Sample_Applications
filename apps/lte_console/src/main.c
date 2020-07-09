@@ -54,12 +54,25 @@ static int hl7800_send_at_cmd(const struct shell *shell, size_t argc,
 	return mdm_hl7800_send_at_cmd(cmd);
 }
 
+#ifdef CONFIG_MODEM_HL7800_FW_UPDATE
+static int hl7800_update(const struct shell *shell, size_t argc, char **argv)
+{
+	ARG_UNUSED(argc);
+
+	return mdm_hl7800_update_fw(argv[1]);
+}
+#endif
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	hl_cmds, SHELL_CMD(pwr_off, NULL, "Power off HL7800", hl7800_pwr_off),
 	SHELL_CMD(reset, NULL, "Reset HL7800", hl7800_reset),
 	SHELL_CMD_ARG(wake, NULL, "Wake/Sleep HL7800", hl7800_wake, 2, 0),
 	SHELL_CMD_ARG(send, NULL, "Send AT cmd to HL7800", hl7800_send_at_cmd,
 		      2, 0),
+#ifdef CONFIG_MODEM_HL7800_FW_UPDATE			  
+	SHELL_CMD_ARG(update, NULL, "Update HL7800 firmware", hl7800_update, 2,
+		      0),
+#endif			  
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 SHELL_CMD_REGISTER(hl, &hl_cmds, "HL7800 commands", NULL);
