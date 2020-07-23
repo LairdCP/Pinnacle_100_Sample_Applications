@@ -8,3 +8,5 @@ modules
 net-tools
 
 tools/
+
+*pm_static*.yml

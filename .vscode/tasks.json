@@ -14,9 +14,9 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp}",
+      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:app} ${workspaceRoot}/${input:app}",
       "windows": {
-        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:app} ${workspaceRoot}\\${input:app}"
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -26,9 +26,9 @@
     {
       "label": "build for mcuboot",
       "type": "shell",
-      "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:buildApp} ${workspaceRoot}/${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}/${input:buildApp}/prj.conf ${config:app_mcuboot_config_unix}\"",
+      "command": "cp ${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/pm_static.pinnacle100.yml ${workspaceRoot}/${input:app}/pm_static.yml && west build -b pinnacle_100_dvk -d ${workspaceRoot}/build/${input:app} ${workspaceRoot}/${input:app} -- -DCONF_FILE=\"${workspaceRoot}/${input:app}/prj.conf ${config:app_mcuboot_config_unix}\" -Dmcuboot_CONF_FILE=\"${config:mcuboot_config_unix}\"",
       "windows": {
-        "command": "west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp} -- -DCONF_FILE=\"${workspaceRoot}\\${input:buildApp}\\prj.conf ${config:app_mcuboot_config_windows}\""
+        "command": "cp ${workspaceRoot}/../modules/zephyr_lib/mcuboot_config/pm_static.pinnacle100.yml ${workspaceRoot}/${input:app}/pm_static.yml && west build -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:app} ${workspaceRoot}\\${input:app} -- -DCONF_FILE=\"${workspaceRoot}\\${input:app}\\prj.conf ${config:app_mcuboot_config_windows}\" -Dmcuboot_CONF_FILE=\"${config:mcuboot_config_unix}\""
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -50,9 +50,9 @@
     {
       "label": "re-build",
       "type": "shell",
-      "command": "west build -p -b pinnacle_100_dvk -d build/${input:buildApp} ${input:buildApp}",
+      "command": "west build -p -b pinnacle_100_dvk -d build/${input:app} ${input:app}",
       "windows": {
-        "command": "west build -p -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+        "command": "west build -p -b pinnacle_100_dvk -d ${workspaceRoot}\\build\\${input:app} ${workspaceRoot}\\${input:app}"
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -62,9 +62,9 @@
     {
       "label": "build for pca10056",
       "type": "shell",
-      "command": "west build -p -b nrf52840_pca10056 -d build/${input:buildApp} ${input:buildApp}",
+      "command": "west build -p -b nrf52840_pca10056 -d build/${input:app} ${input:app}",
       "windows": {
-        "command": "west build -p -b nrf52840_pca10056 -d ${workspaceRoot}\\build\\${input:buildApp} ${workspaceRoot}\\${input:buildApp}"
+        "command": "west build -p -b nrf52840_pca10056 -d ${workspaceRoot}\\build\\${input:app} ${workspaceRoot}\\${input:app}"
       },
       "problemMatcher": {
         "base": "$gcc",
@@ -74,9 +74,9 @@
     {
       "label": "flash application",
       "type": "shell",
-      "command": "west flash -d build/${input:buildApp}",
+      "command": "west flash -d build/${input:app}",
       "windows": {
-        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp}"
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:app}"
       },
       "problemMatcher": []
     },
@@ -92,36 +92,45 @@
     {
       "label": "flash signed",
       "type": "shell",
-      "command": "west flash -d build/${input:buildApp} --hex-file build/${input:buildApp}/zephyr/zephyr.signed.hex",
+      "command": "west flash -d build/${input:app} --hex-file build/${input:app}/zephyr/app_signed.hex",
       "windows": {
-        "command": "west flash -d ${workspaceRoot}\\build\\${input:buildApp} --hex-file ${workspaceRoot}\\build\\${input:buildApp}\\zephyr\\zephyr.signed.hex"
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:app} --hex-file ${workspaceRoot}\\build\\${input:app}\\zephyr\\app_signed.hex"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "flash merged",
+      "type": "shell",
+      "command": "west flash -d build/${input:app} --hex-file build/${input:app}/zephyr/merged.hex",
+      "windows": {
+        "command": "west flash -d ${workspaceRoot}\\build\\${input:app} --hex-file ${workspaceRoot}\\build\\${input:app}\\zephyr\\merged.hex"
       },
       "problemMatcher": []
     },
     {
       "label": "sign",
       "type": "shell",
-      "command": "west sign -d build/${input:buildApp} -t imgtool -- --key ${workspaceRoot}/../bootloader/mcuboot/root-rsa-2048.pem",
+      "command": "west sign -d build/${input:app} -t imgtool -- --key ${workspaceRoot}/../bootloader/mcuboot/root-rsa-2048.pem",
       "windows": {
-        "command": "west sign -d ${workspaceRoot}\\build\\${input:buildApp} -t imgtool -- --key ${workspaceRoot}\\..\\bootloader\\mcuboot\\root-rsa-2048.pem"
+        "command": "west sign -d ${workspaceRoot}\\build\\${input:app} -t imgtool -- --key ${workspaceRoot}\\..\\bootloader\\mcuboot\\root-rsa-2048.pem"
       },
       "problemMatcher": []
     },
     {
       "label": "clean",
       "type": "shell",
-      "command": "west build -t clean -d build/${input:buildApp}",
+      "command": "west build -t clean -d build/${input:app}",
       "windows": {
-        "command": "west build -t clean -d ${workspaceRoot}\\build\\${input:buildApp}"
+        "command": "west build -t clean -d ${workspaceRoot}\\build\\${input:app}"
       },
       "problemMatcher": []
     },
     {
       "label": "pristine",
       "type": "shell",
-      "command": "west build -t pristine -d build/${input:buildApp}",
+      "command": "west build -t pristine -d build/${input:app}",
       "windows": {
-        "command": "west build -t pristine -d ${workspaceRoot}\\build\\${input:buildApp}"
+        "command": "west build -t pristine -d ${workspaceRoot}\\build\\${input:app}"
       },
       "problemMatcher": []
     },
@@ -141,16 +150,16 @@
     {
       "label": "menuconfig",
       "type": "shell",
-      "command": "west build -t menuconfig -d ${workspaceFolder}/build/${input:buildApp} ${workspaceFolder}/${input:buildApp}",
+      "command": "west build -t menuconfig -d ${workspaceFolder}/build/${input:app} ${workspaceFolder}/${input:app}",
       "windows": {
-        "command": "west build -t menuconfig -d ${workspaceFolder}\\build\\${input:buildApp} ${workspaceFolder}\\${input:buildApp}"
+        "command": "west build -t menuconfig -d ${workspaceFolder}\\build\\${input:app} ${workspaceFolder}\\${input:app}"
       },
       "problemMatcher": []
     },
     {
       "label": "mcumgr upload signed app",
       "type": "shell",
-      "command": "sudo mcumgr ${input:mcumgr_cnx} image upload ${workspaceFolder}/build/${input:app}/zephyr/zephyr.signed.bin",
+      "command": "sudo mcumgr ${input:mcumgr_cnx} image upload ${workspaceFolder}/build/${input:app}/zephyr/app_update.bin",
       "problemMatcher": []
     },
     {
@@ -192,7 +201,7 @@
   ],
   "inputs": [
     {
-      "id": "buildApp",
+      "id": "app",
       "description": "Select an app to build",
       "default": "apps/lte_console",
       "type": "pickString",

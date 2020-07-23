@@ -8,6 +8,15 @@
 		},
 		{
 			"path": "../modules/zephyr_lib"
+		},
+		{
+			"path": "../bootloader/mcuboot"
+		},
+		{
+			"path": "../nrfxlib"
+		},
+		{
+			"path": "../nrf"
 		}
 	],
 	"settings": {
