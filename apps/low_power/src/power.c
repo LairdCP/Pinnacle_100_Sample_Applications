@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <zephyr.h>
-#include <misc/printk.h>
-#include <power.h>
+#include <sys/printk.h>
+#include <power/power.h>
 #include <device.h>
 
 #include "led.h"

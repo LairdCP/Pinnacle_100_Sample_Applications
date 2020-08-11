@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #include <zephyr.h>
-#include <misc/printk.h>
+#include <sys/printk.h>
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(http_get_query);

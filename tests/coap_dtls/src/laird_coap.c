@@ -1,5 +1,4 @@
-/* laird_coap.c - CoAP library
- *
+/*
  * Copyright (c) 2020 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -10,7 +9,7 @@
 LOG_MODULE_REGISTER(laird_coap);
 
 #include <errno.h>
-#include <misc/byteorder.h>
+#include <sys/byteorder.h>
 #include <zephyr.h>
 #include <mbedtls/ssl.h>
 #include <net/tls_credentials.h>
@@ -29,6 +28,7 @@ LOG_MODULE_REGISTER(laird_coap);
 
 #define CA_TAG 1
 #define DEVICE_CERT_TAG 2
+#define POLL_FOREVER -1
 
 /* CoAP client socket fd */
 static int sock;
@@ -45,7 +45,7 @@ static const sec_tag_t sock_sec_tags[] = { CA_TAG, DEVICE_CERT_TAG };
 
 static void wait(void)
 {
-	if (poll(fds, nfds, K_FOREVER) < 0) {
+	if (poll(fds, nfds, POLL_FOREVER) < 0) {
 		COAP_LOG_ERR("Error in poll:%d", errno);
 	}
 }

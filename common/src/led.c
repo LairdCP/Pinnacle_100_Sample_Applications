@@ -1,5 +1,4 @@
-/* led.c - LED control
- *
+/*
  * Copyright (c) 2020 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -15,9 +14,9 @@ LOG_MODULE_REGISTER(oob_led);
 // Includes
 //=============================================================================
 
-#include <gpio.h>
+#include <drivers/gpio.h>
 #include <kernel.h>
-
+#include "devicetree_legacy_unfixed.h"
 #include "led.h"
 
 //=============================================================================
@@ -36,6 +35,8 @@ LOG_MODULE_REGISTER(oob_led);
 
 #define MINIMUM_ON_TIME K_MSEC(1)
 #define MINIMUM_OFF_TIME K_MSEC(1)
+#define MINIMUM_ON_TIME_MS 1
+#define MINIMUM_OFF_TIME_MS 1
 
 enum led_state {
 	ON = true,
@@ -142,9 +143,9 @@ void led_blink(enum led_index index, struct led_blink_pattern const *pPattern)
 	led[index].pattern_busy = true;
 	memcpy(&led[index].pattern, pPattern, sizeof(struct led_blink_pattern));
 	led[index].pattern.on_time =
-		MAX(led[index].pattern.on_time, MINIMUM_ON_TIME);
+		MAX(led[index].pattern.on_time, MINIMUM_ON_TIME_MS);
 	led[index].pattern.off_time =
-		MAX(led[index].pattern.off_time, MINIMUM_OFF_TIME);
+		MAX(led[index].pattern.off_time, MINIMUM_OFF_TIME_MS);
 	change_state(&led[index], ON, BLINK);
 	GIVE_MUTEX(led_mutex);
 }
@@ -187,11 +188,11 @@ static void led_configure_pin(enum led_index index, u32_t pin)
 	int ret;
 	led[index].pin = pin;
 	ret = gpio_pin_configure(led[index].device_handle, led[index].pin,
-				 (GPIO_DIR_OUT));
+				 (GPIO_OUTPUT));
 	if (ret) {
 		LED_LOG_ERR("Error configuring GPIO");
 	}
-	ret = gpio_pin_write(led[index].device_handle, led[index].pin, OFF);
+	ret = gpio_pin_set(led[index].device_handle, led[index].pin, OFF);
 	if (ret) {
 		LED_LOG_ERR("Error setting GPIO state");
 	}
@@ -250,9 +251,9 @@ static void change_state(struct led *pLed, bool state, bool blink)
 		k_timer_stop(&pLed->timer);
 	} else {
 		if (state == ON) {
-			k_timer_start(&pLed->timer, pLed->pattern.on_time, 0);
+			k_timer_start(&pLed->timer, K_MSEC(pLed->pattern.on_time), K_MSEC(0));
 		} else {
-			k_timer_start(&pLed->timer, pLed->pattern.off_time, 0);
+			k_timer_start(&pLed->timer, K_MSEC(pLed->pattern.off_time), K_MSEC(0));
 		}
 	}
 
@@ -261,12 +262,12 @@ static void change_state(struct led *pLed, bool state, bool blink)
 
 static void turn_on(struct led *pLed)
 {
-	gpio_pin_write(pLed->device_handle, pLed->pin, ON);
+	gpio_pin_set(pLed->device_handle, pLed->pin, ON);
 }
 
 static void turn_off(struct led *pLed)
 {
-	gpio_pin_write(pLed->device_handle, pLed->pin, OFF);
+	gpio_pin_set(pLed->device_handle, pLed->pin, OFF);
 }
 
 //=============================================================================

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 

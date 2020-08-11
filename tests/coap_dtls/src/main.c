@@ -10,6 +10,7 @@ LOG_MODULE_REGISTER(coap_dtls, LOG_LEVEL_DBG);
 #include "laird_coap.h"
 #include "lte.h"
 #include "certificate.h"
+#include <kernel.h>
 
 #define MAIN_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
 #define MAIN_LOG_WRN(...) LOG_WRN(__VA_ARGS__)

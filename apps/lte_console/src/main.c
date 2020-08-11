@@ -1,4 +1,9 @@
-/* main.c - Application main entry point */
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <logging/log.h>
 LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 

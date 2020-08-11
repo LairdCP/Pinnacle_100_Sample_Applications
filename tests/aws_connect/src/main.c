@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Laird Connectivity
+ * Copyright (c) 2020 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -287,7 +287,7 @@ static int try_to_connect(struct mqtt_client *client)
 		if (rc != 0) {
 			connectFailures++;
 			PRINT_RESULT("mqtt_connect", rc);
-			k_sleep(APP_SLEEP_MSECS);
+			k_sleep(K_MSEC(APP_SLEEP_MSECS));
 			continue;
 		}
 

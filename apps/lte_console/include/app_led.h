@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef APP_LED_H
 #define APP_LED_H
 

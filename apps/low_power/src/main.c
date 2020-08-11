@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <stdio.h>
 #include <zephyr.h>
-#include <power.h>
+#include <power/power.h>
 #include <string.h>
 #include <soc.h>
 #include <device.h>

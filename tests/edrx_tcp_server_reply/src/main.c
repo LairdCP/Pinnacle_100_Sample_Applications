@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2020 Laird Connectivity
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <zephyr.h>
-#include <power.h>
+#include <power/power.h>
 #include <string.h>
 #include <net/socket.h>
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL

@@ -1,5 +1,4 @@
-/* lte.c - LTE management
- *
+/*
  * Copyright (c) 2020 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -18,7 +17,6 @@ LOG_MODULE_REGISTER(app_lte);
 #include <net/net_mgmt.h>
 #include <net/socket.h>
 
-#include <drivers/modem/modem_receiver.h>
 #include <drivers/modem/hl7800.h>
 
 #include "lte.h"
@@ -60,16 +58,18 @@ struct mgmt_events {
 
 static struct net_if *iface;
 static struct net_if_config *cfg;
-static struct mdm_receiver_context *mdm_rcvr;
 #ifdef CONFIG_DNS_RESOLVER
 static struct dns_resolve_context *dns;
 #endif
 static struct lte_status lteStatus;
 static lte_event_function_t lteCallbackFunction = NULL;
 
+#define NETWORK_SEARCH_PATTERN_ON_MS 100
+#define NETWORK_SEARCH_PATTERN_OFF_MS 900
+
 static const struct led_blink_pattern NETWORK_SEARCH_LED_PATTERN = {
-	.on_time = K_MSEC(100),
-	.off_time = K_MSEC(900),
+	.on_time = NETWORK_SEARCH_PATTERN_ON_MS,
+	.off_time = NETWORK_SEARCH_PATTERN_OFF_MS,
 	.repeat_count = REPEAT_INDEFINITELY
 };
 
@@ -241,16 +241,8 @@ int lteInit(void)
 	}
 #endif
 
-	/* Get the modem receive context */
-	mdm_rcvr = mdm_receiver_context_from_id(0);
-	if (mdm_rcvr == NULL) {
-		LTE_LOG_ERR("Invalid modem receiver");
-		rc = LTE_ERR_MDM_CTX;
-		goto exit;
-	}
-
-	lteStatus.radio_version = mdm_rcvr->data_revision;
-	lteStatus.IMEI = mdm_rcvr->data_imei;
+	lteStatus.radio_version = (const char *)mdm_hl7800_get_fw_version();
+	lteStatus.IMEI = (const char *)mdm_hl7800_get_imei();
 	lteStatus.ICCID = (const char *)mdm_hl7800_get_iccid();
 	lteStatus.serialNumber = (const char *)mdm_hl7800_get_sn();
 	mdm_hl7800_generate_status_events();
