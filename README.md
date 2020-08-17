@@ -39,10 +39,10 @@ From the directory where you issued the `west init` and `west update` commands y
 
 ```
 # Windows
-west build -b pinnacle_100_dvk -d pinnacle_firmware\build\apps\lte_console pinnacle_firmware\apps\lte_console -- -D BOARD_ROOT=%cd%\pinnacle_firmware
+west build -b pinnacle_100_dvk -d pinnacle_100_sample_applications\apps\lte_console\build pinnacle_100_sample_applications\apps\lte_console
 
 # Linux and macOS
-west build -b pinnacle_100_dvk -d pinnacle_firmware/build/apps/lte_console pinnacle_firmware/apps/lte_console -- -D BOARD_ROOT=$PWD/pinnacle_firmware
+west build -b pinnacle_100_dvk -d pinnacle_100_sample_applications/apps/lte_console/build pinnacle_100_sample_applications/apps/lte_console
 ```
 
 # Sample Applications
