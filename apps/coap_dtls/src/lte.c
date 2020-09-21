@@ -158,7 +158,7 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 		break;
 
 	default:
-		LOG_ERR("Unknown modem event");
+		LOG_WRN("Unknown modem event");
 		break;
 	}
 }

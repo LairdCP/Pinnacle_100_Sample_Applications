@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.13.1)
+
+set(BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../)
+
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(coap_dtls)
 
@@ -13,19 +16,18 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
 generate_inc_file_for_target(
     app
-    src/certs/laird-dev-nbiot-caTrustStore.der
-    ${gen_dir}/laird-dev-nbiot-caTrustStore.der.inc
+    src/certs/root_server_cert.der
+    ${gen_dir}/root_server_cert.der.inc
     )
 
 generate_inc_file_for_target(
     app
-    src/certs/pinnacle_test_cert.der
-    ${gen_dir}/pinnacle_test_cert.der.inc
+    src/certs/client_cert.der
+    ${gen_dir}/client_cert.der.inc
     )
 
 generate_inc_file_for_target(
     app
-    src/certs/pinnacle_test_key_nopass.der
-    ${gen_dir}/pinnacle_test_key_nopass.der.inc
+    src/certs/client_privkey.der
+    ${gen_dir}/client_privkey.der.inc
     )
-

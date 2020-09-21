@@ -1,0 +1,24 @@
+# Copyright (c) 2020 Laird Connectivity
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig USER_APPLICATION
+     bool "Config User Application"
+	 default y
+
+if USER_APPLICATION
+
+config APP_SERVER_IP_ADDRESS
+    string "CoAP server IPv4 address"
+
+config APP_SERVER_PORT
+    string "CoAP server port"
+
+config APP_SERVER_HOSTNAME
+    string "CoAP server host name"
+
+config APP_SERVER_DISABLE_HOSTNAME_CHECK
+    bool "Disable server hostname check"
+
+endif # USER_APPLICATION
+
+source "Kconfig.zephyr"

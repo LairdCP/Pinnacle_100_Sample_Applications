@@ -7,14 +7,14 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define SERVER_HOST "nbiot.sparassidae.com"
-#define SERVER_PORT_STR "5684"
+#define SERVER_HOST CONFIG_APP_SERVER_HOSTNAME
+#define SERVER_PORT_STR CONFIG_APP_SERVER_PORT
 
 #ifdef CONFIG_DNS_RESOLVER
 #define DNS_RETRIES 3
 #define DNS_RETRY_TIME_SECONDS 2
 #else
-#define SERVER_IP_ADDR "3.89.10.212"
+#define SERVER_IP_ADDR CONFIG_APP_SERVER_IP_ADDRESS
 #endif /* CONFIG_DNS_RESOLVER */
 
 #endif /* __CONFIG_H__ */

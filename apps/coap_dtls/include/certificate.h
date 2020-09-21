@@ -8,15 +8,15 @@
 #define __CERTIFICATE_H__
 
 static const unsigned char ca_certificate[] = {
-#include "laird-dev-nbiot-caTrustStore.der.inc"
+#include "root_server_cert.der.inc"
 };
 
 static const unsigned char dev_certificate[] = {
-#include "pinnacle_test_cert.der.inc"
+#include "client_cert.der.inc"
 };
 
 static const unsigned char dev_key[] = {
-#include "pinnacle_test_key_nopass.der.inc"
+#include "client_privkey.der.inc"
 };
 
 #endif /* __CERTIFICATE_H__ */

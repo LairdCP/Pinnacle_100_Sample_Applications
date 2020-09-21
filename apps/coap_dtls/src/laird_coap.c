@@ -150,6 +150,11 @@ int laird_coap_start_client()
 		return ret;
 	}
 
+#ifdef CONFIG_APP_SERVER_DISABLE_HOSTNAME_CHECK
+#undef SERVER_HOST
+#define SERVER_HOST NULL
+#endif
+
 	ret = setsockopt(sock, SOL_TLS, TLS_HOSTNAME, SERVER_HOST,
 			 sizeof(SERVER_HOST));
 	if (ret < 0) {
