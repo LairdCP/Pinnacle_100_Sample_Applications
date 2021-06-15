@@ -16,7 +16,7 @@
 #include "lte.h"
 #include "http_get.h"
 
-#define RESETREAS_REG (volatile u32_t *)0x40000400
+#define RESETREAS_REG (volatile uint32_t *)0x40000400
 
 #ifdef CONFIG_MODEM_HL7800
 K_SEM_DEFINE(lte_event_sem, 0, 1);
@@ -70,7 +70,7 @@ void main(void)
 	printf("\n\n*** Power Management Demo on %s ***\n", CONFIG_BOARD);
 
 	/* Read the reset reason register */
-	u32_t resetReas = *RESETREAS_REG;
+	uint32_t resetReas = *RESETREAS_REG;
 	printf("Reset reason: 0x%08X\n", resetReas);
 
 	led_init();

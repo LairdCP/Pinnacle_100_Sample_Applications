@@ -25,9 +25,9 @@ enum led_index {
  * times (repeated twice). 
  */
 struct led_blink_pattern {
-	s32_t on_time;
-	s32_t off_time;
-	u32_t repeat_count;
+	int32_t on_time;
+	int32_t off_time;
+	uint32_t repeat_count;
 };
 
 #define REPEAT_INDEFINITELY (0xFFFFFFFF)

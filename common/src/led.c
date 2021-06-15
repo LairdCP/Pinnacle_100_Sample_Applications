@@ -16,7 +16,6 @@ LOG_MODULE_REGISTER(oob_led);
 
 #include <drivers/gpio.h>
 #include <kernel.h>
-#include "devicetree_legacy_unfixed.h"
 #include "led.h"
 
 //=============================================================================
@@ -51,7 +50,7 @@ enum led_blink_state {
 struct led {
 	enum led_state state;
 	struct device *device_handle;
-	u32_t pin;
+	uint32_t pin;
 	bool pattern_busy;
 	struct led_blink_pattern pattern;
 	struct k_timer timer;
@@ -182,7 +181,7 @@ static void led_bind_device(enum led_index index, const char *name)
 	}
 }
 
-static void led_configure_pin(enum led_index index, u32_t pin)
+static void led_configure_pin(enum led_index index, uint32_t pin)
 {
 	CHECK_INDEX();
 	int ret;

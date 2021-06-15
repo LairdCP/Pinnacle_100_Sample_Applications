@@ -51,7 +51,7 @@ LOG_MODULE_REGISTER(app_lte);
 #endif
 
 struct mgmt_events {
-	u32_t event;
+	uint32_t event;
 	net_mgmt_event_handler_t handler;
 	struct net_mgmt_event_callback cb;
 };
@@ -81,7 +81,7 @@ static void onLteEvent(enum lte_event event)
 }
 
 static void iface_ready_evt_handler(struct net_mgmt_event_callback *cb,
-				    u32_t mgmt_event, struct net_if *iface)
+				    uint32_t mgmt_event, struct net_if *iface)
 {
 #ifdef CONFIG_DNS_RESOLVER
 	if (mgmt_event != NET_EVENT_DNS_SERVER_ADD) {
@@ -99,7 +99,7 @@ static void iface_ready_evt_handler(struct net_mgmt_event_callback *cb,
 }
 
 static void iface_down_evt_handler(struct net_mgmt_event_callback *cb,
-				   u32_t mgmt_event, struct net_if *iface)
+				   uint32_t mgmt_event, struct net_if *iface)
 {
 	if (mgmt_event != NET_EVENT_IF_DOWN) {
 		return;
@@ -137,7 +137,7 @@ static void setup_iface_events(void)
 
 static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 {
-	u8_t code = ((struct mdm_hl7800_compound_event *)event_data)->code;
+	uint8_t code = ((struct mdm_hl7800_compound_event *)event_data)->code;
 
 	switch (event) {
 	case HL7800_EVENT_NETWORK_STATE_CHANGE:
