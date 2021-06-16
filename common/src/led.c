@@ -49,7 +49,7 @@ enum led_blink_state {
 
 struct led {
 	enum led_state state;
-	struct device *device_handle;
+	const struct device *device_handle;
 	uint32_t pin;
 	bool pattern_busy;
 	struct led_blink_pattern pattern;
