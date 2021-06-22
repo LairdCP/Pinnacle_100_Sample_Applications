@@ -10,6 +10,8 @@
 #include <string.h>
 #include <soc.h>
 #include <device.h>
+#include <logging/log.h>
+#include <logging/log_ctrl.h>
 
 #include "config.h"
 #include "led.h"
@@ -51,7 +53,7 @@ static void shutdown_uart1(void)
 
 	struct device *gpio = device_get_binding(GPIO0_DEV);
 	/* RTS */
-	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_DIR_IN));
+	rc = gpio_pin_configure(gpio, MDM_RTS_PIN, (GPIO_DIR_IN));
 	if (rc) {
 		printf("Error configuring GPIO\n");
 	}
@@ -64,6 +66,93 @@ static void shutdown_uart1(void)
 }
 #endif /* CONFIG_MODEM_HL7800 */
 
+#ifdef CONFIG_LOG
+/** @brief Finds the logging subsystem backend pointer for UART.
+ *
+ *  @returns A pointer to the UART backend, NULL if not found.
+ */
+static const struct log_backend *log_find_uart_backend(void)
+{
+	const struct log_backend *backend;
+	const struct log_backend *uart_backend = NULL;
+	uint32_t backend_idx;
+	bool null_backend_found = false;
+#if defined(CONFIG_SHELL_BACKEND_SERIAL)
+#define BACKEND_NAME "shell_uart_backend"
+#elif defined(CONFIG_LOG_BACKEND_UART)
+#define BACKEND_NAME "log_backend_uart"
+#else
+#error "Unhandled backend"
+#endif
+
+	for (backend_idx = 0;
+	     (uart_backend == NULL) && (null_backend_found == false);
+	     backend_idx++) {
+		/* Get the next backend */
+		backend = log_backend_get(backend_idx);
+		/* If it's NULL, stop here */
+		if (backend != NULL) {
+			/* Is it UART backend? */
+			if (!strcmp(backend->name, BACKEND_NAME)) {
+				/* Found it */
+				uart_backend = backend;
+			}
+		} else {
+			null_backend_found = true;
+		}
+	}
+	return (uart_backend);
+}
+
+/** @brief Disables the logging subsystem backend UART.
+ *
+ */
+static void uart_console_logging_disable(void)
+{
+	const struct log_backend *uart_backend;
+
+	uart_backend = log_find_uart_backend();
+	if (uart_backend != NULL) {
+		log_backend_disable(uart_backend);
+	}
+}
+
+/** @brief Enables the logging subsystem backend UART.
+ *
+ */
+static void uart_console_logging_enable(void)
+{
+	const struct log_backend *uart_backend;
+
+	uart_backend = log_find_uart_backend();
+	if (uart_backend != NULL) {
+		log_backend_enable(uart_backend, uart_backend->cb->ctx,
+				   CONFIG_LOG_MAX_LEVEL);
+	}
+}
+#endif
+
+static void shutdown_console_uart(void)
+{
+	const struct device *uart_dev;
+	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
+	int rc = device_set_power_state(uart_dev, DEVICE_PM_OFF_STATE, NULL,
+					NULL);
+	if (rc) {
+		printk("Error disabling console UART peripheral (%d)\n", rc);
+	}
+}
+
+static void startup_console_uart(void)
+{
+	const struct device *uart_dev;
+	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
+	int rc = device_set_power_state(uart_dev, DEVICE_PM_ACTIVE_STATE, NULL,
+					NULL);
+	if (rc) {
+		printk("Error enabling console UART peripheral (%d)\n", rc);
+	}
+}
 /* Application main Thread */
 void main(void)
 {
@@ -109,18 +198,24 @@ void main(void)
 #endif /* CONFIG_MODEM_HL7800 */
 
 	while (1) {
+		startup_console_uart();
+#ifdef CONFIG_LOG
+		uart_console_logging_enable();
+#endif
 #ifdef CONFIG_MODEM_HL7800
 		http_get_execute();
-		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
-		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
 		printf("App busy waiting for %d seconds\n",
 		       BUSY_WAIT_TIME_SECONDS);
 		k_busy_wait(BUSY_WAIT_TIME);
-		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
-		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 #endif
+		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
+#ifdef CONFIG_LOG
+		uart_console_logging_disable();
+#endif
+		shutdown_console_uart();
+		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 	}
 #ifdef CONFIG_MODEM_HL7800
 exit:
