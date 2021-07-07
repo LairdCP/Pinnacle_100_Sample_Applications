@@ -10,7 +10,10 @@ with the Pinnacle 100 modem. An HTTP GET request is performed on a remote servic
 in low power mode. During this time, the UART used for terminal communications is disabled to minimise power consumption.
 
 Upon expiry of the time defined by SLEEP_TIME_SECONDS, the terminal UART is enabled again, and the HTTP GET repeated.
-This behaviour is repeated cyclically until the application is exited.
+This behaviour is repeated forever.
+
+Every 3rd loop, the app switches between keeping the HTTP connection alive and closing it after each request.
+This demonstrates it is possible to keep a TCP connection open while using eDRX.
 
 Configuration Options
 *********************

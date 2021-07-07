@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <zephyr.h>
-#include <power/power.h>
+#include <pm/pm.h>
 #include <string.h>
 #include <soc.h>
 #include <device.h>
@@ -19,6 +19,8 @@
 #include "http_get.h"
 
 #define RESETREAS_REG (volatile uint32_t *)0x40000400
+static int loop_count = 0;
+static bool http_keep_alive = true;
 
 #ifdef CONFIG_MODEM_HL7800
 K_SEM_DEFINE(lte_event_sem, 0, 1);
@@ -136,8 +138,7 @@ static void shutdown_console_uart(void)
 {
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = device_set_power_state(uart_dev, DEVICE_PM_OFF_STATE, NULL,
-					NULL);
+	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_OFF, NULL, NULL);
 	if (rc) {
 		printk("Error disabling console UART peripheral (%d)\n", rc);
 	}
@@ -147,12 +148,13 @@ static void startup_console_uart(void)
 {
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = device_set_power_state(uart_dev, DEVICE_PM_ACTIVE_STATE, NULL,
-					NULL);
+	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_ACTIVE, NULL,
+				     NULL);
 	if (rc) {
 		printk("Error enabling console UART peripheral (%d)\n", rc);
 	}
 }
+
 /* Application main Thread */
 void main(void)
 {
@@ -198,12 +200,17 @@ void main(void)
 #endif /* CONFIG_MODEM_HL7800 */
 
 	while (1) {
+		loop_count++;
 		startup_console_uart();
 #ifdef CONFIG_LOG
 		uart_console_logging_enable();
 #endif
 #ifdef CONFIG_MODEM_HL7800
-		http_get_execute();
+		if (loop_count % 3 == 0) {
+			http_keep_alive = !http_keep_alive;
+		}
+
+		http_get_execute(http_keep_alive);
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
 		printf("App busy waiting for %d seconds\n",
