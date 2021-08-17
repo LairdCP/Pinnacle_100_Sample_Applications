@@ -136,16 +136,20 @@ static void uart_console_logging_enable(void)
 
 static void shutdown_console_uart(void)
 {
+#ifdef CONFIG_SHUTDOWN_CONSOLE_UART
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
 	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_OFF, NULL, NULL);
 	if (rc) {
 		printk("Error disabling console UART peripheral (%d)\n", rc);
 	}
+#endif
 }
 
 static void startup_console_uart(void)
 {
+#ifdef CONFIG_SHUTDOWN_CONSOLE_UART
+
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
 	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_ACTIVE, NULL,
@@ -153,6 +157,7 @@ static void startup_console_uart(void)
 	if (rc) {
 		printk("Error enabling console UART peripheral (%d)\n", rc);
 	}
+#endif
 }
 
 /* Application main Thread */
@@ -202,7 +207,7 @@ void main(void)
 	while (1) {
 		loop_count++;
 		startup_console_uart();
-#ifdef CONFIG_LOG
+#if defined(CONFIG_LOG) && defined(CONFIG_SHUTDOWN_CONSOLE_UART)
 		uart_console_logging_enable();
 #endif
 #ifdef CONFIG_MODEM_HL7800
@@ -218,7 +223,7 @@ void main(void)
 		k_busy_wait(BUSY_WAIT_TIME);
 #endif
 		printf("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
-#ifdef CONFIG_LOG
+#if defined(CONFIG_LOG) && defined(CONFIG_SHUTDOWN_CONSOLE_UART)
 		uart_console_logging_disable();
 #endif
 		shutdown_console_uart();

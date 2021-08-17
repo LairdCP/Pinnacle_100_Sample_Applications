@@ -1,0 +1,15 @@
+menuconfig USER_APPLICATION
+     bool "Config User Application"
+	 default y
+
+if USER_APPLICATION
+
+config SHUTDOWN_CONSOLE_UART
+    bool "shutdown UART console"
+    default y
+    help
+        Shutdown the console UART to save power
+
+endif # USER_APPLICATION
+
+source "Kconfig.zephyr"
