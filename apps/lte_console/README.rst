@@ -5,7 +5,7 @@ Pinnacle 100: LTE Console
 Overview
 ********
 
-The LTE Console application inplements a terminal interface that allows interaction with the modem via its published AT command set. It also allows
+The LTE Console application implements a terminal interface that allows interaction with the modem via its published AT command set. It also allows
 the power consumption of the modem to be externally observed by triggering sleep and shut down modes of the modem. 
 
 Commands available are as follows.
@@ -15,7 +15,7 @@ Commands available are as follows.
 * wake - Sends the modem to sleep, wakes if asleep
 * send - Sends an AT command to the modem, the AT command follows the send command
 
-The application exits only upon occurence of a fatal error.
+The application exits only upon occurrence of a fatal error.
 
 Note that this application is intended to demonstrate the functionality of the modem driver. Should an AT interface be required for a production
 design, it is recommended to utilise the Hosted_Mode_Firmware_.

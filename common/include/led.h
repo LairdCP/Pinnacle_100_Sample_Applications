@@ -15,7 +15,7 @@ enum led_index {
 	BLUE_LED1 = 0,
 	GREEN_LED2,
 	RED_LED3,
-	GREEN_LED4, /* not recommended for use - reserved for bootloader */
+	GREEN_LED4,
 
 	NUMBER_OF_LEDS
 };

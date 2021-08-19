@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/******************************************************************************/
+/* Includes                                                                   */
+/******************************************************************************/
 #include <logging/log.h>
 LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
@@ -16,17 +19,91 @@ LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 #ifdef CONFIG_MODEM_HL7800
 #include <drivers/modem/hl7800.h>
 #endif
-#include "app_led.h"
+#include "led.h"
+#include "lte.h"
 
 #if CONFIG_MCUMGR
 #include "mcumgr_wrapper.h"
 #endif
 
+/******************************************************************************/
+/* Global Constants, Macros and Type Definitions                              */
+/******************************************************************************/
+
 #define HEARTBEAT_INTERVAL K_SECONDS(2)
+#define APN_MSG "APN: [%s]"
+
+/******************************************************************************/
+/* Global Data Definitions                                                    */
+/******************************************************************************/
+extern struct mdm_hl7800_apn *lte_apn_config;
+
+/******************************************************************************/
+/* Local Data Definitions                                                     */
+/******************************************************************************/
+struct led_blink_pattern heartbeat_pattern = { .on_time = 30,
+					       .off_time = 75,
+					       .repeat_count = 2 };
+
+/******************************************************************************/
+/* Local Function Definitions                                                 */
+/******************************************************************************/
 
 #ifdef CONFIG_MODEM_HL7800
 
-static int hl7800_pwr_off(const struct shell *shell, size_t argc, char **argv)
+static int shell_hl_apn_cmd(const struct shell *shell, size_t argc, char **argv)
+{
+	int rc = 0;
+
+	size_t val_len;
+
+	if (argc == 2) {
+		/* set the value */
+		val_len = strlen(argv[1]);
+		if (val_len > MDM_HL7800_APN_MAX_SIZE) {
+			rc = -EINVAL;
+			shell_error(shell, "APN too long [%d]", val_len);
+			goto done;
+		}
+
+		rc = mdm_hl7800_update_apn(argv[1]);
+		if (rc >= 0) {
+			shell_print(shell, APN_MSG, argv[1]);
+		} else {
+			shell_error(shell, "Could not set APN [%d]", rc);
+		}
+	} else if (argc == 1) {
+		/* read the value */
+		shell_print(shell, APN_MSG, lte_apn_config->value);
+	} else {
+		shell_error(shell, "Invalid param");
+		rc = -EINVAL;
+	}
+done:
+	return rc;
+}
+
+static int shell_hl_iccid_cmd(const struct shell *shell, size_t argc,
+			      char **argv)
+{
+	int rc = 0;
+
+	shell_print(shell, "%s", mdm_hl7800_get_iccid());
+
+	return rc;
+}
+
+static int shell_hl_imei_cmd(const struct shell *shell, size_t argc,
+			     char **argv)
+{
+	int rc = 0;
+
+	shell_print(shell, "%s", mdm_hl7800_get_imei());
+
+	return rc;
+}
+
+static int shell_hl_pwr_off(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -34,7 +111,7 @@ static int hl7800_pwr_off(const struct shell *shell, size_t argc, char **argv)
 	return mdm_hl7800_power_off();
 }
 
-static int hl7800_reset(const struct shell *shell, size_t argc, char **argv)
+static int shell_hl_reset(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -52,35 +129,98 @@ static int hl7800_wake(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-static int hl7800_send_at_cmd(const struct shell *shell, size_t argc,
-			      char **argv)
+static int shell_hl_send_at_cmd(const struct shell *shell, size_t argc,
+				char **argv)
 {
-	ARG_UNUSED(argc);
+	int rc = 0;
 
-	const uint8_t *cmd = argv[1];
+	if ((argc == 2) && (argv[0] != NULL) && (argv[1] != NULL)) {
+		rc = mdm_hl7800_send_at_cmd(argv[1]);
+		if (rc < 0) {
+			shell_error(shell, "Command not accepted");
+		}
+	} else {
+		shell_error(shell, "Wrong number of parameters");
 
-	return mdm_hl7800_send_at_cmd(cmd);
+		rc = -EINVAL;
+	}
+
+	return rc;
 }
 
 #ifdef CONFIG_MODEM_HL7800_FW_UPDATE
-static int hl7800_update(const struct shell *shell, size_t argc, char **argv)
+static int shell_hl_fup_cmd(const struct shell *shell, size_t argc, char **argv)
 {
-	ARG_UNUSED(argc);
+	int rc = 0;
 
-	return mdm_hl7800_update_fw(argv[1]);
+	if ((argc == 2) && (argv[1] != NULL)) {
+		rc = mdm_hl7800_update_fw(argv[1]);
+		if (rc < 0) {
+			shell_error(shell, "Command error");
+		}
+	} else {
+		shell_error(shell, "Invalid parameter");
+		rc = -EINVAL;
+	}
+
+	return rc;
 }
 #endif
+
+static int shell_hl_sn_cmd(const struct shell *shell, size_t argc, char **argv)
+{
+	int rc = 0;
+
+	shell_print(shell, "%s", mdm_hl7800_get_sn());
+
+	return rc;
+}
+
+static int shell_hl_ver_cmd(const struct shell *shell, size_t argc, char **argv)
+{
+	int rc = 0;
+
+	shell_print(shell, "%s", mdm_hl7800_get_fw_version());
+
+	return rc;
+}
+
+static int shell_hl_site_survey_cmd(const struct shell *shell, size_t argc,
+				    char **argv)
+{
+	int rc = 0;
+
+	shell_print(shell, "survey status: %d",
+		    mdm_hl7800_perform_site_survey());
+
+	/* Results are printed to shell by lte.site_survey_handler() */
+
+	return rc;
+}
+
+/******************************************************************************/
+/* Global Function Definitions                                                */
+/******************************************************************************/
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
-	hl_cmds, SHELL_CMD(pwr_off, NULL, "Power off HL7800", hl7800_pwr_off),
-	SHELL_CMD(reset, NULL, "Reset HL7800", hl7800_reset),
-	SHELL_CMD_ARG(wake, NULL, "Wake/Sleep HL7800", hl7800_wake, 2, 0),
-	SHELL_CMD_ARG(send, NULL, "Send AT cmd to HL7800", hl7800_send_at_cmd,
-		      2, 0),
+	hl_cmds, SHELL_CMD(apn, NULL, "HL7800 APN", shell_hl_apn_cmd),
+	SHELL_CMD_ARG(cmd, NULL,
+		      "Send AT command (only for advanced debug)"
+		      "hl cmd <at command>",
+		      shell_hl_send_at_cmd, 2, 0),
 #ifdef CONFIG_MODEM_HL7800_FW_UPDATE
-	SHELL_CMD_ARG(update, NULL, "Update HL7800 firmware", hl7800_update, 2,
+	SHELL_CMD_ARG(fup, NULL, "Update HL7800 firmware", shell_hl_fup_cmd, 2,
 		      0),
 #endif
+	SHELL_CMD(iccid, NULL, "HL7800 SIM card ICCID", shell_hl_iccid_cmd),
+	SHELL_CMD(imei, NULL, "HL7800 IMEI", shell_hl_imei_cmd),
+	SHELL_CMD(pwr_off, NULL, "Power off HL7800", shell_hl_pwr_off),
+	SHELL_CMD(reset, NULL, "Reset HL7800", shell_hl_reset),
+	SHELL_CMD(sn, NULL, "HL7800 serial number", shell_hl_sn_cmd),
+	SHELL_CMD(survey, NULL, "HL7800 site survey", shell_hl_site_survey_cmd),
+	SHELL_CMD(ver, NULL, "HL7800 firmware version", shell_hl_ver_cmd),
+	SHELL_CMD_ARG(wake, NULL, "Wake/Sleep HL7800", hl7800_wake, 2, 0),
+
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 SHELL_CMD_REGISTER(hl, &hl_cmds, "HL7800 commands", NULL);
@@ -93,17 +233,15 @@ void main(void)
 		"Commit: %s\r\n",
 		APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
 	led_init();
+	lteInit();
 
 #if CONFIG_MCUMGR
 	mcumgr_wrapper_register_subsystems();
 #endif
 
 	while (1) {
-		// TODO: LED heartbeat should use a timer instead of relying on the thread loop.
-		// TODO: wait in main thread on event (semaphore) until some work needs to be done.
-		ledHeartBeat();
+		led_blink(GREEN_LED2, &heartbeat_pattern);
 
 		k_sleep(HEARTBEAT_INTERVAL);
 	}
 }
-

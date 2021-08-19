@@ -6,8 +6,17 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(LTE_Console)
 
 FILE(GLOB app_sources src/*.c)
-target_sources(app PRIVATE ${app_sources})
+target_sources(app PRIVATE
+  ${app_sources}
+  ${CMAKE_SOURCE_DIR}/../../common/src/led.c
+)
+
+target_sources_ifdef(CONFIG_MODEM_HL7800 app PRIVATE
+  ${CMAKE_SOURCE_DIR}/../../common/src/lte.c
+)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/../../common/include)
 
 # Include git info in build
 # Get the current working branch
