@@ -139,7 +139,7 @@ static void shutdown_console_uart(void)
 #ifdef CONFIG_SHUTDOWN_CONSOLE_UART
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_OFF, NULL, NULL);
+	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_OFF);
 	if (rc) {
 		printk("Error disabling console UART peripheral (%d)\n", rc);
 	}
@@ -152,8 +152,7 @@ static void startup_console_uart(void)
 
 	const struct device *uart_dev;
 	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_ACTIVE, NULL,
-				     NULL);
+	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_ACTIVE);
 	if (rc) {
 		printk("Error enabling console UART peripheral (%d)\n", rc);
 	}
@@ -211,10 +210,13 @@ void main(void)
 		uart_console_logging_enable();
 #endif
 #ifdef CONFIG_MODEM_HL7800
+#ifdef CONFIG_MODEM_HL7800_PSM
+		http_keep_alive = false;
+#else
 		if (loop_count % 3 == 0) {
 			http_keep_alive = !http_keep_alive;
 		}
-
+#endif
 		http_get_execute(http_keep_alive);
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800

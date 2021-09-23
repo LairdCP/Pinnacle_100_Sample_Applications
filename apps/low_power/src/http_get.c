@@ -20,7 +20,7 @@
 #define HTTP_PATH "/"
 
 #define SOCKET_READ_TRIES 3
-#define SOCKET_READ_RETRY_DELAY_MSEC 500
+#define SOCKET_READ_RETRY_DELAY_MSEC 1000
 
 #define CHECK(r)                                                               \
 	{                                                                      \

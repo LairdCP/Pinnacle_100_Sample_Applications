@@ -15,11 +15,16 @@ This behaviour is repeated forever.
 Every 3rd loop, the app switches between keeping the HTTP connection alive and closing it after each request.
 This demonstrates it is possible to keep a TCP connection open while using eDRX.
 
+The .sal files in the /docs folder can be opened with the `Saleae v2.x Logic software <https://www.saleae.com/downloads/>`_. The logic traces show relevant signals
+between the NRF52840 and the HL7800 when running this demo in eDRX and PSM mode.
+
 Configuration Options
 *********************
 
 The URL and associated port of the server to process the HTTP GET request is defined by HTTP_HOST and HTTP_PORT in 
 the http_get.c file.
+
+To switch between eDRX and PSM, see prj.conf.
 
 Requirements
 ************
