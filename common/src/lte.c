@@ -307,20 +307,31 @@ exit:
 
 bool lteIsReady(void)
 {
+	bool ready = false;
 #ifdef CONFIG_DNS_RESOLVER
+#if defined(CONFIG_NET_IPV4)
 	struct sockaddr_in *dnsAddr;
+#elif defined(CONFIG_NET_IPV6)
+	struct sockaddr_in6 *dnsAddr;
+#endif
 
 	if (iface != NULL && cfg != NULL && &dns->servers[0] != NULL) {
+#if defined(CONFIG_NET_IPV4)
 		dnsAddr = net_sin(&dns->servers[0].dns_server);
-		return net_if_is_up(iface) && cfg->ip.ipv4 &&
-		       !net_ipv4_is_addr_unspecified(&dnsAddr->sin_addr);
+		ready = net_if_is_up(iface) && cfg->ip.ipv4 &&
+			!net_ipv4_is_addr_unspecified(&dnsAddr->sin_addr);
+#elif defined(CONFIG_NET_IPV6)
+		dnsAddr = net_sin6(&dns->servers[0].dns_server);
+		ready = net_if_is_up(iface) && cfg->ip.ipv6 &&
+			!net_ipv6_is_addr_unspecified(&dnsAddr->sin6_addr);
+#endif
 	}
 #else
 	if (iface != NULL && cfg != NULL) {
-		return net_if_is_up(iface) && cfg->ip.ipv4;
+		ready = net_if_is_up(iface) && cfg->ip.ipv4;
 	}
 #endif /* CONFIG_DNS_RESOLVER */
-	return false;
+	return ready;
 }
 
 struct lte_status *lteGetStatus(void)
