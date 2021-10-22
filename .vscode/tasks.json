@@ -207,13 +207,7 @@
       "type": "pickString",
       "options": [
         "apps/lte_console",
-        "apps/aws_connect",
-        "apps/coap_dtls",
-        "apps/edrx_tcp_server_reply"
-        "apps/http_get",
         "apps/low_power",
-        "apps/tcp_echo_client",
-        "apps/udp_echo_client",
       ]
     },
     {
