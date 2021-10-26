@@ -199,15 +199,27 @@ static void led_configure_pin(enum led_index index, uint32_t pin)
 
 static void bsp_led_init(void)
 {
-	led_bind_device(BLUE_LED1, LED1_DEV);
-	led_bind_device(GREEN_LED2, LED2_DEV);
-	led_bind_device(RED_LED3, LED3_DEV);
-	led_bind_device(GREEN_LED4, LED4_DEV);
+#if defined(CONFIG_BOARD_PINNACLE_100_DVK)
+	led_bind_device(BLUE_LED, LED1_DEV);
+	led_bind_device(GREEN_LED, LED2_DEV);
+	led_bind_device(RED_LED, LED3_DEV);
+	led_bind_device(GREEN_LED2, LED4_DEV);
 
-	led_configure_pin(BLUE_LED1, LED1);
-	led_configure_pin(GREEN_LED2, LED2);
-	led_configure_pin(RED_LED3, LED3);
-	led_configure_pin(GREEN_LED4, LED4);
+	led_configure_pin(BLUE_LED, LED1);
+	led_configure_pin(GREEN_LED, LED2);
+	led_configure_pin(RED_LED, LED3);
+	led_configure_pin(GREEN_LED2, LED4);
+#elif defined(CONFIG_BOARD_MG100)
+	led_bind_device(BLUE_LED, LED2_DEV);
+	led_bind_device(GREEN_LED, LED3_DEV);
+	led_bind_device(RED_LED, LED1_DEV);
+
+	led_configure_pin(BLUE_LED, LED2);
+	led_configure_pin(GREEN_LED, LED3);
+	led_configure_pin(RED_LED, LED1);
+#else
+#error "Unsupported board"
+#endif
 }
 
 static void system_workq_led_timer_handler(struct k_work *item)
@@ -250,9 +262,12 @@ static void change_state(struct led *pLed, bool state, bool blink)
 		k_timer_stop(&pLed->timer);
 	} else {
 		if (state == ON) {
-			k_timer_start(&pLed->timer, K_MSEC(pLed->pattern.on_time), K_MSEC(0));
+			k_timer_start(&pLed->timer,
+				      K_MSEC(pLed->pattern.on_time), K_MSEC(0));
 		} else {
-			k_timer_start(&pLed->timer, K_MSEC(pLed->pattern.off_time), K_MSEC(0));
+			k_timer_start(&pLed->timer,
+				      K_MSEC(pLed->pattern.off_time),
+				      K_MSEC(0));
 		}
 	}
 

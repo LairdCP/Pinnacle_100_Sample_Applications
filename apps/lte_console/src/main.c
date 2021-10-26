@@ -22,7 +22,7 @@ LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 #include "led.h"
 #include "lte.h"
 
-#if CONFIG_MCUMGR
+#if CONFIG_LCZ_MCUMGR_WRAPPER
 #include "mcumgr_wrapper.h"
 #endif
 
@@ -235,12 +235,12 @@ void main(void)
 	led_init();
 	lteInit();
 
-#if CONFIG_MCUMGR
+#if CONFIG_LCZ_MCUMGR_WRAPPER
 	mcumgr_wrapper_register_subsystems();
 #endif
 
 	while (1) {
-		led_blink(GREEN_LED2, &heartbeat_pattern);
+		led_blink(GREEN_LED, &heartbeat_pattern);
 
 		k_sleep(HEARTBEAT_INTERVAL);
 	}

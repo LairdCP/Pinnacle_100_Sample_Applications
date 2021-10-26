@@ -12,17 +12,18 @@
 //=============================================================================
 
 enum led_index {
-	BLUE_LED1 = 0,
+	BLUE_LED = 0,
+	GREEN_LED,
+	RED_LED,
+#ifdef CONFIG_BOARD_PINNACLE_100_DVK
 	GREEN_LED2,
-	RED_LED3,
-	GREEN_LED4,
-
+#endif
 	NUMBER_OF_LEDS
 };
 
 /* The on and off times are in system ticks.
- * If the repeat count is 2 the pattern will be displayed 3 
- * times (repeated twice). 
+ * If the repeat count is 2 the pattern will be displayed 3
+ * times (repeated twice).
  */
 struct led_blink_pattern {
 	int32_t on_time;
@@ -39,7 +40,9 @@ struct led_blink_pattern {
 #define LED1_NODE DT_ALIAS(led0)
 #define LED2_NODE DT_ALIAS(led1)
 #define LED3_NODE DT_ALIAS(led2)
+#if defined(CONFIG_BOARD_PINNACLE_100_DVK)
 #define LED4_NODE DT_ALIAS(led3)
+#endif
 
 #define LED1_DEV DT_GPIO_LABEL(LED1_NODE, gpios)
 #define LED1 DT_GPIO_PIN(LED1_NODE, gpios)
@@ -47,9 +50,10 @@ struct led_blink_pattern {
 #define LED2 DT_GPIO_PIN(LED2_NODE, gpios)
 #define LED3_DEV DT_GPIO_LABEL(LED3_NODE, gpios)
 #define LED3 DT_GPIO_PIN(LED3_NODE, gpios)
+#if defined(CONFIG_BOARD_PINNACLE_100_DVK)
 #define LED4_DEV DT_GPIO_LABEL(LED4_NODE, gpios)
 #define LED4 DT_GPIO_PIN(LED4_NODE, gpios)
-
+#endif
 //=============================================================================
 // Global Data Definitions
 //=============================================================================
@@ -60,8 +64,8 @@ struct led_blink_pattern {
 //=============================================================================
 
 /**
- * @brief Init the LEDs for the board.  
- * 
+ * @brief Init the LEDs for the board.
+ *
  * LEDs should be off after completion.
  * Creates mutex used by on/off/blink functions.
  *
@@ -85,14 +89,14 @@ void led_turn_off_isr(enum led_index index);
 /**
  * @param index is a Valid LED
  * @param led_blink_pattern @ref struct led_blink_pattern
- * 
+ *
  * @details
  *  The pattern in copied by the LED driver.
  */
 void led_blink(enum led_index index, struct led_blink_pattern const *pPattern);
 
 /**
- * @param param function Called in system work queue context 
+ * @param param function Called in system work queue context
  * when pattern is complete (use NULL to disable).
  */
 void led_register_pattern_complete_function(enum led_index index,
