@@ -214,11 +214,17 @@ static void modemEventCallback(enum mdm_hl7800_event event, void *event_data)
 
 	case HL7800_EVENT_SLEEP_STATE_CHANGE:
 		switch (code) {
-		case HL7800_SLEEP_STATE_ASLEEP:
+		case HL7800_SLEEP_SLEEP:
 			LTE_LOG_DBG("HL7800 asleep");
 			break;
-		case HL7800_SLEEP_STATE_AWAKE:
+		case HL7800_SLEEP_AWAKE:
 			LTE_LOG_DBG("HL7800 awake!");
+			break;
+		case HL7800_SLEEP_HIBERNATE:
+			LTE_LOG_DBG("HL7800 hibernate!");
+			break;
+		case HL7800_SLEEP_LITE_HIBERNATE:
+			LTE_LOG_DBG("HL7800 lite hibernate!");
 			break;
 		default:
 			break;

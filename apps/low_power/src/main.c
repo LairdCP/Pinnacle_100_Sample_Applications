@@ -6,7 +6,8 @@
 
 #include <stdio.h>
 #include <zephyr.h>
-#include <pm/pm.h>
+#include <pm/device.h>
+#include <pm/device_runtime.h>
 #include <string.h>
 #include <soc.h>
 #include <device.h>
@@ -17,6 +18,8 @@
 #include "led.h"
 #include "lte.h"
 #include "http_get.h"
+
+#define UART_CONSOLE_DEV_NAME "UART_0"
 
 #define RESETREAS_REG (volatile uint32_t *)0x40000400
 static int loop_count = 0;
@@ -138,8 +141,8 @@ static void shutdown_console_uart(void)
 {
 #ifdef CONFIG_SHUTDOWN_CONSOLE_UART
 	const struct device *uart_dev;
-	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_OFF);
+	uart_dev = device_get_binding(UART_CONSOLE_DEV_NAME);
+	int rc = pm_device_runtime_put(uart_dev);
 	if (rc) {
 		printk("Error disabling console UART peripheral (%d)\n", rc);
 	}
@@ -151,8 +154,8 @@ static void startup_console_uart(void)
 #ifdef CONFIG_SHUTDOWN_CONSOLE_UART
 
 	const struct device *uart_dev;
-	uart_dev = device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME);
-	int rc = pm_device_state_set(uart_dev, PM_DEVICE_STATE_ACTIVE);
+	uart_dev = device_get_binding(UART_CONSOLE_DEV_NAME);
+	int rc = pm_device_runtime_get(uart_dev);
 	if (rc) {
 		printk("Error enabling console UART peripheral (%d)\n", rc);
 	}
@@ -210,7 +213,8 @@ void main(void)
 		uart_console_logging_enable();
 #endif
 #ifdef CONFIG_MODEM_HL7800
-#ifdef CONFIG_MODEM_HL7800_PSM
+#if !defined(CONFIG_MODEM_HL7800_SLEEP_LEVEL_SLEEP) ||                         \
+	defined(CONFIG_MODEM_HL7800_PSM)
 		http_keep_alive = false;
 #else
 		if (loop_count % 3 == 0) {
