@@ -7,44 +7,18 @@
       "path": "../Pinnacle_100_Sample_Applications_manifest"
     },
     {
-      "path": "../zephyr"
-    },
-    {
-      "path": "../modules/zephyr_lib"
-    },
-    {
-      "path": "../bootloader/mcuboot"
-    },
-    {
-      "path": "../nrfxlib"
+      "path": "../modules/lib/laird_connect"
     },
     {
       "path": "../nrf"
+    },
+    {
+      "path": "../zephyr"
     }
   ],
   "settings": {
     "files.associations": {
-      "printk.h": "c",
-      "toolchain.h": "c",
-      "zephyr.h": "c",
-      "kernel.h": "c",
-      "sched_priq.h": "c",
-      "rb.h": "c",
-      "types.h": "c",
-      "bluetooth.h": "c",
-      "stddef.h": "c",
-      "initializer_list": "c",
-      "type_traits": "c",
-      "xutility": "c",
-      "device.h": "c",
-      "modem_receiver.h": "c",
-      "hl7800.h": "c",
-      "buf.h": "c",
-      "led_strip.h": "c",
-      "oob_ble.h": "c",
-      "byteorder.h": "c",
-      "ios": "c",
-      "lte.h": "c"
+      "*.h": "c",
     }
   }
 }
