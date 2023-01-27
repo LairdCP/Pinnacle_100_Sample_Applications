@@ -1,53 +1,47 @@
 /*
- * Copyright (c) 2020 Laird Connectivity
+ * Copyright (c) 2020-2023 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/******************************************************************************/
-/* Includes                                                                   */
-/******************************************************************************/
-#include <logging/log.h>
+/**************************************************************************************************/
+/* Includes                                                                                       */
+/**************************************************************************************************/
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 
-#include <zephyr.h>
 #include <stdlib.h>
-#include <version.h>
-#include <drivers/gpio.h>
-#include <shell/shell.h>
-#include <shell/shell_uart.h>
+
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/shell/shell.h>
+#include <zephyr/shell/shell_uart.h>
+#include <zephyr/zephyr.h>
 #ifdef CONFIG_MODEM_HL7800
-#include <drivers/modem/hl7800.h>
+#include <zephyr/drivers/modem/hl7800.h>
 #endif
+
 #include "led.h"
-#include "lte.h"
+#include "version.h"
 
-#if CONFIG_LCZ_MCUMGR_WRAPPER
-#include "mcumgr_wrapper.h"
-#endif
-
-/******************************************************************************/
-/* Global Constants, Macros and Type Definitions                              */
-/******************************************************************************/
+/**************************************************************************************************/
+/* Local Constant, Macro and Type Definitions                                                     */
+/**************************************************************************************************/
 
 #define HEARTBEAT_INTERVAL K_SECONDS(2)
-#define APN_MSG "APN: [%s]"
+#define APN_MSG		   "APN: [%s]"
 
-/******************************************************************************/
-/* Global Data Definitions                                                    */
-/******************************************************************************/
-extern struct mdm_hl7800_apn *lte_apn_config;
+/**************************************************************************************************/
+/* Local Data Definitions                                                                         */
+/**************************************************************************************************/
+static struct mdm_hl7800_apn *lte_apn_config;
+static struct mdm_hl7800_callback_agent hl7800_evt_agent;
 
-/******************************************************************************/
-/* Local Data Definitions                                                     */
-/******************************************************************************/
-struct led_blink_pattern heartbeat_pattern = { .on_time = 30,
-					       .off_time = 75,
-					       .repeat_count = 2 };
+static struct lcz_led_blink_pattern heartbeat_pattern = {
+	.on_time = 30, .off_time = 75, .repeat_count = 2};
 
-/******************************************************************************/
-/* Local Function Definitions                                                 */
-/******************************************************************************/
+/**************************************************************************************************/
+/* Local Function Definitions                                                                     */
+/**************************************************************************************************/
 
 #ifdef CONFIG_MODEM_HL7800
 
@@ -83,8 +77,7 @@ done:
 	return rc;
 }
 
-static int shell_hl_iccid_cmd(const struct shell *shell, size_t argc,
-			      char **argv)
+static int shell_hl_iccid_cmd(const struct shell *shell, size_t argc, char **argv)
 {
 	int rc = 0;
 
@@ -93,8 +86,7 @@ static int shell_hl_iccid_cmd(const struct shell *shell, size_t argc,
 	return rc;
 }
 
-static int shell_hl_imei_cmd(const struct shell *shell, size_t argc,
-			     char **argv)
+static int shell_hl_imei_cmd(const struct shell *shell, size_t argc, char **argv)
 {
 	int rc = 0;
 
@@ -129,8 +121,7 @@ static int hl7800_wake(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-static int shell_hl_send_at_cmd(const struct shell *shell, size_t argc,
-				char **argv)
+static int shell_hl_send_at_cmd(const struct shell *shell, size_t argc, char **argv)
 {
 	int rc = 0;
 
@@ -185,22 +176,31 @@ static int shell_hl_ver_cmd(const struct shell *shell, size_t argc, char **argv)
 	return rc;
 }
 
-static int shell_hl_site_survey_cmd(const struct shell *shell, size_t argc,
-				    char **argv)
+static int shell_hl_site_survey_cmd(const struct shell *shell, size_t argc, char **argv)
 {
 	int rc = 0;
 
-	shell_print(shell, "survey status: %d",
-		    mdm_hl7800_perform_site_survey());
+	shell_print(shell, "survey status: %d", mdm_hl7800_perform_site_survey());
 
 	/* Results are printed to shell by lte.site_survey_handler() */
 
 	return rc;
 }
 
-/******************************************************************************/
-/* Global Function Definitions                                                */
-/******************************************************************************/
+static void hl7800_event_callback(enum mdm_hl7800_event event, void *event_data)
+{
+	switch (event) {
+	case HL7800_EVENT_APN_UPDATE:
+		lte_apn_config = (struct mdm_hl7800_apn *)event_data;
+		break;
+	default:
+		break;
+	}
+}
+
+/**************************************************************************************************/
+/* Global Function Definitions                                                                    */
+/**************************************************************************************************/
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	hl_cmds, SHELL_CMD(apn, NULL, "HL7800 APN", shell_hl_apn_cmd),
@@ -209,8 +209,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 		      "hl cmd <at command>",
 		      shell_hl_send_at_cmd, 2, 0),
 #ifdef CONFIG_MODEM_HL7800_FW_UPDATE
-	SHELL_CMD_ARG(fup, NULL, "Update HL7800 firmware", shell_hl_fup_cmd, 2,
-		      0),
+	SHELL_CMD_ARG(fup, NULL, "Update HL7800 firmware", shell_hl_fup_cmd, 2, 0),
 #endif
 	SHELL_CMD(iccid, NULL, "HL7800 SIM card ICCID", shell_hl_iccid_cmd),
 	SHELL_CMD(imei, NULL, "HL7800 IMEI", shell_hl_imei_cmd),
@@ -232,15 +231,15 @@ void main(void)
 		"Branch: %s\r\n"
 		"Commit: %s\r\n",
 		APP_MAJOR, APP_MINOR, APP_PATCH, GIT_BRANCH, GIT_COMMIT_HASH);
-	led_init();
-	lteInit();
 
-#if CONFIG_LCZ_MCUMGR_WRAPPER
-	mcumgr_wrapper_register_subsystems();
+#ifdef CONFIG_MODEM_HL7800
+	hl7800_evt_agent.event_callback = hl7800_event_callback;
+	mdm_hl7800_register_event_callback(&hl7800_evt_agent);
+	mdm_hl7800_generate_status_events();
 #endif
 
 	while (1) {
-		led_blink(GREEN_LED, &heartbeat_pattern);
+		lcz_led_blink(GREEN_LED, &heartbeat_pattern, true);
 
 		k_sleep(HEARTBEAT_INTERVAL);
 	}
