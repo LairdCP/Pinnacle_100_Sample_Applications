@@ -6,9 +6,13 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(pinnacle100_power_mgmt)
 
-FILE(GLOB app_sources src/*.c)
 target_sources(app PRIVATE
-    ${app_sources}
+    src/main.c
     ${CMAKE_SOURCE_DIR}/../../common/src/led.c)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/../../common/include)
+
+if(CONFIG_NETWORKING)
+    target_sources(app PRIVATE
+        src/http_get.c)
+endif()

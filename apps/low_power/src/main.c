@@ -24,16 +24,16 @@
 
 #define RESETREAS_REG (volatile uint32_t *)0x40000400
 static int loop_count = 0;
-static bool http_keep_alive = true;
 
 #ifdef CONFIG_MODEM_HL7800
+static bool http_keep_alive = true;
 static struct lcz_nm_event_agent nm_event_agent;
 K_SEM_DEFINE(lte_event_sem, 0, 1);
 
 #else
-#include <zephyr/gpio.h>
-#include <zephyr/uart.h>
-#define GPIO0_DEV     = "GPIO_0"
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/uart.h>
+#define GPIO0_DEV     "GPIO_0"
 #define MDM_RESET_DEV "GPIO_1"
 #define MDM_RESET_PIN 15
 #define MDM_TX_PIN    14
@@ -42,22 +42,32 @@ K_SEM_DEFINE(lte_event_sem, 0, 1);
 static void shutdown_uart1(void)
 {
 #ifdef CONFIG_UART_1_NRF_UARTE
-	struct device *uart_dev;
-	uart_dev = device_get_binding("UART_1");
+	const struct device *uart_dev;
+	enum pm_device_state state;
+	int rc;
 
-	int rc = device_set_power_state(uart_dev, DEVICE_PM_OFF_STATE, NULL, NULL);
-	if (rc) {
-		printk("Error disabling UART1 peripheral (%d)\n", rc);
+	uart_dev = device_get_binding("UART_1");
+	if (uart_dev == NULL) {
+		printk("No device UART_1\n");
+		return;
 	}
 
-	struct device *gpio = device_get_binding(GPIO0_DEV);
+	(void)pm_device_state_get(uart_dev, &state);
+	if (state != PM_DEVICE_STATE_SUSPENDED) {
+		rc = pm_device_action_run(uart_dev, PM_DEVICE_ACTION_SUSPEND);
+		if (rc) {
+			printk("Error disabling UART1 peripheral (%d)\n", rc);
+		}
+	}
+
+	const struct device *gpio = device_get_binding(GPIO0_DEV);
 	/* RTS */
-	rc = gpio_pin_configure(gpio, MDM_RTS_PIN, (GPIO_DIR_IN));
+	rc = gpio_pin_configure(gpio, MDM_RTS_PIN, (GPIO_INPUT));
 	if (rc) {
 		printk("Error configuring GPIO\n");
 	}
 	/* TX */
-	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_DIR_IN));
+	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_INPUT));
 	if (rc) {
 		printk("Error configuring GPIO\n");
 	}
@@ -173,6 +183,7 @@ static void startup_console_uart(void)
 #endif
 }
 
+#if defined(CONFIG_NETWORKING)
 static void nm_event_callback(enum lcz_nm_event event)
 {
 	printk("Network monitor event %d\n", event);
@@ -185,6 +196,7 @@ static void nm_event_callback(enum lcz_nm_event event)
 		break;
 	}
 }
+#endif
 
 /* Application main Thread */
 void main(void)
@@ -218,13 +230,13 @@ void main(void)
 
 #else
 	shutdown_uart1();
-	struct device *reset_gpio = device_get_binding(MDM_RESET_DEV);
-	ret = gpio_pin_configure(reset_gpio, MDM_RESET_PIN, GPIO_DIR_OUT);
+	const struct device *reset_gpio = device_get_binding(MDM_RESET_DEV);
+	ret = gpio_pin_configure(reset_gpio, MDM_RESET_PIN, GPIO_OUTPUT);
 	if (ret) {
 		printk("Error configuring GPIO\n");
 	}
 	/* hold modem in reset */
-	ret = gpio_pin_write(reset_gpio, MDM_RESET_PIN, 0);
+	ret = gpio_pin_set_raw(reset_gpio, MDM_RESET_PIN, 0);
 	if (ret) {
 		printk("Error setting GPIO state\n");
 	}
@@ -259,9 +271,9 @@ void main(void)
 		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
 	}
 #ifdef CONFIG_MODEM_HL7800
-
-#endif /* CONFIG_MODEM_HL7800 */
 exit:
+#endif /* CONFIG_MODEM_HL7800 */
 	printk("Exiting main()\n");
+	shutdown_console_uart();
 	return;
 }

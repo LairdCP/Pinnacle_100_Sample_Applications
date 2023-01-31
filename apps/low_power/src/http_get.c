@@ -8,8 +8,8 @@
 
 #include <stdio.h>
 
-#include <zephyr/errno.h>
-#include <zephyr/fcntl.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <zephyr/kernel.h>
 #include <zephyr/net/socket.h>
 
