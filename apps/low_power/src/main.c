@@ -98,16 +98,6 @@ static void shutdown_uart1(void)
 #endif /* CONFIG_MODEM_HL7800 */
 
 #ifdef CONFIG_LOG
-/** @brief Finds the logging subsystem backend pointer for UART.
- *
- *  @returns A pointer to the UART backend, NULL if not found.
- */
-static const struct log_backend *log_find_uart_backend(void)
-{
-	const struct log_backend *backend;
-	const struct log_backend *uart_backend = NULL;
-	uint32_t backend_idx;
-	bool null_backend_found = false;
 #if defined(CONFIG_SHELL_BACKEND_SERIAL)
 #define BACKEND_NAME "shell_uart_backend"
 #elif defined(CONFIG_LOG_BACKEND_UART)
@@ -116,8 +106,21 @@ static const struct log_backend *log_find_uart_backend(void)
 #error "Unhandled backend"
 #endif
 
-	for (backend_idx = 0; (uart_backend == NULL) && (null_backend_found == false);
-	     backend_idx++) {
+static const struct log_backend *uart_backend;
+
+/** @brief Finds the logging subsystem backend pointer for UART.
+ *
+ *  @returns 0 for success, < 0 if not found.
+ */
+static int log_find_uart_backend(void)
+{
+	int ret = -ENOENT;
+	const struct log_backend *backend;
+	uint32_t backend_idx;
+
+
+	uart_backend = NULL;
+	for (backend_idx = 0; (uart_backend == NULL); backend_idx++) {
 		/* Get the next backend */
 		backend = log_backend_get(backend_idx);
 		/* If it's NULL, stop here */
@@ -126,12 +129,14 @@ static const struct log_backend *log_find_uart_backend(void)
 			if (!strcmp(backend->name, BACKEND_NAME)) {
 				/* Found it */
 				uart_backend = backend;
+				ret = 0;
+				break;
 			}
 		} else {
-			null_backend_found = true;
+			break;
 		}
 	}
-	return (uart_backend);
+	return ret;
 }
 
 /** @brief Disables the logging subsystem backend UART.
@@ -139,11 +144,8 @@ static const struct log_backend *log_find_uart_backend(void)
  */
 static void uart_console_logging_disable(void)
 {
-	const struct log_backend *uart_backend;
-
-	uart_backend = log_find_uart_backend();
 	if (uart_backend != NULL) {
-		log_backend_disable(uart_backend);
+		log_backend_deactivate(uart_backend);
 	}
 }
 
@@ -152,11 +154,8 @@ static void uart_console_logging_disable(void)
  */
 static void uart_console_logging_enable(void)
 {
-	const struct log_backend *uart_backend;
-
-	uart_backend = log_find_uart_backend();
 	if (uart_backend != NULL) {
-		log_backend_enable(uart_backend, uart_backend->cb->ctx, CONFIG_LOG_MAX_LEVEL);
+		log_backend_activate(uart_backend, uart_backend->cb->ctx);
 	}
 }
 #endif
@@ -231,6 +230,13 @@ void main(void)
 	/* Read the reset reason register */
 	uint32_t resetReas = *RESETREAS_REG;
 	printk("Reset reason: 0x%08X\n", resetReas);
+
+#if defined(CONFIG_LOG)
+	ret = log_find_uart_backend();
+	if (ret != 0) {
+		printk("ERROR: Could not find log backend!\n");
+	}
+#endif
 
 	ret = pm_device_runtime_enable(qspi_flash);
 	if (ret != 0) {
