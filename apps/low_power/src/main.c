@@ -24,11 +24,12 @@
 
 #define RESETREAS_REG (volatile uint32_t *)0x40000400
 static int loop_count = 0;
+static const struct device *qspi_flash = DEVICE_DT_GET(DT_NODELABEL(mx25r64));
 
 #ifdef CONFIG_MODEM_HL7800
 static bool http_keep_alive = true;
 static struct lcz_nm_event_agent nm_event_agent;
-K_SEM_DEFINE(lte_event_sem, 0, 1);
+static K_SEM_DEFINE(lte_event_sem, 0, 1);
 
 static int start_and_ready_modem(void)
 {
@@ -231,8 +232,12 @@ void main(void)
 	uint32_t resetReas = *RESETREAS_REG;
 	printk("Reset reason: 0x%08X\n", resetReas);
 
-#ifdef CONFIG_MODEM_HL7800
+	ret = pm_device_runtime_enable(qspi_flash);
+	if (ret != 0) {
+		printk("ERROR: Could not enable QSPI flash runtime PM [%d]\n", ret);
+	}
 
+#ifdef CONFIG_MODEM_HL7800
 	nm_event_agent.callback = nm_event_callback;
 	lcz_nm_register_event_callback(&nm_event_agent);
 
@@ -240,7 +245,6 @@ void main(void)
 	if (ret != 0) {
 		goto exit;
 	}
-
 #else
 	shutdown_uart1();
 	const struct device *reset_gpio = device_get_binding(MDM_RESET_DEV);
