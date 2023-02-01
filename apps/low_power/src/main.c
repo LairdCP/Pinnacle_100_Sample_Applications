@@ -30,6 +30,27 @@ static bool http_keep_alive = true;
 static struct lcz_nm_event_agent nm_event_agent;
 K_SEM_DEFINE(lte_event_sem, 0, 1);
 
+static int start_and_ready_modem(void)
+{
+	int ret;
+
+	printk("Starting modem...\n");
+	ret = mdm_hl7800_reset();
+	if (ret != 0) {
+		printk("Error starting modem [%d]\n", ret);
+		return ret;
+	} else {
+		printk("Modem started!\n");
+	}
+
+	while (!lcz_nm_network_ready() || ret != 0) {
+		printk("Waiting for LTE to be ready...\n");
+		ret = k_sem_take(&lte_event_sem, K_SECONDS(5));
+	}
+
+	return ret;
+}
+
 #else
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/uart.h>
@@ -192,6 +213,7 @@ static void nm_event_callback(enum lcz_nm_event event)
 		k_sem_give(&lte_event_sem);
 		break;
 	case LCZ_NM_EVENT_IFACE_DOWN:
+		k_sem_reset(&lte_event_sem);
 	default:
 		break;
 	}
@@ -214,18 +236,9 @@ void main(void)
 	nm_event_agent.callback = nm_event_callback;
 	lcz_nm_register_event_callback(&nm_event_agent);
 
-	printk("Starting modem...\n");
-	ret = mdm_hl7800_reset();
+	ret = start_and_ready_modem();
 	if (ret != 0) {
-		printk("Error starting modem [%d]\n", ret);
 		goto exit;
-	} else {
-		printk("Modem started!\n");
-	}
-
-	while (!lcz_nm_network_ready() || ret != 0) {
-		printk("Waiting for LTE to be ready...\n");
-		ret = k_sem_take(&lte_event_sem, K_SECONDS(5));
 	}
 
 #else
@@ -250,18 +263,35 @@ void main(void)
 		uart_console_logging_enable();
 #endif
 #ifdef CONFIG_MODEM_HL7800
-#if !defined(CONFIG_MODEM_HL7800_SLEEP_LEVEL_SLEEP) || defined(CONFIG_MODEM_HL7800_PSM)
+#if !defined(CONFIG_MODEM_HL7800_SLEEP_LEVEL_SLEEP) || defined(CONFIG_MODEM_HL7800_PSM) ||         \
+	defined(CONFIG_POWER_OFF_MODEM)
 		http_keep_alive = false;
 #else
 		if (loop_count % 3 == 0) {
 			http_keep_alive = !http_keep_alive;
 		}
 #endif
-		http_get_execute(http_keep_alive);
+#if defined(CONFIG_POWER_OFF_MODEM)
+		if (loop_count != 1) {
+			ret = start_and_ready_modem();
+		}
+#endif
+		if (ret == 0) {
+			http_get_execute(http_keep_alive);
+		}
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
 		printk("App busy waiting for %d seconds\n", BUSY_WAIT_TIME_SECONDS);
 		k_busy_wait(BUSY_WAIT_TIME);
+#endif
+#if defined(CONFIG_POWER_OFF_MODEM)
+		printk("Power off modem...\n");
+		ret = mdm_hl7800_power_off();
+		if (ret == 0) {
+			printk("Modem off\n");
+		} else {
+			printk("Err turning modem off [%d]\n", ret);
+		}
 #endif
 		printk("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
 #if defined(CONFIG_LOG) && defined(CONFIG_SHUTDOWN_CONSOLE_UART)
