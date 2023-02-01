@@ -7,7 +7,7 @@ The LTE Console application implements a terminal interface that allows interact
 HL7800 related commands start with the `hl` command via the UART console. Typing `hl` and then pressing `tab` will show available commands.
 
 Note that this application is intended to demonstrate the functionality of the modem driver. Should an AT interface be required for a production
-design, it is recommended to utilise the [Hosted Mode Firmware](https://www.lairdconnect.com/documentation/480-00079-pinnacle-100-hosted-mode-firmware-version-1-build-19).
+design, it is recommended to utilize the [Hosted Mode Firmware](https://www.lairdconnect.com/documentation/480-00079-pinnacle-100-hosted-mode-firmware-version-1-build-19).
 
 ## Configuration Options
 
@@ -24,5 +24,5 @@ From the directory where the `west init` and `west update` commands were issued,
 are used to build the application.
 
 ```
-west build -b pinnacle_100_dvk -d Pinnacle_100_Sample_Applications/build/apps/lte_console Pinnacle_100_Sample_Applications/apps/lte_console
+west build -p auto -b pinnacle_100_dvk -d Pinnacle_100_Sample_Applications/build/apps/lte_console Pinnacle_100_Sample_Applications/apps/lte_console
 ```

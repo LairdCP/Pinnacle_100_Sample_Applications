@@ -15,7 +15,7 @@ From the directory where you issued the `west init` and `west update` commands y
 ## Build `lte_console` app
 
 ```
-west build -b pinnacle_100_dvk -d Pinnacle_100_Sample_Applications/apps/lte_console/build Pinnacle_100_Sample_Applications/apps/lte_console
+west build -p auto -b pinnacle_100_dvk -d Pinnacle_100_Sample_Applications/apps/lte_console/build Pinnacle_100_Sample_Applications/apps/lte_console
 ```
 
 # Sample Applications
