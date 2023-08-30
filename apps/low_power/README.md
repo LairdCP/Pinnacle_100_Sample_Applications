@@ -12,8 +12,6 @@ This behavior is repeated forever.
 Every 3rd loop, the app switches between keeping the HTTP connection alive and closing it after each request.
 This demonstrates it is possible to keep a TCP connection open while using eDRX. It is only possible to maintain a TCP connection with eDRX and sleep mode. eDRX with lite hibernate or hibernate cannot maintain a TCP connection. PSM with any sleep mode cannot maintain a TCP connection.
 
-The .sal files in the [docs](./docs) folder can be opened with the [Saleae v2.x Logic software](https://www.saleae.com/downloads/). The logic traces show relevant signals between the nRF52840 and the HL7800 when running this demo in eDRX and PSM modes.
-
 ## Configuration Options
 
 The URL and associated port of the server to process the HTTP GET request is defined by `HTTP_HOST` and `HTTP_PORT` in
