@@ -9,8 +9,8 @@
 #include <zephyr/logging/log_ctrl.h>
 #include <zephyr/pm/device.h>
 #include <zephyr/pm/device_runtime.h>
-#include <zephyr/zephyr.h>
-
+#include <zephyr/kernel.h>
+#include <stdio.h>
 #include <soc.h>
 #if defined(CONFIG_LCZ_NETWORK_MONITOR)
 #include <lcz_network_monitor.h>
@@ -35,19 +35,19 @@ static int start_and_ready_modem(void)
 {
 	int ret;
 
-	printk("Starting modem...\n");
+	printf("Starting modem...\n");
 	ret = mdm_hl7800_reset();
 	if (ret != 0) {
-		printk("Error starting modem [%d]\n", ret);
+		printf("Error starting modem [%d]\n", ret);
 		return ret;
 	} else {
-		printk("Modem started!\n");
+		printf("Modem started!\n");
 	}
 
-	while (!lcz_nm_network_ready() || ret != 0) {
-		printk("Waiting for LTE to be ready...\n");
-		ret = k_sem_take(&lte_event_sem, K_SECONDS(5));
-	}
+	do {
+		printf("Waiting for LTE to be ready...\n");
+		ret = k_sem_take(&lte_event_sem, K_SECONDS(30));
+	} while (ret != 0);
 
 	return ret;
 }
@@ -70,7 +70,7 @@ static void shutdown_uart1(void)
 
 	uart_dev = device_get_binding("UART_1");
 	if (uart_dev == NULL) {
-		printk("No device UART_1\n");
+		printf("No device UART_1\n");
 		return;
 	}
 
@@ -78,7 +78,7 @@ static void shutdown_uart1(void)
 	if (state != PM_DEVICE_STATE_SUSPENDED) {
 		rc = pm_device_action_run(uart_dev, PM_DEVICE_ACTION_SUSPEND);
 		if (rc) {
-			printk("Error disabling UART1 peripheral (%d)\n", rc);
+			printf("Error disabling UART1 peripheral (%d)\n", rc);
 		}
 	}
 
@@ -86,18 +86,18 @@ static void shutdown_uart1(void)
 	/* RTS */
 	rc = gpio_pin_configure(gpio, MDM_RTS_PIN, (GPIO_INPUT));
 	if (rc) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 	/* TX */
 	rc = gpio_pin_configure(gpio, MDM_TX_PIN, (GPIO_INPUT));
 	if (rc) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 #endif
 }
 #endif /* CONFIG_MODEM_HL7800 */
 
-#ifdef CONFIG_LOG
+#if defined(CONFIG_LOG)
 #if defined(CONFIG_SHELL_BACKEND_SERIAL)
 #define BACKEND_NAME "shell_uart_backend"
 #elif defined(CONFIG_LOG_BACKEND_UART)
@@ -139,6 +139,7 @@ static int log_find_uart_backend(void)
 	return ret;
 }
 
+#if defined(CONFIG_SHUTDOWN_CONSOLE_UART)
 /** @brief Disables the logging subsystem backend UART.
  *
  */
@@ -159,6 +160,7 @@ static void uart_console_logging_enable(void)
 	}
 }
 #endif
+#endif
 
 static void shutdown_console_uart(void)
 {
@@ -169,14 +171,14 @@ static void shutdown_console_uart(void)
 
 	uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	if (uart_dev == NULL) {
-		printk("No console UART device!\n");
+		printf("No console UART device!\n");
 		return;
 	}
 	(void)pm_device_state_get(uart_dev, &state);
 	if (state != PM_DEVICE_STATE_SUSPENDED) {
 		rc = pm_device_action_run(uart_dev, PM_DEVICE_ACTION_SUSPEND);
 		if (rc) {
-			printk("Error disabling console UART peripheral (%d)\n", rc);
+			printf("Error disabling console UART peripheral (%d)\n", rc);
 		}
 	}
 #endif
@@ -191,14 +193,14 @@ static void startup_console_uart(void)
 
 	uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	if (uart_dev == NULL) {
-		printk("No console UART device!\n");
+		printf("No console UART device!\n");
 		return;
 	}
 	(void)pm_device_state_get(uart_dev, &state);
 	if (state != PM_DEVICE_STATE_ACTIVE) {
 		rc = pm_device_action_run(uart_dev, PM_DEVICE_ACTION_RESUME);
 		if (rc) {
-			printk("Error enabling console UART peripheral (%d)\n", rc);
+			printf("Error enabling console UART peripheral (%d)\n", rc);
 		}
 	}
 #endif
@@ -207,7 +209,7 @@ static void startup_console_uart(void)
 #if defined(CONFIG_NETWORKING)
 static void nm_event_callback(enum lcz_nm_event event)
 {
-	printk("Network monitor event %d\n", event);
+	printf("Network monitor event %d\n", event);
 	switch (event) {
 	case LCZ_NM_EVENT_IFACE_DNS_ADDED:
 		k_sem_give(&lte_event_sem);
@@ -221,26 +223,27 @@ static void nm_event_callback(enum lcz_nm_event event)
 #endif
 
 /* Application main Thread */
-void main(void)
+int main(void)
 {
 	int ret = 0;
+	int sleep_seconds = SLEEP_TIME_SECONDS;
 
-	printk("\n\n*** Power Management Demo on %s ***\n", CONFIG_BOARD);
+	printf("\n\n*** Power Management Demo on %s ***\n", CONFIG_BOARD);
 
 	/* Read the reset reason register */
 	uint32_t resetReas = *RESETREAS_REG;
-	printk("Reset reason: 0x%08X\n", resetReas);
+	printf("Reset reason: 0x%08X\n", resetReas);
 
 #if defined(CONFIG_LOG)
 	ret = log_find_uart_backend();
 	if (ret != 0) {
-		printk("ERROR: Could not find log backend!\n");
+		printf("ERROR: Could not find log backend!\n");
 	}
 #endif
 
 	ret = pm_device_runtime_enable(qspi_flash);
 	if (ret != 0) {
-		printk("ERROR: Could not enable QSPI flash runtime PM [%d]\n", ret);
+		printf("ERROR: Could not enable QSPI flash runtime PM [%d]\n", ret);
 	}
 
 #ifdef CONFIG_MODEM_HL7800
@@ -256,12 +259,12 @@ void main(void)
 	const struct device *reset_gpio = device_get_binding(MDM_RESET_DEV);
 	ret = gpio_pin_configure(reset_gpio, MDM_RESET_PIN, GPIO_OUTPUT);
 	if (ret) {
-		printk("Error configuring GPIO\n");
+		printf("Error configuring GPIO\n");
 	}
 	/* hold modem in reset */
 	ret = gpio_pin_set_raw(reset_gpio, MDM_RESET_PIN, 0);
 	if (ret) {
-		printk("Error setting GPIO state\n");
+		printf("Error setting GPIO state\n");
 	}
 
 #endif /* CONFIG_MODEM_HL7800 */
@@ -291,29 +294,35 @@ void main(void)
 		}
 #endif /* CONFIG_MODEM_HL7800 */
 #ifndef CONFIG_MODEM_HL7800
-		printk("App busy waiting for %d seconds\n", BUSY_WAIT_TIME_SECONDS);
+		printf("App busy waiting for %d seconds\n", BUSY_WAIT_TIME_SECONDS);
 		k_busy_wait(BUSY_WAIT_TIME);
 #endif
 #if defined(CONFIG_POWER_OFF_MODEM)
-		printk("Power off modem...\n");
+		printf("Power off modem...\n");
 		ret = mdm_hl7800_power_off();
 		if (ret == 0) {
-			printk("Modem off\n");
+			printf("Modem off\n");
 		} else {
-			printk("Err turning modem off [%d]\n", ret);
+			printf("Err turning modem off [%d]\n", ret);
 		}
 #endif
-		printk("App sleeping for %d seconds\n", SLEEP_TIME_SECONDS);
+		if (http_keep_alive) {
+			sleep_seconds = SLEEP_TIME_KEEP_ALIVE_SECONDS;
+			printf("Reducing sleep time to keep the socket alive\n");
+		} else {
+			sleep_seconds = SLEEP_TIME_SECONDS;
+		}
+		printf("App sleeping for %d seconds\n", sleep_seconds);
 #if defined(CONFIG_LOG) && defined(CONFIG_SHUTDOWN_CONSOLE_UART)
 		uart_console_logging_disable();
 #endif
 		shutdown_console_uart();
-		k_sleep(K_SECONDS(SLEEP_TIME_SECONDS));
+		k_sleep(K_SECONDS(sleep_seconds));
 	}
 #ifdef CONFIG_MODEM_HL7800
 exit:
 #endif /* CONFIG_MODEM_HL7800 */
-	printk("Exiting main()\n");
+	printf("Exiting main()\n");
 	shutdown_console_uart();
-	return;
+	return -1;
 }

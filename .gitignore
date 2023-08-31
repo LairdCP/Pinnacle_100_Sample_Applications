@@ -12,3 +12,5 @@ tools/
 *pm_static*.yml
 
 boards/
+
+.vscode/settings.json

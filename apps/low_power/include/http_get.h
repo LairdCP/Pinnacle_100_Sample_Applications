@@ -7,7 +7,7 @@
 #ifndef HTTP_GET_H
 #define HTTP_GET_H
 
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 int http_get_execute(bool keep_alive);
 

@@ -15,7 +15,7 @@ LOG_MODULE_REGISTER(lte_console, LOG_LEVEL_DBG);
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/shell/shell_uart.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 #ifdef CONFIG_MODEM_HL7800
 #include <zephyr/drivers/modem/hl7800.h>
 #endif
@@ -225,7 +225,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 SHELL_CMD_REGISTER(hl, &hl_cmds, "HL7800 commands", NULL);
 #endif /* CONFIG_MODEM_HL7800 */
 
-void main(void)
+int main(void)
 {
 	LOG_INF("Pinnacle 100 LTE Console %d.%d.%d\r\n"
 		"Branch: %s\r\n"
@@ -243,4 +243,6 @@ void main(void)
 
 		k_sleep(HEARTBEAT_INTERVAL);
 	}
+
+	return -1;
 }

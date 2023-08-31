@@ -5,14 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "cwd": "${workspaceRoot}",
-      "executable": "build/${input:app}/zephyr/zephyr.elf",
+      "cwd": "${workspaceFolder}",
+      "executable": "build/${input:board}/${input:app}/zephyr/zephyr.elf",
       "name": "Debug",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "jlink",
       "device": "nRF52840_xxAA",
-      "interface": "swd"
+      "interface": "swd",
+      "svdFile": "${workspaceFolder}/../modules/hal/nordic/nrfx/mdk/nrf52840.svd"
     }
   ],
   "inputs": [
@@ -23,12 +24,17 @@
       "type": "pickString",
       "options": [
         "apps/lte_console",
-        "apps/low_power",
-        "tests/udp_echo_client",
-        "tests/http_get",
-        "tests/tcp_echo_client",
-        "tests/aws_connect",
-        "tests/coap_dtls"
+        "apps/low_power"
+      ]
+    },
+    {
+      "id": "board",
+      "description": "Select a board",
+      "default": "pinnacle_100_dvk",
+      "type": "pickString",
+      "options": [
+        "pinnacle_100_dvk",
+        "mg100"
       ]
     }
   ]
